@@ -3,6 +3,7 @@
 import datetime
 import math
 from datetime import timedelta
+from scipy.interpolate import interp1d
 
 # current date 2020.06.15
 
@@ -35,38 +36,31 @@ def gen_logistic_curve(t):
 def timedelta_to_range(t1, t2, now):
     curve_zone_start = -6
     curve_zone_end = 6
-    # print("t1 " + str(t1))
-    # print("t2 " + str(t2))
-    # print("now " + str(now))
-
-    # Figure out how 'wide' each range is
-    left_span = t2 - t1
-    # print("left_span " + str(left_span))
-    right_span = curve_zone_end - curve_zone_start
-
-    # Convert the left range into a 0-1 range (float)
-    value_scaled = float(now - t1) / float(left_span)
-
-    # Convert the 0-1 range into a value in the right range.
-    return curve_zone_start + (value_scaled * right_span)
+    polate = interp1d([t1, t2], [curve_zone_start, curve_zone_end])
+    return polate(now)
 
 
 def brightness_to_settings(brightness):
-    max_shutter_speed = 15
-    max_iso = 1600
+    min_shutter_speed = 15
+    max_shutter_speed = 1/8000
+    min_iso = 1600
+    max_iso = 100
     aperture = 2.8
-    # if brightness <
+    shutter_polate = interp1d([0, 1], [min_shutter_speed, max_shutter_speed])
+    iso_polate = interp1d([0, 1], [min_iso, max_iso])
+    return shutter_polate(brightness), iso_polate(brightness)
 
 
-now = datetime.datetime.strptime("2020-06-15T20:00:00", dtFormat)
+now = datetime.datetime.strptime("2020-06-15T23:30:00", dtFormat)
 
 
-for i in range(0, 18):
+for i in range(0, 13):
     t = (now + timedelta(hours=i))
     mapped = timedelta_to_range(astroTwiStartAt.timestamp(), noonAt.timestamp(), t.timestamp())
-    res = gen_logistic_curve(mapped)
-    # print(t.strftime("%Y-%m-%dT%H:%M:%S") + "," + str(res))
-    print(str(res))
+    brightness = gen_logistic_curve(mapped)
+    settings = brightness_to_settings(brightness)
+    print(t.strftime("%Y-%m-%dT%H:%M:%S") + "," + str(brightness) + "," + str(settings[0]) + "," + str(settings[1]))
+    # print(str(res))
 
 
 # for i in range(-6, 6, 1):

@@ -1,1 +1,1 @@
-"# expose-to-the-light" 
+# expose-to-the-light
