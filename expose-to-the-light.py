@@ -1,68 +1,63 @@
 #!/usr/bin/python3
-
 import datetime
-import math
+import time
+import numpy as np
+import gphoto2 as gp
+
 from datetime import timedelta
-from scipy.interpolate import interp1d
+from CurvedSettings import SettingsCurve, SettingsWithTime
 
-# current date 2020.06.15
-
-dtFormat = "%Y-%m-%dT%H:%M:%S"
-sunSetAt = datetime.datetime.strptime("2020-06-15T21:19:00", dtFormat)
-sunRiseAt = datetime.datetime.strptime("2020-06-15T21:19:00", dtFormat)
-astroTwiStartAt = datetime.datetime.strptime("2020-06-15T23:30:00", dtFormat)
-astroTwiEndAt = datetime.datetime.strptime("2020-06-16T02:30:00", dtFormat)
-
-noonAt = datetime.datetime.strptime("2020-06-16T12:00:00", dtFormat)
-
-
-# https://en.wikipedia.org/wiki/Sigmoid_function
-def sigmoid(x):
-    return 1 / (1 + math.pow(math.e, (x * -1)))
-
-
-# https://en.wikipedia.org/wiki/Generalised_logistic_function
-def gen_logistic_curve(t):
-    a = 0
-    b = 0.7
-    k = 1.0
-    q = 0.5
-    v = 0.5
-    m = 0
-    c = 1
-    return a + ((k - a) / (math.pow(c + q * (math.pow(math.e, (b * t) * -1)), (1 / v))))
+settings = np.array([
+    SettingsWithTime(timedelta(minutes=20), 15, 1600),
+    SettingsWithTime(timedelta(minutes=20), 8, 1600),
+    SettingsWithTime(timedelta(minutes=15), 4, 800),
+    SettingsWithTime(timedelta(minutes=10), 2, 800),
+    SettingsWithTime(timedelta(minutes=5), 1, 800),
+    SettingsWithTime(timedelta(minutes=5), 1/2, 400),
+    SettingsWithTime(timedelta(minutes=5), 1/4, 400),
+    SettingsWithTime(timedelta(minutes=5), 1/8, 400),
+    SettingsWithTime(timedelta(minutes=5), 1/15, 400),
+    SettingsWithTime(timedelta(minutes=10), 1/30, 400),
+    SettingsWithTime(timedelta(minutes=10), 1/60, 400),
+    SettingsWithTime(timedelta(minutes=15), 1/125, 400),
+    SettingsWithTime(timedelta(minutes=20), 1/250, 400),
+    SettingsWithTime(timedelta(minutes=20), 1/500, 400),
+    SettingsWithTime(timedelta(minutes=30), 1/1000, 200),
+    SettingsWithTime(timedelta(minutes=30), 1/2000, 200),
+    SettingsWithTime(timedelta(minutes=40), 1/4000, 100),
+    SettingsWithTime(timedelta(minutes=40), 1/8000, 100)
+])
 
 
-def timedelta_to_range(t1, t2, now):
-    curve_zone_start = -6
-    curve_zone_end = 6
-    polate = interp1d([t1, t2], [curve_zone_start, curve_zone_end])
-    return polate(now)
+def main():
+    dt_format = "%Y-%m-%dT%H:%M:%S"
+    darkness_start_changing_at = datetime.datetime.strptime("2020-07-03T18:00:00", dt_format)
+    sc = SettingsCurve(darkness_start_changing_at, np.flip(settings))
+
+    while True:
+        t = datetime.now()
+        ss = sc.calc_setting_for_time(t, 'shutter_speed')
+        iso = sc.calc_setting_for_time(t, 'iso')
+
+        print("Settings[iso: " + str(iso) + ", shutter_speed: " + str(ss) + "]")
+
+        text = camera.get_summary()
+        print('Summary')
+        print('=======')
+        print(str(text))
+
+        time.sleep(1)
 
 
-def brightness_to_settings(brightness):
-    min_shutter_speed = 15
-    max_shutter_speed = 1/8000
-    min_iso = 1600
-    max_iso = 100
-    aperture = 2.8
-    shutter_polate = interp1d([0, 1], [min_shutter_speed, max_shutter_speed])
-    iso_polate = interp1d([0, 1], [min_iso, max_iso])
-    return shutter_polate(brightness), iso_polate(brightness)
+if __name__ == "__main__":
+    try:
+        camera = gp.Camera()
+        camera.init()
+        main(camera)
+    except KeyboardInterrupt:
+        camera.exit()
+        print("Terminating...as you told me...")
+    finally:
+        camera.exit()
+        print("I'm done...terminating...")
 
-
-now = datetime.datetime.strptime("2020-06-15T23:30:00", dtFormat)
-
-
-for i in range(0, 13):
-    t = (now + timedelta(hours=i))
-    mapped = timedelta_to_range(astroTwiStartAt.timestamp(), noonAt.timestamp(), t.timestamp())
-    brightness = gen_logistic_curve(mapped)
-    settings = brightness_to_settings(brightness)
-    print(t.strftime("%Y-%m-%dT%H:%M:%S") + "," + str(brightness) + "," + str(settings[0]) + "," + str(settings[1]))
-    # print(str(res))
-
-
-# for i in range(-6, 6, 1):
-#     # print(str(i) + "," + str(sigmoid(i)) + "," + str(genLogisticCurve(i)))
-#     print(str(gen_logistic_curve(i)))

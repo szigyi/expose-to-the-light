@@ -9,6 +9,10 @@ setup(name='expose-to-the-light',
       license='MIT',
       packages=['ettl'],
       install_requires=[
-          'scipy',
+            'numpy',
+            'pandas',
+            'libgphoto2',
+            'gphoto2',
+            'scipy',
       ],
       zip_safe=False)
