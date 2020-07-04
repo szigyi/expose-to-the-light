@@ -15,7 +15,7 @@ class SettingsCurve:
     def __init__(self, begins_at, settings_with_time):
         self.begins_at = begins_at
         self.settings_with_time = settings_with_time
-        self.df = self.buildSettingsFrame()
+        self.df = self.build_settings_frame()
 
     def ev(self, iso, shutter_speed, aperture):
         ev100 = math.log2(math.pow(aperture, 2) / shutter_speed)

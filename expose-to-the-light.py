@@ -35,7 +35,7 @@ def main():
     sc = SettingsCurve(darkness_start_changing_at, np.flip(settings))
 
     while True:
-        t = datetime.now()
+        t = datetime.datetime.now()
         ss = sc.calc_setting_for_time(t, 'shutter_speed')
         iso = sc.calc_setting_for_time(t, 'iso')
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     try:
         camera = gp.Camera()
         camera.init()
-        main(camera)
+        main()
     except KeyboardInterrupt:
         camera.exit()
         print("Terminating...as you told me...")
