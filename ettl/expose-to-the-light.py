@@ -23,11 +23,16 @@ def configured_camera():
         cfg = camera.get_config()
         capturetarget_cfg = cfg.get_child_by_name('capturetarget')
         capturetarget = capturetarget_cfg.get_value()
-        capturetarget_cfg.set_value('Internal RAM')
+        capturetarget_cfg.set_value('Memory card')
         # camera dependent - 'imageformat' is 'imagequality' on some
         imageformat_cfg = cfg.get_child_by_name('imageformat')
         imageformat = imageformat_cfg.get_value()
         imageformat_cfg.set_value('Small Fine JPEG')
+
+        imageformatsd_cfg = cfg.get_child_by_name('imageformatsd')
+        imageformatsd = imageformatsd_cfg.get_value()
+        imageformatsd_cfg.set_value('Small Fine JPEG')
+
         camera.set_config(cfg)
         # use camera
         yield camera
@@ -96,7 +101,8 @@ def set_camera_config(camera, iso, shutter_speed, aperture):
 
 def main():
     dt_format = "%Y-%m-%dT%H:%M:%S"
-    darkness_start_changing_at = datetime.datetime.strptime("2020-07-04T11:00:00", dt_format)
+    darkness_start_changing_at = datetime.datetime.strptime("2020-07-04T18:00:00", dt_format)
+    interval_seconds = 30
     sc = SettingsCurve(darkness_start_changing_at, sunset_curvature())
 
     count = 0
@@ -111,14 +117,14 @@ def main():
                 shutter_speed = shutter_speed_to_string(ss)
                 iso = sc.calc_setting_for_time(t, 'iso')
 
-                print(datetime.datetime.strftime(t, dt_format) + " [iso: " + str(iso) + ", shutter_speed: " + shutter_speed + " (" + str(ss) + ")]")
+                print(datetime.datetime.strftime(t, dt_format) + " " + str(count) + ". [iso: " + str(iso) + ", shutter_speed: " + shutter_speed + " (" + str(ss) + ")]")
 
                 set_camera_config(camera, iso, shutter_speed, aperture)
 
-                # path = camera.capture(gp.GP_CAPTURE_IMAGE)
+                camera.capture(gp.GP_CAPTURE_IMAGE)
                 count += 1
 
-                time.sleep(1)
+                time.sleep(interval_seconds)
             except KeyboardInterrupt:
                 break
     return 0
