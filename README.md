@@ -36,3 +36,16 @@ In the root folder of this project.
 
 ## Run the app
    * ``
+   
+## Useful docs
+   * http://www.gphoto.org/doc/remote/
+   * https://github.com/jim-easterbrook/python-gphoto2
+   * https://github.com/jim-easterbrook/python-gphoto2/blob/master/examples/time_lapse.py
+   
+## Debugging or for Development
+In order to run python-gphoto2 examples you need to install further dependencies
+
+https://github.com/jim-easterbrook/python-gphoto2/blob/39f392c8793b990cbd2e8f517e0436e012833b92/examples/cam-conf-view-gui.py
+   * `sudo -H pip install tzlocal`
+   * `pip install Pillow`
+   * `pip install PyQt5`

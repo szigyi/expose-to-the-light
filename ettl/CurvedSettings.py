@@ -17,7 +17,8 @@ class SettingsCurve:
         self.settings_with_time = settings_with_time
         self.df = self.build_settings_frame()
 
-    def ev(self, iso, shutter_speed, aperture):
+    @staticmethod
+    def ev(iso, shutter_speed, aperture):
         ev100 = math.log2(math.pow(aperture, 2) / shutter_speed)
         if iso > 100:
             return ev100 + math.log2(iso / 100)
@@ -65,4 +66,3 @@ class SettingsCurve:
         res = self.df.iloc[sortss[:1]][column]
         # print(res)
         return res.iloc[0]
-
