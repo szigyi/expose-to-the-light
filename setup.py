@@ -11,7 +11,7 @@ setup(name='expose-to-the-light',
       install_requires=[
             'numpy',
             'pandas',
-            'libgphoto2',
+            # 'libgphoto2',
             'gphoto2',
             'scipy',
       ],
