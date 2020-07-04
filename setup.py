@@ -7,7 +7,7 @@ setup(name='expose-to-the-light',
       author='Szigyi',
       author_email='szigyi@example.com',
       license='MIT',
-      # packages=['ettl'],
+      packages=['ettl'],
       install_requires=[
             'numpy',
             'pandas',
