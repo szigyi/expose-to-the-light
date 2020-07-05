@@ -14,6 +14,7 @@ from ettl.curvature import sunset_curvature, test_sunset_curvature
 
 
 def main():
+    darkness_start_changing_at = sunset_at - brightness_change_before_sunset_time_delta
     sc = SettingsCurve(darkness_start_changing_at, sunset_curve)
 
     print_plot(sc.ev_curve())
@@ -52,19 +53,21 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser(description='expose-to-the-light arguments')
         parser.add_argument('--test-run', help='test run (default: false)', default=False, action='store_true')
         parser.add_argument('interval', help='interval between two photos taken', type=int)
-        parser.add_argument('darkness_starts', help='datetime when the darkness starts', type=lambda s: datetime.datetime.strptime(s, dt_format))
+        parser.add_argument('sunset_at', help='datetime when the sun sets', type=lambda s: datetime.datetime.strptime(s, dt_format))
         args = parser.parse_args()
+
+        brightness_change_before_sunset_time_delta = datetime.timedelta(hours=3)
 
         if args.test_run:
             capture_image = False
             interval_seconds = 0.5
             sunset_curve = test_sunset_curvature()
-            darkness_start_changing_at = datetime.datetime.now()
+            sunset_at = datetime.datetime.now() + brightness_change_before_sunset_time_delta
         else:
             capture_image = True
             interval_seconds = args.interval
             sunset_curve = sunset_curvature()
-            darkness_start_changing_at = args.darkness_starts
+            sunset_at = args.sunset_at
 
         sys.exit(main())
     except KeyboardInterrupt:

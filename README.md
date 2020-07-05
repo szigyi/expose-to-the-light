@@ -1,5 +1,10 @@
 # expose-to-the-light
 
+## TODO
+- [ ] use sunset and sunrise times to adjust curvature
+- [ ] add http UI to start the app and see logs, curvature plots
+- [ ] consider time of year to adjust length of curvature ??
+
 ## Dependencies
 > order is important. First install system dependencies and then python dependencies!
 Install the actual gphoto2 and other as system dependency
