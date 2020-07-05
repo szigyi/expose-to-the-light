@@ -20,7 +20,7 @@ def print_plot(ev):
 
 def main():
     dt_format = "%Y-%m-%dT%H:%M:%S"
-    darkness_start_changing_at = datetime.datetime.strptime("2020-07-04T18:00:00", dt_format)
+    darkness_start_changing_at = datetime.datetime.strptime("2020-07-05T09:00:00", dt_format)
     sc = SettingsCurve(darkness_start_changing_at, sunset_curvature())
     ev = sc.ev_curve()
     print_plot(ev)

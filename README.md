@@ -39,6 +39,14 @@ In the root folder of this project.
    * ``
 
 ## Errors at the start
+> gphoto2.GPhoto2Error: [-105] Unknown model
+
+Chance is your camera is not connected to the computer
+   * Is it turned on?
+   * Is the USB cable connected?
+   * Is it in PTP mode?
+
+
 kill running gphoto2 processes!
 
 ## Useful docs
