@@ -1,21 +1,22 @@
 #!/usr/bin/python3
 from __future__ import print_function
 
+import argparse
 import sys
 import datetime
 import time
-import gphoto2 as gp
 
-from ettl.CameraControl import configured_camera, empty_event_queue, shutter_speed_to_string, set_camera_config
-from ettl.CurvedSettings import SettingsCurve
-from ettl.Curvature import sunset_curvature
+from ettl.camera_control import configured_camera, empty_event_queue, shutter_speed_to_string, set_camera_config
+from ettl.print_to_terminal import print_plot, print_settings
+from ettl.curved_settings import SettingsCurve
+from ettl.curvature import sunset_curvature, test_sunset_curvature
 
 
 def main():
-    dt_format = "%Y-%m-%dT%H:%M:%S"
-    darkness_start_changing_at = datetime.datetime.strptime("2020-07-05T09:00:00", dt_format)
-    interval_seconds = 30
-    sc = SettingsCurve(darkness_start_changing_at, sunset_curvature())
+    sc = SettingsCurve(darkness_start_changing_at, sunset_curve)
+
+    print_plot(sc.ev_curve())
+    print_settings(sc.df)
 
     count = 0
     with configured_camera() as camera:
@@ -44,6 +45,20 @@ def main():
 
 if __name__ == "__main__":
     try:
+        dt_format = "%Y-%m-%dT%H:%M:%S"
+        parser = argparse.ArgumentParser(description='expose-to-the-light arguments')
+        parser.add_argument('--test-run', help='test run (default: false)', default=False, action='store_true')
+        args = parser.parse_args()
+
+        if args.test_run:
+            interval_seconds = 0.5
+            sunset_curve = test_sunset_curvature()
+            darkness_start_changing_at = datetime.datetime.now()
+        else:
+            interval_seconds = 30
+            sunset_curve = sunset_curvature()
+            darkness_start_changing_at = datetime.datetime.strptime("2020-07-05T12:12:00", dt_format)
+
         sys.exit(main())
     except KeyboardInterrupt:
         print("Terminating...as you told me...")

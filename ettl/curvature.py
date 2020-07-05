@@ -1,10 +1,17 @@
 import numpy as np
 from datetime import timedelta
-from ettl.CurvedSettings import SettingsWithTime
+from ettl.curved_settings import SettingsWithTime
 
 
 def sunset_curvature():
     return np.flip(settings)
+
+
+def test_sunset_curvature():
+    def mins_to_seconds(s):
+        return SettingsWithTime(timedelta(seconds=0.5), s.shutter_speed, s.iso)
+
+    return np.array(list(map(mins_to_seconds, sunset_curvature())))
 
 
 def sunrise_curvature():
@@ -16,7 +23,7 @@ settings = np.array([
     #     SettingsWithTime(timedelta(minutes=15.0), 13, 1600),
     #     SettingsWithTime(timedelta(minutes=15.0), 10, 1600),
     SettingsWithTime(timedelta(minutes=10.0), 8, 800),
-    SettingsWithTime(timedelta(minutes=8.0), 6, 800),
+    SettingsWithTime(timedelta(minutes=8.0), 6.3, 800),
     SettingsWithTime(timedelta(minutes=5.0), 5, 800),
     SettingsWithTime(timedelta(minutes=4.0), 3.2, 800),
     #     SettingsWithTime(timedelta(minutes=4.0), 2.5, 800),
