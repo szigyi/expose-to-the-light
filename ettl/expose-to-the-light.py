@@ -51,6 +51,7 @@ if __name__ == "__main__":
         dt_format = "%Y-%m-%dT%H:%M:%S"
         parser = argparse.ArgumentParser(description='expose-to-the-light arguments')
         parser.add_argument('--test-run', help='test run (default: false)', default=False, action='store_true')
+        parser.add_argument('interval', help='interval between two photos taken', type=int)
         parser.add_argument('darkness_starts', help='datetime when the darkness starts', type=lambda s: datetime.datetime.strptime(s, dt_format))
         args = parser.parse_args()
 
@@ -61,7 +62,7 @@ if __name__ == "__main__":
             darkness_start_changing_at = datetime.datetime.now()
         else:
             capture_image = True
-            interval_seconds = 30
+            interval_seconds = args.interval
             sunset_curve = sunset_curvature()
             darkness_start_changing_at = args.darkness_starts
 
