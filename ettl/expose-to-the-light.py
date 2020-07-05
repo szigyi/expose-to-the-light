@@ -58,12 +58,12 @@ if __name__ == "__main__":
             capture_image = False
             interval_seconds = 0.5
             sunset_curve = test_sunset_curvature()
+            darkness_start_changing_at = datetime.datetime.now()
         else:
             capture_image = True
             interval_seconds = 30
             sunset_curve = sunset_curvature()
-
-        darkness_start_changing_at = args.darkness_starts
+            darkness_start_changing_at = args.darkness_starts
 
         sys.exit(main())
     except KeyboardInterrupt:
