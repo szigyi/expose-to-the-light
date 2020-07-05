@@ -51,18 +51,19 @@ if __name__ == "__main__":
         dt_format = "%Y-%m-%dT%H:%M:%S"
         parser = argparse.ArgumentParser(description='expose-to-the-light arguments')
         parser.add_argument('--test-run', help='test run (default: false)', default=False, action='store_true')
+        parser.add_argument('darkness_starts', help='datetime when the darkness starts', type=lambda s: datetime.datetime.strptime(s, dt_format))
         args = parser.parse_args()
 
         if args.test_run:
             capture_image = False
             interval_seconds = 0.5
             sunset_curve = test_sunset_curvature()
-            darkness_start_changing_at = datetime.datetime.now()
         else:
             capture_image = True
             interval_seconds = 30
             sunset_curve = sunset_curvature()
-            darkness_start_changing_at = datetime.datetime.strptime("2020-07-05T12:12:00", dt_format)
+
+        darkness_start_changing_at = args.darkness_starts
 
         sys.exit(main())
     except KeyboardInterrupt:

@@ -21,7 +21,7 @@ def sunrise_curvature():
 settings = np.array([
     SettingsWithTime(timedelta(minutes=20.0), 15, 1600),
     #     SettingsWithTime(timedelta(minutes=15.0), 13, 1600),
-    #     SettingsWithTime(timedelta(minutes=15.0), 10, 1600),
+    #     SettingsWithTime(timedelta(minutes=15.0), 10.3, 1600),
     SettingsWithTime(timedelta(minutes=10.0), 8, 800),
     SettingsWithTime(timedelta(minutes=8.0), 6.3, 800),
     SettingsWithTime(timedelta(minutes=5.0), 5, 800),

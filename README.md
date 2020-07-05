@@ -38,7 +38,13 @@ In the root folder of this project.
 
 ## Run the app
 > Make sure the project has been installed first!
-`python3 ettl/expose-to-the-light.p`
+
+`python3 ettl/expose-to-the-light.py 2020-07-05T12:12:00`
+
+### Run in test mode
+This mode just tries all the settings on your camera. So you can verify that every settings will work and your camera can accept it.
+
+`python3 ettl/expose-to-the-light.py --test-run 2020-07-05T12:12:00`
 
 ## Errors at the start
 > gphoto2.GPhoto2Error: [-105] Unknown model
@@ -51,6 +57,7 @@ Chance is your camera is not connected to the computer
 > gphoto2.GPhoto2Error: [-53] Could not claim the USB device
 
 Kill the running gphoto2 processes!
+
 `ps aux | grep gphoto`
 ```
 pi         745  0.0  0.7  43780  7252 ?        Ssl  14:14   0:00 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
