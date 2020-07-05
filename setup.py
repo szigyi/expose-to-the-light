@@ -13,6 +13,8 @@ setup(name='expose-to-the-light',
             'pandas',
             # 'libgphoto2',
             'gphoto2',
-            'scipy',
+            'termplotlib',
+            'PyGnuplot'
+            # 'scipy',
       ],
       zip_safe=False)

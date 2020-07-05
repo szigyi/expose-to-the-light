@@ -66,3 +66,6 @@ class SettingsCurve:
         res = self.df.iloc[sortss[:1]][column]
         # print(res)
         return res.iloc[0]
+
+    def ev_curve(self):
+        return self.df[['time', 'ev']]

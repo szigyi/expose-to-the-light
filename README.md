@@ -9,6 +9,7 @@ You need first `python3`
 On Mac Os
    * `brew install pkg-config`
    * `brew install gphoto2`
+   * `brew install gnuplot`
 
 On Raspberry Pi (unix)
    * `apt install pkg-config`
@@ -36,11 +37,15 @@ In the root folder of this project.
 
 ## Run the app
    * ``
-   
+
+## Errors at the start
+kill running gphoto2 processes!
+
 ## Useful docs
    * http://www.gphoto.org/doc/remote/
    * https://github.com/jim-easterbrook/python-gphoto2
    * https://github.com/jim-easterbrook/python-gphoto2/blob/master/examples/time_lapse.py
+   * http://gphoto-software.10949.n7.nabble.com/Beginner-Using-libgphoto2-how-to-find-set-config-values-td16449.html
    
 ## Debugging or for Development
 In order to run python-gphoto2 examples you need to install further dependencies
