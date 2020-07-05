@@ -51,7 +51,7 @@ if __name__ == "__main__":
         dt_format = "%Y-%m-%dT%H:%M:%S"
         parser = argparse.ArgumentParser(description='expose-to-the-light arguments')
         parser.add_argument('--test-run', help='test run (default: false)', default=False, action='store_true')
-        parser.add_argument('darkness_starts', help='datetime when the darkness starts', type=lambda s: datetime.datetime.strptime(s, dt_format))
+        parser.add_argument('darkness_starts', required=False, help='datetime when the darkness starts', type=lambda s: datetime.datetime.strptime(s, dt_format))
         args = parser.parse_args()
 
         if args.test_run:
