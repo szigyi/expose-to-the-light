@@ -12,8 +12,9 @@ On Mac Os
    * `brew install gnuplot`
 
 On Raspberry Pi (unix)
-   * `apt install pkg-config`
-   * `apt install gphoto2`
+   * `sudo apt install pkg-config`
+   * `sudo apt install gphoto2`
+   * `sudo apt install gnuplot`
 
 Install the python wrapper lib as python dependency
    * `sudo pip install -v gphoto2`
@@ -21,7 +22,7 @@ Install the python wrapper lib as python dependency
 ## Install
 In the root folder of this project.
 
-`pip install .`
+`pip3 install .`
 
 ## Connect camera to your computer
    * Make sure the camera is in PTP mode.
@@ -36,7 +37,8 @@ In the root folder of this project.
    * Final test that everything is okey `gphoto2 --summary`
 
 ## Run the app
-   * ``
+> Make sure the project has been installed first!
+`python3 ettl/expose-to-the-light.p`
 
 ## Errors at the start
 > gphoto2.GPhoto2Error: [-105] Unknown model
@@ -46,8 +48,17 @@ Chance is your camera is not connected to the computer
    * Is the USB cable connected?
    * Is it in PTP mode?
 
+> gphoto2.GPhoto2Error: [-53] Could not claim the USB device
 
-kill running gphoto2 processes!
+Kill the running gphoto2 processes!
+`ps aux | grep gphoto`
+```
+pi         745  0.0  0.7  43780  7252 ?        Ssl  14:14   0:00 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
+pi        1439  0.1  1.0 116320 10172 ?        Sl   14:26   0:00 /usr/lib/gvfs/gvfsd-gphoto2 --spawner :1.4 /org/gtk/gvfs/exec_spaw/1
+pi        1461  0.0  0.0   7348   572 pts/0    S+   14:28   0:00 grep --color=auto gphoto
+```
+   * `kill -9 745`
+   * `kill -9 1439`
 
 ## Useful docs
    * http://www.gphoto.org/doc/remote/
