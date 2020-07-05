@@ -5,6 +5,7 @@ import argparse
 import sys
 import datetime
 import time
+import gphoto2 as gp
 
 from ettl.camera_control import configured_camera, empty_event_queue, shutter_speed_to_string, set_camera_config
 from ettl.print_to_terminal import print_plot, print_settings
@@ -34,7 +35,9 @@ def main():
 
                 set_camera_config(camera, iso, shutter_speed, aperture)
 
-                # camera.capture(gp.GP_CAPTURE_IMAGE)
+                if capture_image:
+                    camera.capture(gp.GP_CAPTURE_IMAGE)
+
                 count += 1
 
                 time.sleep(interval_seconds)
@@ -51,10 +54,12 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         if args.test_run:
+            capture_image = False
             interval_seconds = 0.5
             sunset_curve = test_sunset_curvature()
             darkness_start_changing_at = datetime.datetime.now()
         else:
+            capture_image = True
             interval_seconds = 30
             sunset_curve = sunset_curvature()
             darkness_start_changing_at = datetime.datetime.strptime("2020-07-05T12:12:00", dt_format)
