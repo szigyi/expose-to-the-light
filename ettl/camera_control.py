@@ -5,33 +5,31 @@ import gphoto2 as gp
 
 @contextmanager
 def configured_camera():
-    # initialise camera
     camera = gp.Camera()
     camera.init()
     try:
-        # adjust camera configuratiuon
         cfg = camera.get_config()
         capturetarget_cfg = cfg.get_child_by_name('capturetarget')
         capturetarget = capturetarget_cfg.get_value()
         capturetarget_cfg.set_value('Memory card')
-        # camera dependent - 'imageformat' is 'imagequality' on some
+
+        image_format = 'RAW'
         imageformat_cfg = cfg.get_child_by_name('imageformat')
         imageformat = imageformat_cfg.get_value()
-        imageformat_cfg.set_value('Small Fine JPEG')
+        imageformat_cfg.set_value(image_format)
 
         imageformatsd_cfg = cfg.get_child_by_name('imageformatsd')
-        imageformatsd = imageformatsd_cfg.get_value()
-        imageformatsd_cfg.set_value('Small Fine JPEG')
+        imageformatsd_cfg.set_value(image_format)
+
+        drivemode_cfg = cfg.get_child_by_name('drivemode')
+        drivemode_cfg.set_value('Single silent')
 
         camera.set_config(cfg)
-        # use camera
         yield camera
     finally:
-        # reset configuration
         capturetarget_cfg.set_value(capturetarget)
         imageformat_cfg.set_value(imageformat)
         camera.set_config(cfg)
-        # free camera
         print("Freeing camera connection!")
         camera.exit()
 
