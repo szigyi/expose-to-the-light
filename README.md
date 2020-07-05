@@ -44,7 +44,7 @@ In the root folder of this project.
 ### Run in test mode
 This mode just tries all the settings on your camera. So you can verify that every settings will work and your camera can accept it.
 
-`python3 ettl/expose-to-the-light.py --test-run`
+`python3 ettl/expose-to-the-light.py 2020-07-05T12:12:00 --test-run`
 
 ## Errors at the start
 > gphoto2.GPhoto2Error: [-105] Unknown model
