@@ -73,3 +73,13 @@ https://github.com/jim-easterbrook/python-gphoto2/blob/39f392c8793b990cbd2e8f517
    * `sudo -H pip install tzlocal`
    * `pip install Pillow`
    * `pip install PyQt5`
+
+### Remote monitoring
+The app is running on my raspberry pi which is connected to a powerbank and to the camera.
+
+I trigger the `ettl` app from a machine remote. In order to SSH into the raspberry pi in the middle of nowhere you need a phone.
+
+Turn on tethering on the phone and connect the raspberry pi and your computer via wifi. (raspberry pi needs to be setup to connect when you have screen etc.)
+
+Then just ssh into the raspberry pi from the computer
+`ssh -o ConnectTimeout=5 pi@172.20.10.12`
