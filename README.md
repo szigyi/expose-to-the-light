@@ -1,7 +1,8 @@
 # expose-to-the-light
 
 ## TODO
-- [ ] use sunset and sunrise times to adjust curvature
+- [ ] merge sunrise curvature into the sunset
+- [X] use sunset and sunrise times to adjust curvature
 - [ ] add http UI to start the app and see logs, curvature plots
 - [ ] consider time of year to adjust length of curvature ??
 
