@@ -12,8 +12,8 @@ import org.http4s.implicits._
 
 object App extends IOApp with StrictLogging {
 
-  val port = sys.env.getOrElse("http_port", "8230").toInt
-  val env = sys.env.getOrElse("ENV", "local")
+  private val port = sys.env.getOrElse("http_port", "8230").toInt
+  private val env = sys.env.getOrElse("ENV", "local")
 
   override def run(args: List[String]): IO[ExitCode] = {
     BlazeServerBuilder[IO]
@@ -24,7 +24,7 @@ object App extends IOApp with StrictLogging {
       .compile
       .drain
       .handleErrorWith(logErrorAsAFinalFrontier)
-      .map(_ => finalWords)
+      .map(_ => finalWords())
       .as(ExitCode.Success)
   }
 
@@ -34,7 +34,7 @@ object App extends IOApp with StrictLogging {
     Router(
       "/"           -> ioc.staticApi.service,
       "/health"     -> ioc.healthApi.service,
-      "/curvature"  -> ioc.curvatureApi.service
+      "/settings"   -> ioc.settingsApi.service
     ).orNotFound
   }
 
@@ -43,7 +43,7 @@ object App extends IOApp with StrictLogging {
     IO.raiseError(throwable)
   }
 
-  private def finalWords: Unit =
+  private def finalWords(): Unit =
     logger.info(s"App is terminating as you said so!")
 
 
