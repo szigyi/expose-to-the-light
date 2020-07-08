@@ -23,7 +23,7 @@ class SettingsApi {
       Ok(Curvature.settings.map(toCurvedModel))
 
     case GET -> Root / "scaled" =>
-      Ok(Scale.scale(Curvature.settings, ZonedDateTime.now()).map(toScaledModel))
+      Ok(Scale.scale(Curvature.settings.reverse, ZonedDateTime.now()).map(toScaledModel))
   }
 }
 

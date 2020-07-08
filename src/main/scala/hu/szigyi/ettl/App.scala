@@ -1,8 +1,10 @@
 package hu.szigyi.ettl
 
+import java.util.concurrent.{ExecutorService, Executors}
+
 import cats.syntax.functor._
 import cats.data.Kleisli
-import cats.effect.{ContextShift, ExitCode, IO, IOApp}
+import cats.effect.{ExitCode, IO, IOApp}
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.util.ManifestReader
 import org.http4s.server.Router
@@ -10,10 +12,13 @@ import org.http4s.{Request, Response}
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+
 object App extends IOApp with StrictLogging {
 
   private val port = sys.env.getOrElse("http_port", "8230").toInt
   private val env = sys.env.getOrElse("ENV", "local")
+  implicit private val backgroundExecutionContext: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
   override def run(args: List[String]): IO[ExitCode] = {
     BlazeServerBuilder[IO]
@@ -34,7 +39,8 @@ object App extends IOApp with StrictLogging {
     Router(
       "/"           -> ioc.staticApi.service,
       "/health"     -> ioc.healthApi.service,
-      "/settings"   -> ioc.settingsApi.service
+      "/settings"   -> ioc.settingsApi.service,
+      "/timelapse"   -> ioc.timeLapseAPi.service
     ).orNotFound
   }
 

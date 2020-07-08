@@ -11,6 +11,7 @@ organization := "hu.szigyi"
 version := s"0.1.$buildNumber"
 scalaVersion := "2.13.3"
 resolvers += "jitpack" at "https://jitpack.io"
+resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtocol(true)
 
 val circeVersion  = "0.13.0"
 val http4sVersion = "0.21.0"
@@ -21,6 +22,7 @@ libraryDependencies ++= Seq(
   "io.circe"                  %% "circe-literal"      % circeVersion,
   "com.github.pureconfig"     %% "pureconfig"         % "0.12.2",
 
+  "org.gphoto"                %  "gphoto2-java"       % "1.5",
   "com.github.dorinp.reflux"  %% "reflux-generic"     % "0.0.13",
   "org.apache.commons"        % "commons-text"        % "1.8",
 
