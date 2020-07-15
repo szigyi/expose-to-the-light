@@ -1,5 +1,24 @@
 # expose-to-the-light
 
+## Distribute the app
+
+### Assembly jar
+https://github.com/sbt/sbt-assembly
+
+`sbt assebmly`
+
+### Publish artifact to github
+https://github.com/djspiewak/sbt-github-packages
+
+`sbt publisher/publish`
+
+### Publish artifact to Homebrew
+https://docs.brew.sh/Formula-Cookbook
+
+`brew create https://www.dropbox.com/s/t1423cqxagi61gn/expose-to-the-light_2.13-0.1.1.jar?dl=0`
+
+
+
 ## TODO
 - [ ] merge sunrise curvature into the sunset
 - [X] use sunset and sunrise times to adjust curvature
