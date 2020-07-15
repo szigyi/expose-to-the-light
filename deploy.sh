@@ -2,6 +2,7 @@
 
 token=$1
 version=$2
+#export BUILD_NUMBER="$version"
 
 echo ""
 echo "Assembling $version jar package..."
@@ -12,7 +13,7 @@ echo "Deploying $version jar package to Dropbox..."
 asset_src="target/scala-2.13/expose-to-the-light_2.13-$version.jar"
 asset_dst="/artifact/expose-to-the-light_2.13-$version.jar"
 install_src="install.sh"
-install_dst="/script/install_$version.sh"
+install_dst="/script/install.sh"
 
 curl -X POST https://content.dropboxapi.com/2/files/upload \
     --header "Authorization: Bearer $token" \

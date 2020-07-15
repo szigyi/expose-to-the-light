@@ -5,7 +5,7 @@ import Path.flatRebase
 
 def env(name: String) = Option(System.getenv(name)).getOrElse("unknown")
 //val buildNumber: String = env("BUILD_NUMBER")
-val buildNumber: String = "1"
+val buildNumber: String = "2"
 
 name := "expose-to-the-light"
 organization := "hu.szigyi"

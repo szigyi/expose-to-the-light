@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+version=$1
+
 if [[ -n $(which java) ]]; then
   echo "Installing jdk as did not found it on this machine..."
   sudo apt-get update
@@ -7,10 +9,10 @@ if [[ -n $(which java) ]]; then
 fi
 
 echo "Downloading artifact..."
-wget https://www.dropbox.com/s/2plv7ixju61gbk7/expose-to-the-light_2.13-0.1.1.jar
+wget https://www.dropbox.com/s/2plv7ixju61gbk7/expose-to-the-light_2.13-"$version".jar
 
 echo "Installing auto-runner..."
 
 
 echo "Starting application..."
-java -jar expose-to-the-light_2.13-0.1.1.jar
+java -jar expose-to-the-light_2.13-"$version".jar
