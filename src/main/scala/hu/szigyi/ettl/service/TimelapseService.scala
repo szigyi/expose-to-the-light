@@ -3,6 +3,7 @@ package hu.szigyi.ettl.service
 import java.time.ZonedDateTime
 
 import cats.effect.{ContextShift, IO, Timer}
+import hu.szigyi.ettl.service.CameraService.CameraError
 import org.gphoto2.CameraWidgets
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,7 +17,7 @@ class TimelapseService(cameraService: CameraService)(implicit ec: ExecutionConte
       Thread.sleep(500)
     }).reduce((_, _) => ())
 
-  def test: IO[Unit] = {
+  def test: IO[Either[CameraError, String]] = {
     val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now())
     IO.fromFuture(IO(Future {
       cameraService.useCamera(setSettings(scaled))

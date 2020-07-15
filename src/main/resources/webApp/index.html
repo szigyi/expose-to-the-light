@@ -7,14 +7,21 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
     <title>ettl</title>
 <!--    <link href="css/style.css" rel="stylesheet" />-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
-    <h1>Expose to the Light</h1>
+    <h1 class="text-center">Expose to the Light</h1>
 
-    <div id="curved"></div>
-    <div id="scaled"></div>
-    <button onclick="runTest()">Run test</button>
+    <div class="container">
+        <div id="curved"></div>
+        <div id="scaled"></div>
+        <form onsubmit="return false;">
+            <button type="submit" class="btn btn-primary" onclick="runTest()">Run test</button>
+        </form>
+        <ul id="result" class="list-group">
+        </ul>
+    </div>
     <script src="chart.js"></script>
     <script src="api.js"></script>
 </body>

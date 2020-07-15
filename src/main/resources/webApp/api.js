@@ -1,7 +1,7 @@
 
 
 function runTest(){
-//    let result = document.querySelector('#result');
+    let result = document.querySelector('#result');
 //    let eventPlanner = document.querySelector('#eventPlanner');
 
 //    let startNotification = document.querySelector('#startNotification');
@@ -19,9 +19,15 @@ function runTest(){
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            console.log("test is done")
-//            result.innerHTML = result.innerHTML + "<br>[" + document.querySelector('#startNotification').value + "," + document.querySelector('#eventReference').value + "] OK, it is stored! Well done, mate!";
-//            eventPlanner.reset();
+            let data = JSON.parse(xhr.responseText);
+            let now = "<span class=\"badge badge-secondary\">" + new Date().toISOString() + "_UTC</span>"
+            if (data.error) {
+                let msg = "<span class=\"badge badge-danger\">" + data.error.msg + "</span>"
+                let suggestion = "<p>" + data.error.suggestion + "</p>"
+                result.innerHTML = result.innerHTML + "<li class=\"list-group-item\">" + now + msg + suggestion + "</li>";
+            } else {
+                result.innerHTML = result.innerHTML + "<li class=\"list-group-item\">" + now + "<span class=\"badge badge-primary\">" + data.result + "<span></li>";
+            }
         }
     };
 

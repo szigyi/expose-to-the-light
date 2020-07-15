@@ -3,6 +3,7 @@ package hu.szigyi.ettl
 import cats.effect.{Blocker, ContextShift, IO, Timer}
 import hu.szigyi.ettl.api.{HealthApi, SettingsApi, StaticApi, TimelapseApi}
 import hu.szigyi.ettl.service.{CameraService, TimelapseService}
+import hu.szigyi.ettl.util.ShellKill
 
 import scala.concurrent.ExecutionContext
 
@@ -10,7 +11,8 @@ class InverseOfControl(env: String)(implicit backgroundProcesses: ExecutionConte
 
   val blocker: Blocker = Blocker[IO].allocated.unsafeRunSync()._1
 
-  val cameraService = new CameraService()
+  val shellKill = new ShellKill()
+  val cameraService = new CameraService(shellKill)
   val timeLapseService = new TimelapseService(cameraService)
 
   val staticApi: StaticApi = new StaticApi(blocker)
