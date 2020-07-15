@@ -1,5 +1,13 @@
 # expose-to-the-light
 
+## Install application on Raspberry Pi
+artifact = https://www.dropbox.com/sh/tjhu0op7hzqvonk/AAACatOs5-DtAsaOV4DFC9hoa?dl=0
+
+script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl=0
+
+`wget https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl=0`
+
+
 ## Distribute the app
 
 ### Assembly jar
@@ -12,10 +20,10 @@ https://github.com/djspiewak/sbt-github-packages
 
 `sbt publisher/publish`
 
-### Publish artifact to Homebrew
-https://docs.brew.sh/Formula-Cookbook
 
-`brew create https://www.dropbox.com/s/t1423cqxagi61gn/expose-to-the-light_2.13-0.1.1.jar?dl=0`
+### Publish artifact to Dropbox
+`./deploy.sh`
+
 
 
 

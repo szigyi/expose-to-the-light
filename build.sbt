@@ -10,11 +10,13 @@ val buildNumber: String = "1"
 name := "expose-to-the-light"
 organization := "hu.szigyi"
 version := s"0.1.$buildNumber"
-scalaVersion := "2.13.3"
+val scalaMajorVersion = "2.13"
+scalaVersion := scalaMajorVersion + ".3"
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtocol(true)
 
 mainClass in assembly := Some("hu.szigyi.ettl.App")
+assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
 val circeVersion  = "0.13.0"
 val http4sVersion = "0.21.0"
@@ -38,18 +40,3 @@ libraryDependencies ++= Seq(
 
   "org.scalatest"             %% "scalatest"          % "3.1.0"  % Test
 )
-
-//publishArtifact := false
-
-publishMavenStyle := true
-githubOwner := "szigyi"
-githubRepository := "expose-to-the-light"
-githubTokenSource := TokenSource.GitConfig("github.token")  || TokenSource.Environment("GITHUB_TOKEN")
-
-credentials +=
-  Credentials(
-    "GitHub Package Registry",
-    "https://maven.pkg.github.com",
-    "szigyi",
-    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
-  )
