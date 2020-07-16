@@ -30,7 +30,7 @@ shared_link=$(
               --data "{\"path\": \"$asset_dst\",\"settings\": {\"requested_visibility\": \"public\"}}"  | jq -r '.url'
               )
 
-new_version_map="version_url_map[\"$version\"]=version_url_map(\"$shared_link\")"
+new_version_map="version_url_map[\"$version\"]=\"$shared_link\""
 
 ESCAPED_REPLACE=$(printf '%s\n' "$new_version_map" | sed -e 's/[\/&]/\\&/g')
 ESCAPED_REPLACE="$ESCAPED_REPLACE\\
