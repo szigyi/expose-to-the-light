@@ -14,7 +14,7 @@ import org.http4s.implicits._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
-object App extends IOApp with StrictLogging {
+object WebApp extends IOApp with StrictLogging {
 
   private val port = sys.env.getOrElse("http_port", "8230").toInt
   private val env = sys.env.getOrElse("ENV", "local")

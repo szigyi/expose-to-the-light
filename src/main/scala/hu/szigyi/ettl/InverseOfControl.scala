@@ -12,8 +12,7 @@ class InverseOfControl(env: String)(implicit backgroundProcesses: ExecutionConte
   val blocker: Blocker = Blocker[IO].allocated.unsafeRunSync()._1
 
   val shellKill = new ShellKill()
-  val cameraService = new CameraService(shellKill)
-  val timeLapseService = new TimelapseService(cameraService)
+  val timeLapseService = new TimelapseService(shellKill)
 
   val staticApi: StaticApi = new StaticApi(blocker)
   val healthApi: HealthApi = new HealthApi(env)
