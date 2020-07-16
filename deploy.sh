@@ -25,6 +25,6 @@ echo ""
 echo "Deploying $version install script..."
 curl -X POST https://content.dropboxapi.com/2/files/upload \
     --header "Authorization: Bearer $token" \
-    --header "Dropbox-API-Arg: {\"path\": \"$install_dst\"}" \
+    --header "Dropbox-API-Arg: {\"path\": \"$install_dst\", \"mode\": \"overwrite\"}" \
     --header "Content-Type: application/octet-stream" \
     --data-binary @$install_src
