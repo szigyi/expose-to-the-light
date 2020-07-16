@@ -9,8 +9,12 @@ if [[ ! -n $(which java) ]]; then
   sudo apt-get install default-jdk
 fi
 
+declare -A version_url_map
+version_url_map["0.1.1"]=version_url_map("https://www.dropbox.com/s/2plv7ixju61gbk7/expose-to-the-light_2.13-0.1.1.jar?dl=0")
+version_url_map["0.1.2"]=version_url_map("https://www.dropbox.com/s/3om37g5asra3605/expose-to-the-light_2.13-0.1.2.jar?dl=0")
+
 echo "Downloading artifact..."
-wget https://www.dropbox.com/s/2plv7ixju61gbk7/"$artifact"?dl=1
+wget version_url_map["$version"]
 mv "$artifact"?dl=1 "$artifact"
 
 echo "Artifact's Manifest file:"
