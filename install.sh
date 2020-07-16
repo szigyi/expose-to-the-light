@@ -12,6 +12,7 @@ fi
 declare -A version_url_map
 version_url_map["0.1.1"]=version_url_map("https://www.dropbox.com/s/2plv7ixju61gbk7/expose-to-the-light_2.13-0.1.1.jar?dl=0")
 version_url_map["0.1.2"]=version_url_map("https://www.dropbox.com/s/3om37g5asra3605/expose-to-the-light_2.13-0.1.2.jar?dl=0")
+##_new_version_url_map_here
 
 echo "Downloading artifact..."
 wget version_url_map["$version"]
