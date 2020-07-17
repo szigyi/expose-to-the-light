@@ -8,7 +8,11 @@ import hu.szigyi.ettl.service.Curvature.CurvedSetting
 import scala.concurrent.duration.Duration
 
 object Scale {
-  case class ScaledSetting(time: ZonedDateTime, shutterSpeed: Double, iso: Int, aperture: Double)
+  case class ScaledSetting(time: ZonedDateTime,
+                           shutterSpeed: Double,
+                           shutterSpeedString: String,
+                           iso: Int,
+                           aperture: Double)
 
   implicit class RichDateTime(val dateTime: ZonedDateTime) extends AnyVal {
     def +(duration: Duration): ZonedDateTime = {
@@ -22,7 +26,7 @@ object Scale {
     var darknessBegins = sunset.minusHours(darknessBeforeSunset)
     curvature.map(s => {
       darknessBegins += s.duration
-      ScaledSetting(darknessBegins, s.shutterSpeed, s.iso, s.aperture)
+      ScaledSetting(darknessBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
     })
   }
 }

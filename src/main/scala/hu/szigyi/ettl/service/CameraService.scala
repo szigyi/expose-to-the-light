@@ -1,61 +1,62 @@
 package hu.szigyi.ettl.service
 
+import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.service.CameraService.{CameraError, GenericCameraError, OfflineCamera}
 import hu.szigyi.ettl.util.ShellKill
-import hu.szigyi.ettl.util.ShutterSpeedMap._
 import org.gphoto2.{Camera, CameraUtils, CameraWidgets, GPhotoException}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 class CameraService(kill: ShellKill) extends StrictLogging {
   private val camera = new Camera()
 
-  private def initialise: CameraWidgets = {
+  private def initialise: Unit = {
     camera.initialize()
-    camera.newConfiguration()
+    val testConf = camera.newConfiguration()
+    CameraUtils.closeQuietly(testConf)
   }
 
-  private def acquireRootWidget: Try[CameraWidgets] =
-    Try(camera.newConfiguration())
+  private def acquireRootWidget: IO[CameraWidgets] =
+    IO.fromTry(Try(camera.newConfiguration()))
 
-  def useCamera(doYourThing: (=> Try[CameraWidgets]) => Try[Unit]): Either[CameraError, String] = {
-    val result = Try(initialise).recoverWith {
+  def useCamera(restOfTheApp: => IO[List[Unit]]): IO[Either[CameraError, String]] = {
+    IO.fromTry(Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         kill.killGPhoto2Processes
         Try(camera.newConfiguration())
       case unrecoverableException =>
         Failure(unrecoverableException)
 
-    }.flatMap(_ => doYourThing(acquireRootWidget)) match {
-      case Success(_) =>
+    }).flatMap(_ => restOfTheApp).attempt.map {
+      case Right(_) =>
         logger.info("Task is done")
         Right("Task is done")
-      case Failure(e: GPhotoException) if e.result == -105 =>
+      case Left(e: GPhotoException) if e.result == -105 =>
         val error = OfflineCamera(e.getMessage)
         logger.error(error.msg)
         Left(error)
-      case Failure(e: GPhotoException) =>
+      case Left(e: GPhotoException) =>
         logger.error(e.getMessage, e)
         Left(GenericCameraError(e.getMessage, e.result, None))
-      case Failure(e) =>
+      case Left(e) =>
         logger.error(e.getMessage, e)
         Left(GenericCameraError(e.getMessage, 0, None))
-    }
-    CameraUtils.closeQuietly(camera)
-    result
-  }
-
-  def setSettings(acquireRootWidget: => Try[CameraWidgets], shutterSpeed: Double, iso: Int, aperture: Double): Try[Unit] = {
-    toShutterSpeed(shutterSpeed).map(ss => {
-      logger.info(s"[ss: $ss, i: ${iso.toString}, a: $aperture]")
-      setConfig(acquireRootWidget, "/capturesettings/shutterspeed", ss)
+    }.map(res => {
+      CameraUtils.closeQuietly(camera)
+      res
     })
-    setConfig(acquireRootWidget, "/imgsettings/iso", iso.toString)
-    setConfig(acquireRootWidget, "/capturesettings/aperture", aperture.toString)
   }
 
-  private def setConfig(acquireRootWidget: => Try[CameraWidgets], key: String, value: String): Try[Unit] =
+  def setEvSettings(shutterSpeedString: String, iso: String, aperture: String): IO[Unit] =
+    for {
+      _ <- IO(logger.info(s"[ss: $shutterSpeedString, i: $iso, a: $aperture]"))
+      _ <- setConfig("/capturesettings/shutterspeed", shutterSpeedString)
+      _ <- setConfig("/imgsettings/iso", iso)
+      _ <- setConfig("/capturesettings/aperture", aperture)
+  } yield ()
+
+  private def setConfig(key: String, value: String): IO[Unit] =
     acquireRootWidget.map(rootWidget => {
       rootWidget.setValue(key, value)
       rootWidget.apply()

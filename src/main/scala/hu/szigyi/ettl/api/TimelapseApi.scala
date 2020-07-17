@@ -14,10 +14,7 @@ class TimelapseApi(tlService: TimelapseService) {
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO] {
     case GET -> Root / "test" =>
-      Ok(tlService.test.map {
-        case Right(value) => TimelapseResponse(None, Some(value))
-        case Left(value) => TimelapseResponse(Some(value), None)
-      })
+      Ok(tlService.storeTestTimelapseTask)
   }
 }
 
