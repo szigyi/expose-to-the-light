@@ -8,6 +8,7 @@
     <title>ettl</title>
 <!--    <link href="css/style.css" rel="stylesheet" />-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
@@ -16,13 +17,24 @@
     <div class="container">
         <div id="curved"></div>
         <div id="scaled"></div>
-        <form onsubmit="return false;">
-            <button type="submit" class="btn btn-primary" onclick="runTest()">Run test</button>
-        </form>
-        <ul id="result" class="list-group">
+        <div class="row">
+            <div class="form-group col-md-3">
+                <button type="button" class="btn btn-primary" onclick="runTest()">Run test</button>
+            </div>
+            <div class="form-inline">
+                <label for="sunset" class="form-label">Date time of sunset:</label>
+                <input type="datetime-local" id="sunset" class="form-control col-md-5" name="sunset">
+                <button type="button" class="btn btn-success" onclick="storeTimelapse()">Store Timelapse</button>
+            </div>
+        </div>
+        <h3>Stored tasks:</h3>
+        <ul id="storedTasks" class="list-group log-view">
+        </ul>
+        <h3>Executed tasks:</h3>
+        <ul id="executedTasks" class="list-group log-view">
         </ul>
     </div>
-    <script src="chart.js"></script>
+<!--    <script src="chart.js"></script>-->
     <script src="api.js"></script>
 </body>
 </html>

@@ -92,7 +92,8 @@ object InfluxDomain {
           evFieldName -> asDouble(r.ev)
         )
           ++ asOptionT(errorFieldName, r.error)(asString)
-          ++ asOptionT(suggestionFieldName, r.suggestion)(asString)
+          ++ None
+//          ++ asOptionT(suggestionFieldName, r.suggestion)(asString)
         ,
         Seq(idFieldName -> r.id, testFieldName -> asBoolean(r.test)),
         time = Some(r.timestamp.time)

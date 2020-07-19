@@ -15,45 +15,40 @@ import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 
 import scala.concurrent.duration._
 
-// TODO: Use proper scheduler from BlazeServer to emit events!
 class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLimit: Duration,
                        clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
-  def storeTestTimelapseTask: IO[Unit] = {
-    val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now())
+  def storeTestTimelapseTask: IO[Seq[TimelapseTask]] = {
+    val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now().plusHours(3))
     val delayInMillisec = 500
     val now = clock.instant()
     val start = now.plusSeconds(1)
     val end = start.plusMillis(scaled.size * delayInMillisec)
     val time = Iterator.iterate(start)(_.plusMillis(delayInMillisec)).takeWhile(_.isBefore(end)).toSeq
     val id = UUID.randomUUID().toString
-    val task = time.zip(scaled).map {
+    val tasks = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
         TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
           EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
-    influx.writeTimelapseTasks(task)
-      .map(_ => logger.info(s"Stored: \n${task.mkString("\n")}"))
+    influx.writeTimelapseTasks(tasks)
+      .map(_ => logger.info(s"Stored: \n${tasks.mkString("\n")}"))
+      .map(_ => tasks)
   }
 
   def executeCurrentTimelapseTasks: IO[Unit] =
     for {
-      now <- IO(clock.instant())
-      end <- IO(now.plusNanos(rateLimit.toNanos))
-      _ = logger.info(s"Getting: $now - $end")
-      maybeTask <- getTimelapseTasks(now, end)
+      from <- IO(clock.instant())
+      maybeTask <- getTimelapseTasks(from).map(_.headOption)
       - <- executeTaskOnCamera(maybeTask)
     } yield ()
 
-  private def getTimelapseTasks(start: Instant, end: Instant): IO[Option[TimelapseTask]] = {
-    influx.getTimelapseTasks(start, end).map(_.toList).flatMap {
-      case Nil =>
-        IO.pure(None)
-      case t :: _ =>
-        IO.pure(Some(t))
-    }
-  }
+  def getCapturedTasks(from: Instant): IO[Seq[Captured]] =
+    influx.getCaptured(from).map(_.toList)
+
+  private def getTimelapseTasks(from: Instant): IO[Seq[TimelapseTask]] =
+    influx.getTimelapseTasks(from).map(_.toList)
 
   private def executeTaskOnCamera(maybeTask: Option[TimelapseTask]): IO[Option[Unit]] = {
 //    for {

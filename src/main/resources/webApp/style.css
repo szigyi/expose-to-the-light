@@ -1,0 +1,13 @@
+
+.list-group-item {
+    padding: .15rem .25rem;
+}
+
+.test-task {
+    background-color: #dee0e2;
+}
+
+.log-view {
+    overflow: scroll;
+    height: 10rem;
+}

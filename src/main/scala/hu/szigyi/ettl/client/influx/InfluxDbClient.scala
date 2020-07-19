@@ -10,7 +10,7 @@ import reflux._
 
 class InfluxDbClient[F[_]: Functor](influx: InfluxClient[F]) {
 
-  def getTimelapseTasks(from: Instant, to: Instant): F[Vector[TimelapseTask]] =
+  def getTimelapseTasks(from: Instant): F[Vector[TimelapseTask]] =
     influx.asVector[TimelapseTask](
       s"""
          |SELECT
@@ -22,9 +22,9 @@ class InfluxDbClient[F[_]: Functor](influx: InfluxClient[F]) {
          |${TimelapseTask.apertureFieldName},
          |${TimelapseTask.evFieldName}
          |FROM ${TimelapseTask.measurementName}
-         |WHERE time >= '$from' AND time < '$to'""".stripMargin)
+         |WHERE time >= '$from'""".stripMargin)
 
-  def getCaptured(since: Instant): F[Vector[Captured]] = {
+  def getCaptured(from: Instant): F[Vector[Captured]] = {
     influx.asVector[Captured](
       s"""
          |SELECT
@@ -37,7 +37,7 @@ class InfluxDbClient[F[_]: Functor](influx: InfluxClient[F]) {
          |${Captured.errorFieldName},
          |${Captured.suggestionFieldName}
          |FROM ${Captured.measurementName}
-         |WHERE time >= '$since'""".stripMargin)
+         |WHERE time >= '$from'""".stripMargin)
   }
 
   def writeTimelapseTasks(tlt: Seq[TimelapseTask]): F[Unit] = influx.write(tlt)
