@@ -46,12 +46,13 @@ class CameraService(kill: ShellKill) extends StrictLogging {
   }
 
   def setEvSettings(rootWidget: CameraWidgets, c: Capture): IO[Unit] =
-    for {
-      _ <- IO(logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]"))
-      _ <- IO(rootWidget.setValue("/capturesettings/shutterspeed", c.shutterSpeedString))
-      _ <- IO(rootWidget.setValue("/imgsettings/iso", c.iso.toString))
-      _ <- IO(rootWidget.setValue("/capturesettings/aperture", c.aperture.toString))
-  } yield rootWidget.apply()
+    IO.fromTry(Try {
+      logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
+      rootWidget.setValue("/capturesettings/shutterspeed", c.shutterSpeedString)
+      rootWidget.setValue("/imgsettings/iso", c.iso.toString)
+      rootWidget.setValue("/capturesettings/aperture", c.aperture.toString)
+      rootWidget.apply()
+    })
 }
 
 object CameraService {

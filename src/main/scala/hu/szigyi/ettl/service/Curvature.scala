@@ -26,10 +26,10 @@ object Curvature {
 
   val settings: Seq[CurvedSetting] = Seq(
     CurvedSetting(20.0.minutes, 15d, 1600, 2.8),
-    //  CurvedSetting(15.0.minutes, 13, 1600, 2.8),
-    CurvedSetting(15.0.minutes, 10, 1600, 2.8),
+//    CurvedSetting(15.0.minutes, 13, 1600, 2.8),
+//    CurvedSetting(15.0.minutes, 10, 1600, 2.8),
     CurvedSetting(10.0.minutes, 8d, 800, 2.8),
-//    CurvedSetting(8.0.minutes, 6d, 800, 2.8),
+    CurvedSetting(8.0.minutes, 6d, 800, 2.8),
     CurvedSetting(5.0.minutes, 5d, 800, 2.8),
     CurvedSetting(4.0.minutes, 3.2d, 800, 2.8),
     //  CurvedSetting(4.0.minutes, 2.5d, 800, 2.8),
