@@ -24,7 +24,8 @@ object Curvature {
     }
   }
 
-  val settings: Seq[CurvedSetting] = Seq(
+  val settings: Seq[CurvedSetting] = Seq(CurvedSetting(20.0.minutes, 1d / 8000d, 100, 2.8))
+//  val settings: Seq[CurvedSetting] = Seq(
 //    CurvedSetting(20.0.minutes, 15d, 1600, 2.8),
 ////    CurvedSetting(15.0.minutes, 13, 1600, 2.8),
 ////    CurvedSetting(15.0.minutes, 10, 1600, 2.8),
@@ -58,23 +59,23 @@ object Curvature {
 //    CurvedSetting(4.0.minutes, 1d / 80d, 100, 2.8),
 //    CurvedSetting(4.0.minutes, 1d / 100d, 100, 2.8),
 //    CurvedSetting(4.0.minutes, 1d / 125d, 100, 2.8),
-    CurvedSetting(4.0.minutes, 1d / 160d, 100, 2.8),
-    CurvedSetting(4.0.minutes, 1d / 200d, 100, 2.8),
-    CurvedSetting(5.0.minutes, 1d / 250d, 100, 2.8),
-    CurvedSetting(5.0.minutes, 1d / 320d, 100, 2.8),
-    CurvedSetting(5.0.minutes, 1d / 400d, 100, 2.8),
-    CurvedSetting(5.0.minutes, 1d / 500d, 100, 2.8),
-    CurvedSetting(5.0.minutes, 1d / 640d, 100, 2.8),
-    CurvedSetting(10.0.minutes, 1d / 800d, 100, 2.8),
-    CurvedSetting(10.0.minutes, 1d / 1000d, 100, 2.8),
-    CurvedSetting(10.0.minutes, 1d / 1250d, 100, 2.8),
-    CurvedSetting(10.0.minutes, 1d / 1600d, 100, 2.8),
-    CurvedSetting(10.0.minutes, 1d / 2000d, 100, 2.8),
-    CurvedSetting(15.0.minutes, 1d / 2500d, 100, 2.8),
-    CurvedSetting(15.0.minutes, 1d / 3200d, 100, 2.8),
-    CurvedSetting(15.0.minutes, 1d / 4000d, 100, 2.8),
-    CurvedSetting(15.0.minutes, 1d / 5000d, 100, 2.8),
-    CurvedSetting(20.0.minutes, 1d / 6400d, 100, 2.8),
-    CurvedSetting(20.0.minutes, 1d / 8000d, 100, 2.8)
-  )
+//    CurvedSetting(4.0.minutes, 1d / 160d, 100, 2.8),
+//    CurvedSetting(4.0.minutes, 1d / 200d, 100, 2.8),
+//    CurvedSetting(5.0.minutes, 1d / 250d, 100, 2.8),
+//    CurvedSetting(5.0.minutes, 1d / 320d, 100, 2.8),
+//    CurvedSetting(5.0.minutes, 1d / 400d, 100, 2.8),
+//    CurvedSetting(5.0.minutes, 1d / 500d, 100, 2.8),
+//    CurvedSetting(5.0.minutes, 1d / 640d, 100, 2.8),
+//    CurvedSetting(10.0.minutes, 1d / 800d, 100, 2.8),
+//    CurvedSetting(10.0.minutes, 1d / 1000d, 100, 2.8),
+//    CurvedSetting(10.0.minutes, 1d / 1250d, 100, 2.8),
+//    CurvedSetting(10.0.minutes, 1d / 1600d, 100, 2.8),
+//    CurvedSetting(10.0.minutes, 1d / 2000d, 100, 2.8),
+//    CurvedSetting(15.0.minutes, 1d / 2500d, 100, 2.8),
+//    CurvedSetting(15.0.minutes, 1d / 3200d, 100, 2.8),
+//    CurvedSetting(15.0.minutes, 1d / 4000d, 100, 2.8),
+//    CurvedSetting(15.0.minutes, 1d / 5000d, 100, 2.8),
+//    CurvedSetting(20.0.minutes, 1d / 6400d, 100, 2.8),
+//    CurvedSetting(20.0.minutes, 1d / 8000d, 100, 2.8)
+//  )
 }

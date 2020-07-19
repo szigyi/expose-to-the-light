@@ -48,10 +48,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     influx.getCaptured(from).map(_.toSeq)
 
   private def getTimelapseTasks(from: Instant, to: Instant): IO[Seq[TimelapseTask]] =
-    influx.getTimelapseTasks(from, to).map(_.toSeq).map(_.map(task => {
-      logger.info(task.toString)
-      task
-    }))
+    influx.getTimelapseTasks(from, to).map(_.toSeq)
 
   private def executeTaskOnCamera(maybeTask: Option[TimelapseTask]): IO[Option[Unit]] = {
 //    for {
@@ -77,22 +74,12 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     }).sequence
   }
 
-  private def captureImageIfNotTest(test: Boolean): Boolean = {
-    val capture = !test
-    logger.info(s"Capture: $capture becasue test: $test")
-    capture
-  }
+  private def captureImageIfNotTest(test: Boolean): Boolean = !test
 
   private def executeTask(cameraService: CameraService, capture: CaptureSetting, isCapture: Boolean)(rootWidget: CameraWidgets): IO[Unit] = {
     for {
-      _ <- setSettings(cameraService, capture, rootWidget)
-      _ <- if (isCapture) captureImage(cameraService) else IO.unit
+      _ <- cameraService.setEvSettings(rootWidget, capture)
+      _ <- if (isCapture) cameraService.captureImage else IO.unit
     } yield ()
   }
-
-  private def setSettings(cameraService: CameraService, capture: CaptureSetting, rootWidget: CameraWidgets): IO[Unit] =
-    cameraService.setEvSettings(rootWidget, capture)
-
-  private def captureImage(cameraService: CameraService): IO[Unit] =
-    cameraService.captureImage
 }

@@ -13,8 +13,16 @@ class CameraService(kill: ShellKill) extends StrictLogging {
 
   private def initialise: Unit = {
     camera.initialize()
-    val testConf = camera.newConfiguration()
-    CameraUtils.closeQuietly(testConf)
+    val conf = camera.newConfiguration()
+    logger.info("Getting settings names:")
+    logger.info(conf.getNames.toString)
+    val imageFormat = "RAW"
+    conf.setValue("/settings/capturetarget", "Memory card")
+    conf.setValue("/imgsettings/imageformat", imageFormat)
+    conf.setValue("/imgsettings/imageformatsd", imageFormat)
+    conf.setValue("/capturesettings/drivemode", "Single silent")
+    conf.apply()
+    CameraUtils.closeQuietly(conf)
   }
 
   def useCamera(restOfTheApp: CameraWidgets => IO[Unit]): IO[Either[CameraError, String]] = {
@@ -56,7 +64,6 @@ class CameraService(kill: ShellKill) extends StrictLogging {
 
   def captureImage: IO[Unit] = {
     IO.fromTry(Try {
-      logger.info("Capturing image...")
       val cameraFile = camera.captureImage()
       CameraUtils.closeQuietly(cameraFile)
     })
