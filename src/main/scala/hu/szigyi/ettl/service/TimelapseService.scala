@@ -25,14 +25,15 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     val start = now.plusSeconds(1)
     val end = start.plusMillis(scaled.size * delayInMillisec)
     val time = Iterator.iterate(start)(_.plusMillis(delayInMillisec)).takeWhile(_.isBefore(end)).toSeq
-    logger.info(scaled.mkString("\n"))
-    logger.info(time.toSeq.mkString("\n"))
     val id = UUID.randomUUID().toString
     val task = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
-        TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture)
+        TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
+          EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
+    logger.info(task.mkString("\n"))
+    logger.info(time.mkString("\n"))
     influx.writeTimelapseTasks(task).map(_ => logger.info(s"Stored: $task"))
   }
 

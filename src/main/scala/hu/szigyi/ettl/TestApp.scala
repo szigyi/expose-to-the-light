@@ -32,19 +32,8 @@ object TestApp extends IOApp with StrictLogging {
       .resource.use { client =>
       val rateOfBgProcess = 1.second
       val clock = Clock.systemUTC()
-      val influx = {
-        val i = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
-        val dbName = "ettl"
-        i.databaseExists(dbName).map(exists => {
-          if (exists) {
-            IO.unit
-          } else {
-            i.createDatabase("ettl")
-          }
-        }).unsafeRunSync()
-        i.use(dbName)
-      }
-      val influxDbClient = new InfluxDbClient[IO](influx)
+      val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
+      val influxDbClient = InfluxDbClient.apply(influx)
       val shellKill = new ShellKill()
       val timeLapseService = new TimelapseService(shellKill, influxDbClient, rateOfBgProcess, clock)
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)

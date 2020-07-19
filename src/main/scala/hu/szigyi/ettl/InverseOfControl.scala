@@ -19,12 +19,8 @@ class InverseOfControl(env: String, port: Int, client: Client[IO])(implicit time
 
   val clock = Clock.systemUTC()
 
-  val influx = {
-    val i = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
-    i.createDatabase("ettl")
-    i.use("ettl")
-  }
-  val influxDbClient = new InfluxDbClient[IO](influx)
+  val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
+  val influxDbClient = InfluxDbClient.apply(influx)
 
   val rateOfBgProcess = 1.second
   val shellKill = new ShellKill()
