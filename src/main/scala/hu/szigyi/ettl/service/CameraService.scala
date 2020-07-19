@@ -1,7 +1,5 @@
 package hu.szigyi.ettl.service
 
-import java.time.ZonedDateTime
-
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.service.CameraService.{CameraError, Capture, GenericCameraError, OfflineCamera}
@@ -19,10 +17,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     CameraUtils.closeQuietly(testConf)
   }
 
-  private def acquireRootWidget: IO[CameraWidgets] =
-    IO.fromTry(Try(camera.newConfiguration()))
-
-  def useCamera(restOfTheApp: => IO[List[Unit]]): IO[Either[CameraError, String]] = {
+  def useCamera(restOfTheApp: CameraWidgets => IO[List[Unit]]): IO[Either[CameraError, String]] = {
     IO.fromTry(Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         kill.killGPhoto2Processes
@@ -30,7 +25,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
       case unrecoverableException =>
         Failure(unrecoverableException)
 
-    }).flatMap(_ => restOfTheApp).attempt.map {
+    }).flatMap(_ => restOfTheApp(camera.newConfiguration())).attempt.map {
       case Right(_) =>
         logger.info("Task is done")
         Right("Task is done")
@@ -50,20 +45,13 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     })
   }
 
-  def setEvSettings(c: Capture): IO[Unit] =
+  def setEvSettings(rootWidget: CameraWidgets, c: Capture): IO[Unit] =
     for {
       _ <- IO(logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]"))
-      _ <- setConfig("/capturesettings/shutterspeed", c.shutterSpeedString)
-      _ <- setConfig("/imgsettings/iso", c.iso.toString)
-      _ <- setConfig("/capturesettings/aperture", c.aperture.toString)
-  } yield ()
-
-  private def setConfig(key: String, value: String): IO[Unit] =
-    acquireRootWidget.map(rootWidget => {
-      rootWidget.setValue(key, value)
-      rootWidget.apply()
-      CameraUtils.closeQuietly(rootWidget)
-    })
+      _ <- IO(rootWidget.setValue("/capturesettings/shutterspeed", c.shutterSpeedString))
+      _ <- IO(rootWidget.setValue("/imgsettings/iso", c.iso.toString))
+      _ <- IO(rootWidget.setValue("/capturesettings/aperture", c.aperture.toString))
+  } yield rootWidget.apply()
 }
 
 object CameraService {

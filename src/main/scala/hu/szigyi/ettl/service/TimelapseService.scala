@@ -1,17 +1,16 @@
 package hu.szigyi.ettl.service
 
-import java.time.{Clock, Instant, ZoneOffset, ZonedDateTime}
+import java.time.{Clock, Instant, ZonedDateTime}
 import java.util.UUID
 
-import cats.data.OptionT
 import cats.effect.{IO, Timer}
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.{Captured, TimelapseTask}
-import hu.szigyi.ettl.service.CameraService.{CameraError, Capture}
-import hu.szigyi.ettl.service.Scale.ScaledSetting
-import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
+import hu.szigyi.ettl.service.CameraService.Capture
+import hu.szigyi.ettl.util.ShellKill
+import org.gphoto2.CameraWidgets
 
 import scala.concurrent.duration._
 
@@ -20,7 +19,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
 
   def storeTestTimelapseTask: IO[Seq[TimelapseTask]] = {
     val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now().plusHours(3))
-    val delayInMillisec = 2000
+    val delayInMillisec = 1000
     val now = clock.instant()
     val start = now.plusSeconds(1)
     val end = start.plusMillis(scaled.size * delayInMillisec)
@@ -75,15 +74,8 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     }).sequence
   }
 
-  private def setSettings(cameraService: CameraService, captures: Seq[Capture]): IO[List[Unit]] =
+  private def setSettings(cameraService: CameraService, captures: Seq[Capture])(rootWidget: CameraWidgets): IO[List[Unit]] =
     captures.toList.traverse(capture => {
-      cameraService.setEvSettings(capture)
+      cameraService.setEvSettings(rootWidget, capture)
     })
-
-  def test: IO[Either[CameraError, String]] = {
-    val cameraService = new CameraService(shellKill)
-    val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now())
-    ???
-//    cameraService.useCamera(setSettings(cameraService, scaled))
-  }
 }

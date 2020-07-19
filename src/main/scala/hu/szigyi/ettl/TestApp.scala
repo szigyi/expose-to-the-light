@@ -30,7 +30,7 @@ object TestApp extends IOApp with StrictLogging {
       .withMaxConnectionsPerRequestKey(_ => 4)
       .withUserAgent(`User-Agent`(AgentProduct("Mozilla", Some("5.0"))))
       .resource.use { client =>
-      val rateOfBgProcess = 3.seconds
+      val rateOfBgProcess = 0.25.seconds
       val clock = Clock.systemUTC()
       val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
       val influxDbClient = InfluxDbClient.apply(influx)
