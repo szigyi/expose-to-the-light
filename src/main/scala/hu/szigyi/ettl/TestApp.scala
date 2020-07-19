@@ -6,7 +6,7 @@ import java.util.concurrent.Executors
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.client.InfluxDbClient
+import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.service.TimelapseService
 import hu.szigyi.ettl.util.ShellKill
 import org.http4s.Uri
@@ -30,15 +30,15 @@ object TestApp extends IOApp with StrictLogging {
       .withMaxConnectionsPerRequestKey(_ => 4)
       .withUserAgent(`User-Agent`(AgentProduct("Mozilla", Some("5.0"))))
       .resource.use { client =>
-      val rateOfBgProcess = 1.second
+      val rateOfBgProcess = 3.seconds
       val clock = Clock.systemUTC()
       val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
       val influxDbClient = InfluxDbClient.apply(influx)
       val shellKill = new ShellKill()
       val timeLapseService = new TimelapseService(shellKill, influxDbClient, rateOfBgProcess, clock)
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
-      val trigger = fs2.Stream.eval(timeLapseService.storeTestTimelapseTask)
-      trigger.merge(httpJob.run).compile.drain
+      val storeTask = fs2.Stream.eval(timeLapseService.storeTestTimelapseTask)
+      storeTask.merge(httpJob.run).compile.drain
     }.as(ExitCode.Success)
   }
 }

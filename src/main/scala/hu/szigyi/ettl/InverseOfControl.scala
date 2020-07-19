@@ -4,7 +4,7 @@ import java.time.Clock
 
 import cats.effect.{Blocker, ContextShift, IO, Timer}
 import hu.szigyi.ettl.api.{HealthApi, SettingsApi, StaticApi, TimelapseApi}
-import hu.szigyi.ettl.client.InfluxDbClient
+import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.service.TimelapseService
 import hu.szigyi.ettl.util.ShellKill
 import org.http4s.Uri

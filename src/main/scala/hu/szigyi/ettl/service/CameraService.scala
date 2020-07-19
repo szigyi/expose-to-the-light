@@ -1,9 +1,11 @@
 package hu.szigyi.ettl.service
 
+import java.time.ZonedDateTime
+
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.service.CameraService.{CameraError, GenericCameraError, OfflineCamera}
-import hu.szigyi.ettl.util.ShellKill
+import hu.szigyi.ettl.service.CameraService.{CameraError, Capture, GenericCameraError, OfflineCamera}
+import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 import org.gphoto2.{Camera, CameraUtils, CameraWidgets, GPhotoException}
 
 import scala.util.{Failure, Try}
@@ -48,12 +50,12 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     })
   }
 
-  def setEvSettings(shutterSpeedString: String, iso: String, aperture: String): IO[Unit] =
+  def setEvSettings(c: Capture): IO[Unit] =
     for {
-      _ <- IO(logger.info(s"[ss: $shutterSpeedString, i: $iso, a: $aperture]"))
-      _ <- setConfig("/capturesettings/shutterspeed", shutterSpeedString)
-      _ <- setConfig("/imgsettings/iso", iso)
-      _ <- setConfig("/capturesettings/aperture", aperture)
+      _ <- IO(logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]"))
+      _ <- setConfig("/capturesettings/shutterspeed", c.shutterSpeedString)
+      _ <- setConfig("/imgsettings/iso", c.iso.toString)
+      _ <- setConfig("/capturesettings/aperture", c.aperture.toString)
   } yield ()
 
   private def setConfig(key: String, value: String): IO[Unit] =
@@ -65,6 +67,14 @@ class CameraService(kill: ShellKill) extends StrictLogging {
 }
 
 object CameraService {
+
+  case class Capture(shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double)
+  object Capture {
+    def apply(shutterSpeed: Double, iso: Int, aperture: Double): Option[Capture] =
+      ShutterSpeedMap.toShutterSpeed(shutterSpeed).map(sss => {
+        new Capture(shutterSpeed, sss, iso, aperture)
+      })
+  }
 
   trait CameraError {
     val msg: String

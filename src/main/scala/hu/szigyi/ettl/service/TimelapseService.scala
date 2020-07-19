@@ -1,16 +1,17 @@
 package hu.szigyi.ettl.service
 
-import java.time.{Clock, ZoneOffset, ZonedDateTime}
+import java.time.{Clock, Instant, ZoneOffset, ZonedDateTime}
 import java.util.UUID
 
+import cats.data.OptionT
 import cats.effect.{IO, Timer}
-import hu.szigyi.ettl.service.CameraService.CameraError
-import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.client.InfluxDbClient
-import hu.szigyi.ettl.client.InfluxDbClient.TimelapseTask
+import hu.szigyi.ettl.client.influx.InfluxDbClient
+import hu.szigyi.ettl.client.influx.InfluxDomain.{Captured, TimelapseTask}
+import hu.szigyi.ettl.service.CameraService.{CameraError, Capture}
 import hu.szigyi.ettl.service.Scale.ScaledSetting
+import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 
 import scala.concurrent.duration._
 
@@ -32,39 +33,61 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
         TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
           EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
-    logger.info(task.mkString("\n"))
-    logger.info(time.mkString("\n"))
-    influx.writeTimelapseTasks(task).map(_ => logger.info(s"Stored: $task"))
+    influx.writeTimelapseTasks(task)
+      .map(_ => logger.info(s"Stored: \n${task.mkString("\n")}"))
   }
 
-  def doTask: IO[Unit] = {
-    val now = clock.instant()
-    val end = now.plusNanos(rateLimit.toNanos)
-    influx.getTimelapseTasks(now, end).map(_.toList).map {
+  def executeCurrentTimelapseTasks: IO[Unit] =
+    for {
+      now <- IO(clock.instant())
+      end <- IO(now.plusNanos(rateLimit.toNanos))
+      _ = logger.info(s"Getting: $now - $end")
+      maybeTask <- getTimelapseTasks(now, end)
+      - <- executeTaskOnCamera(maybeTask)
+    } yield ()
+
+  private def getTimelapseTasks(start: Instant, end: Instant): IO[Option[TimelapseTask]] = {
+    influx.getTimelapseTasks(start, end).map(_.toList).flatMap {
       case Nil =>
-        IO.pure(Right("No tasks to run!"))
+        IO.pure(None)
       case t :: _ =>
-        val cameraService = new CameraService(shellKill)
-        logger.info(t.toString)
-        val scaled = ScaledSetting(
-          t.timestamp.time.atZone(ZoneOffset.UTC),
-          t.shutterSpeed,
-          ShutterSpeedMap.toShutterSpeed(t.shutterSpeed).get,
-          t.iso,
-          t.aperture
-        )
-        cameraService.useCamera(setSettings(cameraService, Seq(scaled)))
+        IO.pure(Some(t))
     }
   }
 
-  private def setSettings(cameraService: CameraService, scaled: Seq[Scale.ScaledSetting]): IO[List[Unit]] =
-    scaled.toList.traverse(setting => {
-      cameraService.setEvSettings(setting.shutterSpeedString, setting.iso.toString, setting.aperture.toString)
+  private def executeTaskOnCamera(maybeTask: Option[TimelapseTask]): IO[Option[Unit]] = {
+//    for {
+//      task <- IO.fromEither(Either.fromOption(maybeTask))
+//      capture <- Capture(task.shutterSpeed, task.iso, task.aperture)
+//    } yield None
+
+    maybeTask.flatMap(s => {
+      Capture(s.shutterSpeed, s.iso, s.aperture).map(c => {
+        val cameraService = new CameraService(shellKill)
+        cameraService.useCamera(setSettings(cameraService, Seq(c))).flatMap {
+          case Right(captured) =>
+            import Captured._
+            val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed, s.iso, s.aperture, s.ev, None, None)
+            influx.writeCaptured(Seq(captured))
+          case Left(cameraError) =>
+            import Captured._
+            val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed, s.iso, s.aperture, s.ev,
+              Some(cameraError.msg), cameraError.suggestion)
+            influx.writeCaptured(Seq(captured))
+        }
+      })
+    }).sequence
+  }
+
+  private def setSettings(cameraService: CameraService, captures: Seq[Capture]): IO[List[Unit]] =
+    captures.toList.traverse(capture => {
+      cameraService.setEvSettings(capture)
     })
 
   def test: IO[Either[CameraError, String]] = {
     val cameraService = new CameraService(shellKill)
     val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now())
-    cameraService.useCamera(setSettings(cameraService, scaled))
+    ???
+//    cameraService.useCamera(setSettings(cameraService, scaled))
   }
 }
