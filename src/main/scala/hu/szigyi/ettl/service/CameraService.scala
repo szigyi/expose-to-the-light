@@ -2,7 +2,7 @@ package hu.szigyi.ettl.service
 
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.service.CameraService.{CameraError, Capture, GenericCameraError, OfflineCamera}
+import hu.szigyi.ettl.service.CameraService.{CameraError, CaptureSetting, GenericCameraError, OfflineCamera}
 import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 import org.gphoto2.{Camera, CameraUtils, CameraWidgets, GPhotoException}
 
@@ -17,7 +17,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     CameraUtils.closeQuietly(testConf)
   }
 
-  def useCamera(restOfTheApp: CameraWidgets => IO[List[Unit]]): IO[Either[CameraError, String]] = {
+  def useCamera(restOfTheApp: CameraWidgets => IO[Unit]): IO[Either[CameraError, String]] = {
     IO.fromTry(Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         kill.killGPhoto2Processes
@@ -27,7 +27,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
 
     }).flatMap(_ => restOfTheApp(camera.newConfiguration())).attempt.map {
       case Right(_) =>
-        logger.info("Task is done")
+        logger.debug("Task is done")
         Right("Task is done")
       case Left(e: GPhotoException) if e.result == -105 =>
         val error = OfflineCamera(e.getMessage)
@@ -45,7 +45,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     })
   }
 
-  def setEvSettings(rootWidget: CameraWidgets, c: Capture): IO[Unit] =
+  def setEvSettings(rootWidget: CameraWidgets, c: CaptureSetting): IO[Unit] =
     IO.fromTry(Try {
       logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
       rootWidget.setValue("/capturesettings/shutterspeed", c.shutterSpeedString)
@@ -53,15 +53,23 @@ class CameraService(kill: ShellKill) extends StrictLogging {
       rootWidget.setValue("/capturesettings/aperture", c.aperture.toString)
       rootWidget.apply()
     })
+
+  def captureImage: IO[Unit] = {
+    IO.fromTry(Try {
+      logger.info("Capturing image...")
+      val cameraFile = camera.captureImage()
+      CameraUtils.closeQuietly(cameraFile)
+    })
+  }
 }
 
 object CameraService {
 
-  case class Capture(shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double)
-  object Capture {
-    def apply(shutterSpeed: Double, iso: Int, aperture: Double): Option[Capture] =
+  case class CaptureSetting(shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double)
+  object CaptureSetting {
+    def apply(shutterSpeed: Double, iso: Int, aperture: Double): Option[CaptureSetting] =
       ShutterSpeedMap.toShutterSpeed(shutterSpeed).map(sss => {
-        new Capture(shutterSpeed, sss, iso, aperture)
+        new CaptureSetting(shutterSpeed, sss, iso, aperture)
       })
   }
 

@@ -8,7 +8,7 @@ import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.{Captured, TimelapseTask}
-import hu.szigyi.ettl.service.CameraService.Capture
+import hu.szigyi.ettl.service.CameraService.CaptureSetting
 import hu.szigyi.ettl.util.ShellKill
 import org.gphoto2.CameraWidgets
 
@@ -28,7 +28,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     val tasks: Seq[TimelapseTask] = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
-        TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
+        TimelapseTask(time, id, false, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
           EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
     influx.writeTimelapseTasks(tasks)
@@ -45,10 +45,13 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     } yield ()
 
   def getCapturedTasks(from: Instant): IO[Seq[Captured]] =
-    influx.getCaptured(from).map(_.toList)
+    influx.getCaptured(from).map(_.toSeq)
 
   private def getTimelapseTasks(from: Instant, to: Instant): IO[Seq[TimelapseTask]] =
-    influx.getTimelapseTasks(from, to).map(_.toList)
+    influx.getTimelapseTasks(from, to).map(_.toSeq).map(_.map(task => {
+      logger.info(task.toString)
+      task
+    }))
 
   private def executeTaskOnCamera(maybeTask: Option[TimelapseTask]): IO[Option[Unit]] = {
 //    for {
@@ -57,9 +60,9 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
 //    } yield None
 
     maybeTask.flatMap(s => {
-      Capture(s.shutterSpeed, s.iso, s.aperture).map(c => {
+      CaptureSetting(s.shutterSpeed, s.iso, s.aperture).map(c => {
         val cameraService = new CameraService(shellKill)
-        cameraService.useCamera(setSettings(cameraService, Seq(c))).flatMap {
+        cameraService.useCamera(executeTask(cameraService, c, captureImageIfNotTest(s.test))).flatMap {
           case Right(captured) =>
             import Captured._
             val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed, s.iso, s.aperture, s.ev, None, None)
@@ -74,8 +77,22 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     }).sequence
   }
 
-  private def setSettings(cameraService: CameraService, captures: Seq[Capture])(rootWidget: CameraWidgets): IO[List[Unit]] =
-    captures.toList.traverse(capture => {
-      cameraService.setEvSettings(rootWidget, capture)
-    })
+  private def captureImageIfNotTest(test: Boolean): Boolean = {
+    val capture = !test
+    logger.info(s"Capture: $capture becasue test: $test")
+    capture
+  }
+
+  private def executeTask(cameraService: CameraService, capture: CaptureSetting, isCapture: Boolean)(rootWidget: CameraWidgets): IO[Unit] = {
+    for {
+      _ <- setSettings(cameraService, capture, rootWidget)
+      _ <- if (isCapture) captureImage(cameraService) else IO.unit
+    } yield ()
+  }
+
+  private def setSettings(cameraService: CameraService, capture: CaptureSetting, rootWidget: CameraWidgets): IO[Unit] =
+    cameraService.setEvSettings(rootWidget, capture)
+
+  private def captureImage(cameraService: CameraService): IO[Unit] =
+    cameraService.captureImage
 }

@@ -49,7 +49,7 @@ object InfluxDomain {
     val evFieldName = "ev"
 
     implicit val reader: Read[TimelapseTask] = Read.instance(r =>
-      TimelapseTask(r.time, r.getString(idFieldName), r.get[Boolean](testFieldName), r.get[Instant](createdFieldName),
+      TimelapseTask(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Instant](createdFieldName),
         r.get[Double](shutterSpeedFieldName), r.get[Int](isoFieldName), r.get[Double](apertureFieldName),
         r.get[Double](evFieldName)))
 
@@ -79,7 +79,7 @@ object InfluxDomain {
     val suggestionFieldName = "suggestion"
 
     implicit val reader: Read[Captured] = Read.instance(r =>
-      Captured(r.time, r.getString(idFieldName), r.get[Boolean](testFieldName), r.get[Double](shutterSpeedFieldName),
+      Captured(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Double](shutterSpeedFieldName),
         r.get[Int](isoFieldName), r.get[Double](apertureFieldName), r.get[Double](evFieldName),
         r.getOption(errorFieldName), r.getOption(suggestionFieldName)))
 
@@ -93,6 +93,7 @@ object InfluxDomain {
         )
           ++ asOptionT(errorFieldName, r.error)(asString)
           ++ None
+        // TODO fix it, there is an issue with new line char in the string, remove it either here or ehn you create the error message.
 //          ++ asOptionT(suggestionFieldName, r.suggestion)(asString)
         ,
         Seq(idFieldName -> r.id, testFieldName -> asBoolean(r.test)),
