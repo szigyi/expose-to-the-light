@@ -11,7 +11,7 @@ function nowHTML() {
 
 function setDatetimePicker() {
     let dt = document.querySelector('#sunset');
-    let nowDt = new Date().toISOString().slice(0, -1)
+    let nowDt = new Date().toISOString().slice(0, -5)
     console.log("Datepicker: " + nowDt)
     dt.value = nowDt
 }
@@ -76,11 +76,11 @@ function storeTimelapse() {
     let sunset = document.querySelector('#sunset').value;
     let dtSunset = new Date(sunset).toISOString()
     console.log("Sunset: " + dtSunset)
-    storeTimelapseTask("/timelapse/" + dtSunset)
+    storeTimelapseTask("/timelapse/" + getSelectedKeyFrameId() + "/" + dtSunset)
 }
 
 function runTest() {
-    storeTimelapseTask("/timelapse/test")
+    storeTimelapseTask("/timelapse/test/" + getSelectedKeyFrameId())
 }
 
 const rateFetchCaptured = 1000;

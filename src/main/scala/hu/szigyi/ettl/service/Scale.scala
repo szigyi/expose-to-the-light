@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 import java.time.{Duration => JDuration}
 
 import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
-import hu.szigyi.ettl.service.Curvature.CurvedSetting
+import hu.szigyi.ettl.service.KeyFrameService.CurvedSetting
 
 import scala.concurrent.duration.Duration
 

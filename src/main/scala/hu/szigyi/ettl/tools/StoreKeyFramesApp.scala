@@ -9,7 +9,7 @@ import cats.syntax.apply._
 import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
 import KeyFrame._
-import hu.szigyi.ettl.service.Curvature.CurvedSetting
+import hu.szigyi.ettl.service.KeyFrameService.CurvedSetting
 import org.http4s.Uri
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.headers.{AgentProduct, `User-Agent`}

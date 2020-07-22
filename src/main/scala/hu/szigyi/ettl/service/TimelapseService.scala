@@ -17,38 +17,41 @@ import scala.concurrent.duration._
 class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLimit: Duration,
                        clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
-  def storeTimelapseTask(sunset: Instant): IO[Seq[TimelapseTask]] = {
-    val now = clock.instant()
-    val scaled = Scale.scale(Curvature.settings.reverse, sunset.atZone(ZoneOffset.UTC))
-    val id = UUID.randomUUID().toString
-    val tasks = scaled.map(s => {
+  def storeTimelapseTask(keyFrameId: String, sunset: Instant): IO[Seq[TimelapseTask]] =
+  for {
+    now       <- IO.pure(clock.instant())
+    keyFrames <- influx.getKeyFrames(keyFrameId)
+    scaled    = Scale.scaleKeyFrames(keyFrames.reverse, sunset.atZone(ZoneOffset.UTC))
+    id        = UUID.randomUUID().toString
+    tasks     = scaled.map(s => {
       import TimelapseTask._
       TimelapseTask(s.time.toInstant, id, false, now, s.shutterSpeed, s.iso, s.aperture,
         EvService.ev(s.iso, s.shutterSpeed, s.aperture))
     })
-    influx.writeTimelapseTasks(tasks)
+    _         <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
-      .map(_ => tasks)
-  }
+  } yield tasks
 
-  def storeTestTimelapseTask: IO[Seq[TimelapseTask]] = {
-    val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now().plusHours(3))
-    val delayInMillisec = 1000
-    val now = clock.instant()
-    val start = now.plusSeconds(1)
-    val end = start.plusMillis(scaled.size * delayInMillisec)
-    val time = Iterator.iterate(start)(_.plusMillis(delayInMillisec)).takeWhile(_.isBefore(end)).toSeq
-    val id = UUID.randomUUID().toString
-    val tasks: Seq[TimelapseTask] = time.zip(scaled).map {
+  def storeTestTimelapseTask(keyFrameId: String): IO[Seq[TimelapseTask]] =
+  for {
+    keyFrames         <- influx.getKeyFrames(keyFrameId)
+    artificialSunset  = ZonedDateTime.now().plusHours(3)
+    scaled            = Scale.scaleKeyFrames(keyFrames.reverse, artificialSunset)
+    delayInMillisec   = 1000
+    now               = clock.instant()
+    start             = now.plusSeconds(1)
+    end               = start.plusMillis(scaled.size * delayInMillisec)
+    time              = Iterator.iterate(start)(_.plusMillis(delayInMillisec)).takeWhile(_.isBefore(end)).toSeq
+    id                = UUID.randomUUID().toString
+    tasks             = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
         TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
           EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
-    influx.writeTimelapseTasks(tasks)
+    _                 <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
-      .map(_ => tasks)
-  }
+  } yield tasks
 
   def executeCurrentTimelapseTasks: IO[Unit] =
     for {
