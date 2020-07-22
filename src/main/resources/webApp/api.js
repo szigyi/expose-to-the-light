@@ -20,7 +20,7 @@ function getKeyFrameIds() {
     let dropdown = document.querySelector('#key-frame-ids');
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/settings/key-frames", true);
+    xhr.open("GET", "/key-frames", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {

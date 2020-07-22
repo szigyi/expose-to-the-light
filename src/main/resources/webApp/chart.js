@@ -12,7 +12,7 @@ function showKeyFrames(id, dt) {
       .append("g")
         .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
-    d3.json("http://localhost:8230/settings/key-frames/" + id + "/" + dt).then(function(d) {
+    d3.json("http://localhost:8230/key-frames/" + id + "/" + dt).then(function(d) {
       function translate(d){
         var r = {
             time : d3.timeParse("%Y-%m-%dT%I:%M:%S")(d.time),

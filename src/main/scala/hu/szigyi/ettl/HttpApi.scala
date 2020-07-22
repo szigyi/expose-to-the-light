@@ -2,14 +2,14 @@ package hu.szigyi.ettl
 
 import cats.data.Kleisli
 import cats.effect.{ContextShift, ExitCode, IO, Timer}
-import hu.szigyi.ettl.api.{HealthApi, SettingsApi, StaticApi, TimelapseApi}
+import hu.szigyi.ettl.api.{HealthApi, KeyFrameApi, StaticApi, TimelapseApi}
 import hu.szigyi.ettl.util.ManifestReader
-import org.http4s.{HttpRoutes, Request, Response}
+import org.http4s.{Request, Response}
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 
-class HttpApi(env: String, port: Int, staticApi: StaticApi, healthApi: HealthApi, settingsApi: SettingsApi,
+class HttpApi(env: String, port: Int, staticApi: StaticApi, healthApi: HealthApi, keyFrameApi: KeyFrameApi,
               timelapseApi: TimelapseApi)(implicit timer: Timer[IO], contextShift: ContextShift[IO]) {
 
   def run: fs2.Stream[IO, ExitCode] =
@@ -23,7 +23,7 @@ class HttpApi(env: String, port: Int, staticApi: StaticApi, healthApi: HealthApi
     Router(
       "/"           -> staticApi.service,
       "/health"     -> healthApi.service,
-      "/settings"   -> settingsApi.service,
+      "/key-frames" -> keyFrameApi.service,
       "/timelapse"  -> timelapseApi.service
     ).orNotFound
 
