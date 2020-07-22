@@ -39,6 +39,8 @@ object TestApp extends IOApp with StrictLogging {
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
       val storeTask = fs2.Stream.eval(timeLapseService.storeTestTimelapseTask)
       storeTask.merge(httpJob.run).compile.drain
-    }.as(ExitCode.Success)
+    }
+      .map(_ => threadPool.shutdown())
+      .as(ExitCode.Success)
   }
 }

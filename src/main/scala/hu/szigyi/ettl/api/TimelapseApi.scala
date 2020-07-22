@@ -19,6 +19,8 @@ class TimelapseApi(tlService: TimelapseService) {
   val service: HttpRoutes[IO] = HttpRoutes.of[IO] {
     case GET -> Root / "captured" / InstantVar(from) =>
       Ok(tlService.getCapturedTasks(from).map(_.map(CapturedTaskResponse.apply)))
+    case GET -> Root / InstantVar(sunset) =>
+      Ok(tlService.storeTimelapseTask(sunset).map(_.map(TimelapseTaskResponse.apply)))
     case GET -> Root / "test" =>
       Ok(tlService.storeTestTimelapseTask.map(_.map(TimelapseTaskResponse.apply)))
   }

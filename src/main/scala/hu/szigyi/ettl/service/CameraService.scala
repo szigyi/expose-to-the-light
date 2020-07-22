@@ -95,7 +95,7 @@ object CameraService {
         |- Is the camera turned on?
         |- Is the camera connected to this computer via USB cable?
         |- Is the camera in PTP mode? (Disable wifi module for Canon!)
-        |""".stripMargin)
+        |""".stripMargin.replaceAll("\n", " "))
   }
   case class GenericCameraError(msg: String, result: Int, suggestion: Option[String]) extends CameraError
 }

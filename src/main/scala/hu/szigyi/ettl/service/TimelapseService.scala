@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.service
 
-import java.time.{Clock, Instant, ZonedDateTime}
+import java.time.{Clock, Instant, ZoneOffset, ZonedDateTime}
 import java.util.UUID
 
 import cats.effect.{IO, Timer}
@@ -17,6 +17,20 @@ import scala.concurrent.duration._
 class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLimit: Duration,
                        clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
+  def storeTimelapseTask(sunset: Instant): IO[Seq[TimelapseTask]] = {
+    val now = clock.instant()
+    val scaled = Scale.scale(Curvature.settings.reverse, sunset.atZone(ZoneOffset.UTC))
+    val id = UUID.randomUUID().toString
+    val tasks = scaled.map(s => {
+      import TimelapseTask._
+      TimelapseTask(s.time.toInstant, id, false, now, s.shutterSpeed, s.iso, s.aperture,
+        EvService.ev(s.iso, s.shutterSpeed, s.aperture))
+    })
+    influx.writeTimelapseTasks(tasks)
+      .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
+      .map(_ => tasks)
+  }
+
   def storeTestTimelapseTask: IO[Seq[TimelapseTask]] = {
     val scaled = Scale.scale(Curvature.settings.reverse, ZonedDateTime.now().plusHours(3))
     val delayInMillisec = 1000
@@ -28,7 +42,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     val tasks: Seq[TimelapseTask] = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
-        TimelapseTask(time, id, false, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
+        TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
           EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
     }
     influx.writeTimelapseTasks(tasks)

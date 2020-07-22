@@ -14,13 +14,23 @@ import org.http4s.HttpRoutes
 import org.http4s.dsl.impl.Root
 import org.http4s.dsl.io._
 import SettingsApi._
+import hu.szigyi.ettl.api.ApiTool.{InstantVar, ZonedDateTimeVar}
+import hu.szigyi.ettl.client.influx.InfluxDbClient
+import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
 import hu.szigyi.ettl.service.Scale.ScaledSetting
 
-class SettingsApi {
+class SettingsApi(influx: InfluxDbClient[IO]) {
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO] {
-    case GET -> Root / "curved" =>
-      Ok(Curvature.settings.map(toCurvedModel))
+    case GET -> Root / "key-frames" =>
+      influx.getKeyFrameIds.flatMap(Ok(_))
+
+    case GET -> Root / "key-frames" / id / ZonedDateTimeVar(sunset) =>
+      for {
+        keyFrames <- influx.getKeyFrames(id)
+        scaled <- IO.pure(Scale.scaleKeyFrames(keyFrames, sunset))
+        response <- Ok(scaled.map(toScaledModel))
+      } yield response
 
     case GET -> Root / "scaled" =>
       Ok(Scale.scale(Curvature.settings.reverse, ZonedDateTime.now()).map(toScaledModel))
@@ -34,7 +44,7 @@ object SettingsApi {
   case class CurvedModel(duration: Long, shutterSpeed: Double, iso: Int, ev: Double)
   case class ScaledModel(time: String, shutterSpeed: Double, iso: Int, ev: Double)
 
-  def toCurvedModel(s: CurvedSetting): CurvedModel =
+  def toCurvedModel(s: KeyFrame): CurvedModel =
     CurvedModel(s.duration.toNanos, s.shutterSpeed, s.iso, EvService.ev(s.iso, s.shutterSpeed, s.aperture))
 
   def toScaledModel(s: ScaledSetting): ScaledModel =

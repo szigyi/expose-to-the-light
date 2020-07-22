@@ -3,7 +3,10 @@ package hu.szigyi.ettl.client.influx
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneOffset}
 
+import hu.szigyi.ettl.service.EvService
 import reflux.{Measurement, Read, TimeColumn, ToMeasurement}
+
+import scala.concurrent.duration.Duration
 
 object InfluxDomain {
   case class TimelapseTask(timestamp: TimeColumn,
@@ -23,6 +26,15 @@ object InfluxDomain {
                       ev: Double,
                       error: Option[String],
                       suggestion: Option[String])
+
+  case class KeyFrame(timestamp: TimeColumn,
+                      id: String,
+                      duration: Duration,
+                      shutterSpeed: Double,
+                      shutterSpeedString: String,
+                      iso: Int,
+                      aperture: Double,
+                      ev: Double)
 
   trait InfluxDomainTrait {
     val measurementName: String
@@ -92,12 +104,44 @@ object InfluxDomain {
           evFieldName -> asDouble(r.ev)
         )
           ++ asOptionT(errorFieldName, r.error)(asString)
-          ++ None
         // TODO fix it, there is an issue with new line char in the string, remove it either here or ehn you create the error message.
-//          ++ asOptionT(suggestionFieldName, r.suggestion)(asString)
+          ++ asOptionT(suggestionFieldName, r.suggestion)(asString)
         ,
         Seq(idFieldName -> r.id, testFieldName -> asBoolean(r.test)),
         time = Some(r.timestamp.time)
       ))
+  }
+
+  object KeyFrame extends InfluxDomainTrait {
+    override val measurementName = "key_frame"
+    val idFieldName = "id"
+    val durationFieldName = "duration"
+    val shutterSpeedFieldName = "shutterSpeed"
+    val shutterSpeedStringFieldName = "shutterSpeedString"
+    val isoFieldName = "iso"
+    val apertureFieldName = "aperture"
+    val evFieldName = "ev"
+
+    implicit val reader: Read[KeyFrame] = Read.instance(r =>
+      KeyFrame(r.time, r.getString(idFieldName), Duration.fromNanos(r.get[Long](durationFieldName)),
+        r.get[Double](shutterSpeedFieldName), r.getString(shutterSpeedStringFieldName), r.get[Int](isoFieldName),
+        r.get[Double](apertureFieldName), r.get[Double](evFieldName)))
+
+    implicit val writer: ToMeasurement[KeyFrame] = ToMeasurement.instance(measurementName,
+      r => Measurement(
+        Seq(
+          durationFieldName -> asLong(r.duration.toNanos),
+          shutterSpeedFieldName -> asDouble(r.shutterSpeed),
+          shutterSpeedStringFieldName -> asString(r.shutterSpeedString),
+          isoFieldName -> asInt(r.iso),
+          apertureFieldName -> asDouble(r.aperture),
+          evFieldName -> asDouble(r.ev)
+        ),
+        Seq(idFieldName -> r.id),
+        time = Some(r.timestamp.time)
+      ))
+
+    def apply(timestamp: TimeColumn, id: String, duration: Duration, shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double): KeyFrame =
+      new KeyFrame(timestamp, id, duration, shutterSpeed, shutterSpeedString, iso, aperture, EvService.ev(iso, shutterSpeed, aperture))
   }
 }

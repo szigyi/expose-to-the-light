@@ -3,6 +3,7 @@ package hu.szigyi.ettl.service
 import java.time.ZonedDateTime
 import java.time.{Duration => JDuration}
 
+import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
 import hu.szigyi.ettl.service.Curvature.CurvedSetting
 
 import scala.concurrent.duration.Duration
@@ -25,6 +26,14 @@ object Scale {
   def scale(curvature: Seq[CurvedSetting], sunset: ZonedDateTime): Seq[ScaledSetting] = {
     var darknessBegins = sunset.minusHours(darknessBeforeSunset)
     curvature.map(s => {
+      darknessBegins += s.duration
+      ScaledSetting(darknessBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
+    })
+  }
+
+  def scaleKeyFrames(keyFrames: Seq[KeyFrame], sunset: ZonedDateTime): Seq[ScaledSetting] = {
+    var darknessBegins = sunset.minusHours(darknessBeforeSunset)
+    keyFrames.map(s => {
       darknessBegins += s.duration
       ScaledSetting(darknessBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
     })

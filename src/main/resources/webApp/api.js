@@ -1,10 +1,54 @@
 
 
+function setupIndexPage() {
+    getKeyFrameIds()
+    setDatetimePicker()
+}
+
 function nowHTML() {
     return "<span class=\"badge badge-secondary\">" + new Date().toISOString() + "_UTC</span>";
 }
 
-function runTest() {
+function setDatetimePicker() {
+    let dt = document.querySelector('#sunset');
+    let nowDt = new Date().toISOString().slice(0, -1)
+    console.log("Datepicker: " + nowDt)
+    dt.value = nowDt
+}
+
+function getKeyFrameIds() {
+    let dropdown = document.querySelector('#key-frame-ids');
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/settings/key-frames", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            let data = JSON.parse(xhr.responseText);
+            data.forEach(function(t){
+                let o = document.createElement('option');
+                o.value = t
+                o.innerHTML = t
+                dropdown.appendChild(o);
+            })
+        }
+    };
+    xhr.send();
+}
+
+function getSelectedKeyFrameId() {
+    let kf = document.querySelector('#key-frame-ids');
+    return kf.options[kf.selectedIndex].value;
+}
+
+function getDatetimePickerValue() {
+    let dt = document.querySelector('#sunset')
+    let localDt = new Date(dt.value)
+    console.log("sunset value: " + localDt.toISOString())
+    return localDt.toISOString()
+}
+
+function storeTimelapseTask(url) {
     let result = document.querySelector('#storedTasks');
 
     function newLog(t) {
@@ -14,7 +58,6 @@ function runTest() {
     }
 
     let xhr = new XMLHttpRequest();
-    let url = "/timelapse/test";
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
@@ -27,6 +70,17 @@ function runTest() {
     };
     result.innerHTML = result.innerHTML + "<li class=\"list-group-item\">" + nowHTML() + "<span class=\"badge badge-success\">Commence test run<span></li>";
     xhr.send();
+}
+
+function storeTimelapse() {
+    let sunset = document.querySelector('#sunset').value;
+    let dtSunset = new Date(sunset).toISOString()
+    console.log("Sunset: " + dtSunset)
+    storeTimelapseTask("/timelapse/" + dtSunset)
+}
+
+function runTest() {
+    storeTimelapseTask("/timelapse/test")
 }
 
 const rateFetchCaptured = 1000;

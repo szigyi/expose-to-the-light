@@ -28,7 +28,7 @@ class InverseOfControl(env: String, port: Int, client: Client[IO])(implicit time
 
   val staticApi: StaticApi = new StaticApi(blocker)
   val healthApi: HealthApi = new HealthApi(env)
-  val settingsApi: SettingsApi = new SettingsApi()
+  val settingsApi: SettingsApi = new SettingsApi(influxDbClient)
   val timeLapseAPi = new TimelapseApi(timeLapseService)
 
   val httpApi = new HttpApi(env, port, staticApi, healthApi, settingsApi, timeLapseAPi)
