@@ -38,8 +38,8 @@ object KeyFrameApi {
   case class ScaledModel(time: String, shutterSpeed: Double, iso: Int, ev: Double)
 
   def toCurvedModel(s: KeyFrame): CurvedModel =
-    CurvedModel(s.duration.toNanos, s.shutterSpeed, s.iso, EvService.ev(s.iso, s.shutterSpeed, s.aperture))
+    CurvedModel(s.duration.toNanos, s.shutterSpeed, s.iso, EvService.ev(s.shutterSpeed, s.iso, s.aperture))
 
   def toScaledModel(s: ScaledSetting): ScaledModel =
-    ScaledModel(s.time.format(formatter), s.shutterSpeed, s.iso, EvService.ev(s.iso, s.shutterSpeed, s.aperture))
+    ScaledModel(s.time.format(formatter), s.shutterSpeed, s.iso, EvService.ev(s.shutterSpeed, s.iso, s.aperture))
 }

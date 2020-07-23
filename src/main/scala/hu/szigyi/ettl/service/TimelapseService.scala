@@ -26,7 +26,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     tasks     = scaled.map(s => {
       import TimelapseTask._
       TimelapseTask(s.time.toInstant, id, false, now, s.shutterSpeed, s.iso, s.aperture,
-        EvService.ev(s.iso, s.shutterSpeed, s.aperture))
+        EvService.ev(s.shutterSpeed, s.iso, s.aperture))
     })
     _         <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
@@ -47,7 +47,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
       case (time, scaled) =>
         import TimelapseTask._
         TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
-          EvService.ev(scaled.iso, scaled.shutterSpeed, scaled.aperture))
+          EvService.ev(scaled.shutterSpeed, scaled.iso, scaled.aperture))
     }
     _                 <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))

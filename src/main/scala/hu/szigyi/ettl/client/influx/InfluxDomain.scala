@@ -142,6 +142,6 @@ object InfluxDomain {
       ))
 
     def apply(timestamp: TimeColumn, id: String, duration: Duration, shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double): KeyFrame =
-      new KeyFrame(timestamp, id, duration, shutterSpeed, shutterSpeedString, iso, aperture, EvService.ev(iso, shutterSpeed, aperture))
+      new KeyFrame(timestamp, id, duration, shutterSpeed, shutterSpeedString, iso, aperture, EvService.ev(shutterSpeed, iso, aperture))
   }
 }
