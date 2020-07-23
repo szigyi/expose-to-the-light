@@ -1,8 +1,6 @@
 package hu.szigyi.ettl.service
 
 object EvService {
-//  case class EVSetting(shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double, ev: Double)
-
   def ev(shutterSpeed: Double, iso: Int, aperture: Double): Double = {
     val ev100 = log2(math.pow(aperture, 2) / shutterSpeed)
     if (iso > 100) ev100 + log2(iso / 100)
