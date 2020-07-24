@@ -30,7 +30,6 @@
         <div id="scaled"></div>
         <div class="row">
             <div class="form-group col-md-3">
-<!--                <label class="form-label" for="key-frame-ids">:</label>-->
                 <select id="key-frame-ids" class="form-control mb-2 mr-sm-2" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
                     <option>Key-frame ids are loading...</option>
                 </select>
@@ -39,8 +38,8 @@
                 <button type="button" class="btn btn-primary" onclick="runTest()">Run test</button>
             </div>
             <div class="form-inline col-md-6">
-                <label for="sunset" class="form-label">Date time of sunset:</label>
-                <input type="datetime-local" id="sunset" class="form-control" name="sunset" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+                <label for="startAt" class="form-label">Start at:</label>
+                <input type="datetime-local" id="startAt" class="form-control" name="startAt" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
                 <button type="button" class="btn btn-success" onclick="storeTimelapse()">Store Timelapse</button>
             </div>
         </div>

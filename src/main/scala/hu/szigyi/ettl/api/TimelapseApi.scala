@@ -21,8 +21,8 @@ class TimelapseApi(tlService: TimelapseService) {
       Ok(tlService.getCapturedTasks(from)
         .map(_.map(CapturedTaskResponse.apply)))
 
-    case GET -> Root / keyFrameId / InstantVar(sunset) =>
-      Ok(tlService.storeTimelapseTask(keyFrameId, sunset)
+    case GET -> Root / keyFrameId / InstantVar(startAt) =>
+      Ok(tlService.storeTimelapseTask(keyFrameId, startAt)
         .map(_.map(TimelapseTaskResponse.apply)))
 
     case GET -> Root / "test" / keyFrameId =>

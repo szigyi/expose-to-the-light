@@ -5,13 +5,23 @@ function setupIndexPage() {
     setDatetimePicker()
 }
 
+function toLocalDateTimeString(d) {
+    let datestring = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+    console.log("LocalDT: " + datestring)
+    return datestring
+}
+
 function nowHTML() {
-    return "<span class=\"badge badge-secondary\">" + new Date().toISOString() + "_UTC</span>";
+    return "<span class=\"badge badge-secondary\">" + toLocalDateTimeString(new Date()) + " UTC</span>";
+}
+
+function timeHTML(time) {
+    return "<span class=\"badge badge-secondary\">" + toLocalDateTimeString(time) + "</span>"
 }
 
 function setDatetimePicker() {
-    let dt = document.querySelector('#sunset');
-    let nowDt = new Date().toISOString().slice(0, -5)
+    let dt = document.querySelector('#startAt');
+    let nowDt = toLocalDateTimeString(new Date())
     console.log("Datepicker: " + nowDt)
     dt.value = nowDt
 }
@@ -42,9 +52,9 @@ function getSelectedKeyFrameId() {
 }
 
 function getDatetimePickerValue() {
-    let dt = document.querySelector('#sunset')
+    let dt = document.querySelector('#startAt')
     let localDt = new Date(dt.value)
-    console.log("sunset value: " + localDt.toISOString())
+    console.log("startAt UTC: " + localDt.toISOString())
     return localDt.toISOString()
 }
 
@@ -54,7 +64,7 @@ function storeTimelapseTask(url) {
     function newLog(t) {
         let settings = "s: " + t.shutterSpeed + ", i: " + t.iso + ", a: " + t.aperture + ", ev: " + t.ev
         let testClass = ((t.test) ? "test-task" : "")
-        return "<li class=\"list-group-item " + testClass + "\">" + nowHTML() + "<span class=\"badge badge-primary\">" + settings + "<span></li>";
+        return "<li class=\"list-group-item " + testClass + "\">" + timeHTML(new Date(t.timestamp)) + "<span class=\"badge badge-primary\">" + settings + "<span></li>";
     }
 
     let xhr = new XMLHttpRequest();
@@ -73,10 +83,10 @@ function storeTimelapseTask(url) {
 }
 
 function storeTimelapse() {
-    let sunset = document.querySelector('#sunset').value;
-    let dtSunset = new Date(sunset).toISOString()
-    console.log("Sunset: " + dtSunset)
-    storeTimelapseTask("/timelapse/" + getSelectedKeyFrameId() + "/" + dtSunset)
+    let startAt = document.querySelector('#startAt').value;
+    let dtStartAt = new Date(startAt).toISOString()
+    console.log("StartAt: " + dtStartAt)
+    storeTimelapseTask("/timelapse/" + getSelectedKeyFrameId() + "/" + dtStartAt)
 }
 
 function runTest() {
@@ -93,19 +103,15 @@ function getTimeForNextFetchCaptured() {
 function getCapturedTasks() {
     let result = document.querySelector('#executedTasks');
 
-    function timeHTML(time) {
-        return "<span class=\"badge badge-secondary\">" + time + "_UTC</span>"
-    }
-
     function newLog(c) {
         let testClass = ((c.test) ? "test-task" : "");
         if (c.error) {
             let msg = "<span class=\"badge badge-danger\">" + c.error + "</span>"
             let suggestion = "<p>" + c.suggestion + "</p>"
-            return "<li class=\"list-group-item " + testClass + "\">" + timeHTML(c.timestamp) + msg + suggestion + "</li>";
+            return "<li class=\"list-group-item " + testClass + "\">" + timeHTML(new Date(c.timestamp)) + msg + suggestion + "</li>";
         } else {
             let settings = "s: " + c.shutterSpeed + ", i: " + c.iso + ", a: " + c.aperture + ", ev: " + c.ev
-            return "<li class=\"list-group-item " + testClass + "\">" + timeHTML(c.timestamp) + "<span class=\"badge badge-primary\">" + settings + "<span></li>";
+            return "<li class=\"list-group-item " + testClass + "\">" + timeHTML(new Date(c.timestamp)) + "<span class=\"badge badge-primary\">" + settings + "<span></li>";
         }
     }
 

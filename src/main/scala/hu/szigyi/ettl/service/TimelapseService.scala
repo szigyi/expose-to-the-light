@@ -17,11 +17,11 @@ import scala.concurrent.duration._
 class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLimit: Duration,
                        clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
-  def storeTimelapseTask(keyFrameId: String, sunset: Instant): IO[Seq[TimelapseTask]] =
+  def storeTimelapseTask(keyFrameId: String, startAt: Instant): IO[Seq[TimelapseTask]] =
   for {
     now       <- IO.pure(clock.instant())
     keyFrames <- influx.getKeyFrames(keyFrameId)
-    scaled    = Scale.scaleKeyFrames(keyFrames.reverse, sunset.atZone(ZoneOffset.UTC))
+    scaled    = Scale.scaleKeyFrames(keyFrames.reverse, startAt.atZone(ZoneOffset.UTC))
     id        = UUID.randomUUID().toString
     tasks     = scaled.map(s => {
       import TimelapseTask._
@@ -58,6 +58,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
       from <- IO(clock.instant())
       to <- IO(from.plusMillis(rateLimit.toMillis))
       maybeTask <- getTimelapseTasks(from, to).map(_.headOption)
+      _ <- IO(maybeTask.map(task => logger.info(s"Executing task: $task")))
       - <- executeTaskOnCamera(maybeTask)
     } yield ()
 

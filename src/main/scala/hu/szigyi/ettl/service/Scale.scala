@@ -21,21 +21,19 @@ object Scale {
     }
   }
 
-  val darknessBeforeSunset = 3
-
-  def scale(curvature: Seq[CurvedSetting], sunset: ZonedDateTime): Seq[ScaledSetting] = {
-    var darknessBegins = sunset.minusHours(darknessBeforeSunset)
+  def scale(curvature: Seq[CurvedSetting], startAt: ZonedDateTime): Seq[ScaledSetting] = {
+    var timelapseBegins = startAt.minusNanos(0)
     curvature.map(s => {
-      darknessBegins += s.duration
-      ScaledSetting(darknessBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
+      timelapseBegins += s.duration
+      ScaledSetting(timelapseBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
     })
   }
 
-  def scaleKeyFrames(keyFrames: Seq[KeyFrame], sunset: ZonedDateTime): Seq[ScaledSetting] = {
-    var darknessBegins = sunset.minusHours(darknessBeforeSunset)
+  def scaleKeyFrames(keyFrames: Seq[KeyFrame], startAt: ZonedDateTime): Seq[ScaledSetting] = {
+    var timelapseBegins = startAt.minusNanos(0)
     keyFrames.map(s => {
-      darknessBegins += s.duration
-      ScaledSetting(darknessBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
+      timelapseBegins += s.duration
+      ScaledSetting(timelapseBegins, s.shutterSpeed, s.shutterSpeedString, s.iso, s.aperture)
     })
   }
 }
