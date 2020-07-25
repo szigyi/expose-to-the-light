@@ -1,14 +1,16 @@
 package hu.szigyi.ettl.service
 
+import java.time.{Clock, Instant}
+
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.service.CameraService.{CameraError, CaptureSetting, GenericCameraError, OfflineCamera}
+import hu.szigyi.ettl.service.CameraService.{CameraError, CaptureCameraModel, CapturedCameraModel, GenericCameraError, OfflineCamera}
 import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 import org.gphoto2.{Camera, CameraUtils, CameraWidgets, GPhotoException}
 
 import scala.util.{Failure, Try}
 
-class CameraService(kill: ShellKill) extends StrictLogging {
+class CameraService(kill: ShellKill, clock: Clock) extends StrictLogging {
   private val camera = new Camera()
 
   private def initialise: Unit = {
@@ -25,7 +27,7 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     CameraUtils.closeQuietly(conf)
   }
 
-  def useCamera(restOfTheApp: CameraWidgets => IO[Unit]): IO[Either[CameraError, String]] = {
+  def useCamera(restOfTheApp: CameraWidgets => IO[CapturedCameraModel]): IO[Either[CameraError, CapturedCameraModel]] = {
     IO.fromTry(Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         kill.killGPhoto2Processes
@@ -34,9 +36,9 @@ class CameraService(kill: ShellKill) extends StrictLogging {
         Failure(unrecoverableException)
 
     }).flatMap(_ => restOfTheApp(camera.newConfiguration())).attempt.map {
-      case Right(_) =>
-        logger.debug("Task is done")
-        Right("Task is done")
+      case Right(captured) =>
+        logger.debug(s"Task is done: $captured")
+        Right(captured)
       case Left(e: GPhotoException) if e.result == -105 =>
         val error = OfflineCamera(e.getMessage)
         logger.error(error.msg)
@@ -53,13 +55,25 @@ class CameraService(kill: ShellKill) extends StrictLogging {
     })
   }
 
-  def setEvSettings(rootWidget: CameraWidgets, c: CaptureSetting): IO[Unit] =
+  def setEvSettings(rootWidget: CameraWidgets, c: CaptureCameraModel): IO[CapturedCameraModel] =
     IO.fromTry(Try {
       logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
       rootWidget.setValue("/capturesettings/shutterspeed", c.shutterSpeedString)
       rootWidget.setValue("/imgsettings/iso", c.iso.toString)
       rootWidget.setValue("/capturesettings/aperture", c.aperture.toString)
       rootWidget.apply()
+    })
+      .flatMap(_ => getSettings(rootWidget))
+
+  private def getSettings(rootWidget: CameraWidgets): IO[CapturedCameraModel] =
+    IO.fromTry(Try {
+      CapturedCameraModel(
+        clock.instant(),
+        rootWidget.getValue("/capturesettings/shutterspeed").toString.toDouble,
+        rootWidget.getValue("/capturesettings/shutterspeed").toString,
+        rootWidget.getValue("/imgsettings/iso").toString.toInt,
+        rootWidget.getValue("/capturesettings/aperture").toString.toDouble
+      )
     })
 
   def captureImage: IO[Unit] = {
@@ -72,11 +86,14 @@ class CameraService(kill: ShellKill) extends StrictLogging {
 
 object CameraService {
 
-  case class CaptureSetting(shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double)
-  object CaptureSetting {
-    def apply(shutterSpeed: Double, iso: Int, aperture: Double): Option[CaptureSetting] =
-      ShutterSpeedMap.toShutterSpeed(shutterSpeed).map(sss => {
-        new CaptureSetting(shutterSpeed, sss, iso, aperture)
+  case class CaptureCameraModel(shutterSpeed: Option[Double], shutterSpeedString: Option[String], iso: Option[Int],
+                                aperture: Option[Double])
+  case class CapturedCameraModel(time: Instant, shutterSpeed: Double, shutterSpeedString: String, iso: Int,
+                                 aperture: Double)
+  object CaptureCameraModel {
+    def apply(shutterSpeed: Option[Double], iso: Option[Int], aperture: Option[Double]): Option[CaptureCameraModel] =
+      shutterSpeed.map(ss => {
+        new CaptureCameraModel(shutterSpeed, ShutterSpeedMap.toShutterSpeed(ss), iso, aperture)
       })
   }
 

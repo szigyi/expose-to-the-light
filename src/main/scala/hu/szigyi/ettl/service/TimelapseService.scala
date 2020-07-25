@@ -8,7 +8,7 @@ import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.{Captured, TimelapseTask}
-import hu.szigyi.ettl.service.CameraService.CaptureSetting
+import hu.szigyi.ettl.service.CameraService.{CaptureCameraModel, CapturedCameraModel}
 import hu.szigyi.ettl.util.ShellKill
 import org.gphoto2.CameraWidgets
 
@@ -25,8 +25,8 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     id        = UUID.randomUUID().toString
     tasks     = scaled.map(s => {
       import TimelapseTask._
-      TimelapseTask(s.time.toInstant, id, false, now, s.shutterSpeed, s.iso, s.aperture,
-        EvService.ev(s.shutterSpeed, s.iso, s.aperture))
+      TimelapseTask(s.time.toInstant, id, false, now, Some(s.shutterSpeed), Some(s.iso), Some(s.aperture),
+        Some(EvService.ev(s.shutterSpeed, s.iso, s.aperture)))
     })
     _         <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
@@ -46,8 +46,8 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
     tasks             = time.zip(scaled).map {
       case (time, scaled) =>
         import TimelapseTask._
-        TimelapseTask(time, id, true, now, scaled.shutterSpeed, scaled.iso, scaled.aperture,
-          EvService.ev(scaled.shutterSpeed, scaled.iso, scaled.aperture))
+        TimelapseTask(time, id, true, now, Some(scaled.shutterSpeed), Some(scaled.iso), Some(scaled.aperture),
+          Some(EvService.ev(scaled.shutterSpeed, scaled.iso, scaled.aperture)))
     }
     _                 <- influx.writeTimelapseTasks(tasks)
       .map(_ => logger.debug(s"Stored: \n${tasks.mkString("\n")}"))
@@ -75,16 +75,18 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
 //    } yield None
 
     maybeTask.flatMap(s => {
-      CaptureSetting(s.shutterSpeed, s.iso, s.aperture).map(c => {
-        val cameraService = new CameraService(shellKill)
+      CaptureCameraModel(s.shutterSpeed, s.iso, s.aperture).map(c => {
+        val cameraService = new CameraService(shellKill, clock)
         cameraService.useCamera(executeTask(cameraService, c, captureImageIfNotTest(s.test))).flatMap {
-          case Right(captured) =>
+          case Right(c) =>
             import Captured._
-            val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed, s.iso, s.aperture, s.ev, None, None)
+            val captured = Captured(c.time, s.id, s.test, c.shutterSpeed, c.iso, c.aperture,
+              EvService.ev(c.shutterSpeed, c.iso, c.aperture), None, None)
             influx.writeCaptured(Seq(captured))
           case Left(cameraError) =>
             import Captured._
-            val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed, s.iso, s.aperture, s.ev,
+            val captured = Captured(clock.instant(), s.id, s.test, s.shutterSpeed.getOrElse(0.0d),
+              s.iso.getOrElse(0), s.aperture.getOrElse(0.0d), s.ev.getOrElse(0.0d),
               Some(cameraError.msg), cameraError.suggestion)
             influx.writeCaptured(Seq(captured))
         }
@@ -94,10 +96,10 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
 
   private def captureImageIfNotTest(test: Boolean): Boolean = !test
 
-  private def executeTask(cameraService: CameraService, capture: CaptureSetting, isCapture: Boolean)(rootWidget: CameraWidgets): IO[Unit] = {
+  private def executeTask(cameraService: CameraService, capture: CaptureCameraModel, isCapture: Boolean)(rootWidget: CameraWidgets): IO[CapturedCameraModel] = {
     for {
-      _ <- cameraService.setEvSettings(rootWidget, capture)
-      _ <- if (isCapture) cameraService.captureImage else IO.unit
-    } yield ()
+      captured  <- cameraService.setEvSettings(rootWidget, capture)
+      _         <- if (isCapture) cameraService.captureImage else IO.unit
+    } yield captured
   }
 }

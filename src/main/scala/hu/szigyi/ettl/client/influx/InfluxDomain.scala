@@ -13,10 +13,10 @@ object InfluxDomain {
                            id: String,
                            test: Boolean,
                            created: Instant,
-                           shutterSpeed: Double,
-                           iso: Int,
-                           aperture: Double,
-                           ev: Double)
+                           shutterSpeed: Option[Double],
+                           iso: Option[Int],
+                           aperture: Option[Double],
+                           ev: Option[Double])
   case class Captured(timestamp: TimeColumn,
                       id: String,
                       test: Boolean,
@@ -62,18 +62,17 @@ object InfluxDomain {
 
     implicit val reader: Read[TimelapseTask] = Read.instance(r =>
       TimelapseTask(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Instant](createdFieldName),
-        r.get[Double](shutterSpeedFieldName), r.get[Int](isoFieldName), r.get[Double](apertureFieldName),
-        r.get[Double](evFieldName)))
+        r.getOption(shutterSpeedFieldName).map(_.toDouble), r.getOption(isoFieldName).map(_.toInt),
+        r.getOption(apertureFieldName).map(_.toDouble), r.getOption(evFieldName).map(_.toDouble)))
 
     implicit val writer: ToMeasurement[TimelapseTask] = ToMeasurement.instance(measurementName,
       r => Measurement(
-        Seq(
-          createdFieldName -> asInstant(r.created),
-          shutterSpeedFieldName -> asDouble(r.shutterSpeed),
-          isoFieldName -> asInt(r.iso),
-          apertureFieldName -> asDouble(r.aperture),
-          evFieldName -> asDouble(r.ev)
-        ),
+        Seq(createdFieldName -> asInstant(r.created))
+          ++ asOptionT(shutterSpeedFieldName, r.shutterSpeed)(asDouble)
+          ++ asOptionT(isoFieldName, r.iso)(asInt)
+          ++ asOptionT(apertureFieldName, r.aperture)(asDouble)
+          ++ asOptionT(evFieldName, r.ev)(asDouble)
+        ,
         Seq(idFieldName -> r.id, testFieldName -> asBoolean(r.test)),
         time = Some(r.timestamp.time)
       ))

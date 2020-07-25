@@ -45,10 +45,10 @@ object TimelapseApi {
   case class TimelapseTaskResponse(timestamp: Instant,
                                    id: String,
                                    test: Boolean,
-                                   shutterSpeed: Double,
-                                   iso: Int,
-                                   aperture: Double,
-                                   ev: Double)
+                                   shutterSpeed: Option[Double],
+                                   iso: Option[Int],
+                                   aperture: Option[Double],
+                                   ev: Option[Double])
   object TimelapseTaskResponse {
     def apply(t: TimelapseTask): TimelapseTaskResponse =
       new TimelapseTaskResponse(t.timestamp.time, t.id, t.test, t.shutterSpeed, t.iso, t.aperture, t.ev)
