@@ -6,9 +6,9 @@ function setupIndexPage() {
 }
 
 function toLocalDateTimeString(d) {
-    let datestring = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
-    console.log("LocalDT: " + datestring)
-    return datestring
+    let dateString = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+    console.log("LocalDT: " + dateString)
+    return dateString
 }
 
 function nowHTML() {
@@ -58,7 +58,19 @@ function getDatetimePickerValue() {
     return localDt.toISOString()
 }
 
-function storeTimelapseTask(url) {
+function getIntervalValue() {
+    let interval = document.querySelector('#interval').value
+    console.log("Interval: " + interval)
+    return interval
+}
+
+function getCountValue() {
+    let count = document.querySelector('#count').value
+    console.log("Count: " + count)
+    return count
+}
+
+function storeTimelapseTask(url, body) {
     let result = document.querySelector('#storedTasks');
 
     function newLog(t) {
@@ -68,7 +80,7 @@ function storeTimelapseTask(url) {
     }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
+    xhr.open("POST", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -79,18 +91,23 @@ function storeTimelapseTask(url) {
         }
     };
     result.innerHTML = result.innerHTML + "<li class=\"list-group-item\">" + nowHTML() + "<span class=\"badge badge-success\">Commence test run<span></li>";
-    xhr.send();
+    console.log(url + "->" + JSON.stringify(body))
+    xhr.send(JSON.stringify(body));
 }
 
-function storeTimelapse() {
-    let startAt = document.querySelector('#startAt').value;
-    let dtStartAt = new Date(startAt).toISOString()
-    console.log("StartAt: " + dtStartAt)
-    storeTimelapseTask("/timelapse/" + getSelectedKeyFrameId() + "/" + dtStartAt)
+function storeCaptures() {
+    let body = { "startAt": getDatetimePickerValue(), "intervalSeconds": getIntervalValue(), "count": getCountValue() }
+    storeTimelapseTask("/timelapse/capture", body)
+}
+
+function storeSettings() {
+    let body = { "keyFrameId": getSelectedKeyFrameId(), "startAt": getDatetimePickerValue() }
+    storeTimelapseTask("/timelapse/settings", body)
 }
 
 function runTest() {
-    storeTimelapseTask("/timelapse/test/" + getSelectedKeyFrameId())
+    let body = { "keyFrameId": getSelectedKeyFrameId() }
+    storeTimelapseTask("/timelapse/settings/test", body)
 }
 
 const rateFetchCaptured = 1000;

@@ -5,67 +5,78 @@ import java.time.Instant
 import cats.Functor
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.client.influx.InfluxDomain.{Captured, KeyFrame, TimelapseTask}
+import hu.szigyi.ettl.client.influx.InfluxDomain.{CapturedDomain, KeyFrameDomain, ToSetSettingDomain, ToCaptureDomain}
 import reflux._
 
 class InfluxDbClient[F[_]: Functor](influx: InfluxClient[F]) {
 
-  def getTimelapseTasks(from: Instant, to: Instant): F[Vector[TimelapseTask]] =
-    influx.asVector[TimelapseTask](
+  def getSettings(from: Instant, to: Instant): F[Vector[ToSetSettingDomain]] =
+    influx.asVector[ToSetSettingDomain](
       s"""
          |SELECT
-         |${TimelapseTask.idFieldName},
-         |${TimelapseTask.testFieldName},
-         |${TimelapseTask.createdFieldName},
-         |${TimelapseTask.shutterSpeedFieldName},
-         |${TimelapseTask.isoFieldName},
-         |${TimelapseTask.apertureFieldName},
-         |${TimelapseTask.evFieldName}
-         |FROM ${TimelapseTask.measurementName}
+         |${ToSetSettingDomain.idFieldName},
+         |${ToSetSettingDomain.testFieldName},
+         |${ToSetSettingDomain.createdFieldName},
+         |${ToSetSettingDomain.shutterSpeedFieldName},
+         |${ToSetSettingDomain.isoFieldName},
+         |${ToSetSettingDomain.apertureFieldName},
+         |${ToSetSettingDomain.evFieldName}
+         |FROM ${ToSetSettingDomain.measurementName}
          |WHERE time >= '$from' AND time < '$to'""".stripMargin)
 
-  def getCaptured(from: Instant): F[Vector[Captured]] =
-    influx.asVector[Captured](
+  def getTicks(from: Instant, to: Instant): F[Vector[ToCaptureDomain]] =
+    influx.asVector[ToCaptureDomain](
       s"""
          |SELECT
-         |${Captured.idFieldName},
-         |${Captured.testFieldName},
-         |${Captured.shutterSpeedFieldName},
-         |${Captured.isoFieldName},
-         |${Captured.apertureFieldName},
-         |${Captured.evFieldName},
-         |${Captured.errorFieldName},
-         |${Captured.suggestionFieldName}
-         |FROM ${Captured.measurementName}
+         |${ToCaptureDomain.idFieldName},
+         |${ToCaptureDomain.photoOrderFieldName}
+         |FROM ${ToCaptureDomain.measurementName}
+         |WHERE time >= '$from' AND time < '$to'""".stripMargin)
+
+  def getCaptured(from: Instant): F[Vector[CapturedDomain]] =
+    influx.asVector[CapturedDomain](
+      s"""
+         |SELECT
+         |${CapturedDomain.idFieldName},
+         |${CapturedDomain.testFieldName},
+         |${CapturedDomain.photoOrderFieldName},
+         |${CapturedDomain.shutterSpeedFieldName},
+         |${CapturedDomain.isoFieldName},
+         |${CapturedDomain.apertureFieldName},
+         |${CapturedDomain.evFieldName},
+         |${CapturedDomain.errorFieldName},
+         |${CapturedDomain.suggestionFieldName}
+         |FROM ${CapturedDomain.measurementName}
          |WHERE time >= '$from'""".stripMargin)
 
   def getKeyFrameIds: F[Vector[String]] =
     influx.asVector(
       s"""
          |SELECT
-         |${KeyFrame.idFieldName},
-         |${KeyFrame.shutterSpeedStringFieldName}
-         |FROM ${KeyFrame.measurementName}
-         |GROUP BY ${KeyFrame.idFieldName}
+         |${KeyFrameDomain.idFieldName},
+         |${KeyFrameDomain.shutterSpeedStringFieldName}
+         |FROM ${KeyFrameDomain.measurementName}
+         |GROUP BY ${KeyFrameDomain.idFieldName}
          |LIMIT 1""".stripMargin)
 
-  def getKeyFrames(id: String): F[Vector[KeyFrame]] =
-    influx.asVector[KeyFrame](
+  def getKeyFrames(id: String): F[Vector[KeyFrameDomain]] =
+    influx.asVector[KeyFrameDomain](
       s"""
          |SELECT
-         |${KeyFrame.idFieldName},
-         |"${KeyFrame.durationFieldName}",
-         |${KeyFrame.shutterSpeedFieldName},
-         |${KeyFrame.shutterSpeedStringFieldName},
-         |${KeyFrame.isoFieldName},
-         |${KeyFrame.apertureFieldName},
-         |${KeyFrame.evFieldName}
-         |FROM ${KeyFrame.measurementName}
-         |WHERE ${KeyFrame.idFieldName}='$id'""".stripMargin)
+         |${KeyFrameDomain.idFieldName},
+         |"${KeyFrameDomain.durationFieldName}",
+         |${KeyFrameDomain.shutterSpeedFieldName},
+         |${KeyFrameDomain.shutterSpeedStringFieldName},
+         |${KeyFrameDomain.isoFieldName},
+         |${KeyFrameDomain.apertureFieldName},
+         |${KeyFrameDomain.evFieldName}
+         |FROM ${KeyFrameDomain.measurementName}
+         |WHERE ${KeyFrameDomain.idFieldName}='$id'""".stripMargin)
 
-  def writeTimelapseTasks(tlt: Seq[TimelapseTask]): F[Unit] = influx.write(tlt)
-  def writeCaptured(cs: Seq[Captured]): F[Unit] = influx.write(cs)
-  def writeKeyFrame(kfs: Seq[KeyFrame]): F[Unit] = influx.write(kfs)
+  def writeSettings(tlt: Seq[ToSetSettingDomain]): F[Unit] = influx.write(tlt)
+  def writeCaptured(cs: Seq[CapturedDomain]): F[Unit] = influx.write(cs)
+  def writeKeyFrame(kfs: Seq[KeyFrameDomain]): F[Unit] = influx.write(kfs)
+  def writeToBeCaptured(cs: Seq[ToCaptureDomain]): F[Unit] = influx.write(cs)
 }
 
 object InfluxDbClient extends StrictLogging {

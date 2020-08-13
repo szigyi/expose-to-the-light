@@ -7,7 +7,7 @@ import cats.effect.IO
 import hu.szigyi.ettl.api.ApiTool.ZonedDateTimeVar
 import hu.szigyi.ettl.api.KeyFrameApi._
 import hu.szigyi.ettl.client.influx.InfluxDbClient
-import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
+import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrameDomain
 import hu.szigyi.ettl.service.Scale.ScaledSetting
 import hu.szigyi.ettl.service.{EvService, Scale}
 import io.circe.generic.auto._
@@ -22,10 +22,10 @@ class KeyFrameApi(influx: InfluxDbClient[IO]) {
     case GET -> Root =>
       influx.getKeyFrameIds.flatMap(Ok(_))
 
-    case GET -> Root / id / ZonedDateTimeVar(sunset) =>
+    case GET -> Root / id / ZonedDateTimeVar(startAt) =>
       for {
         keyFrames <- influx.getKeyFrames(id)
-        scaled <- IO.pure(Scale.scaleKeyFrames(keyFrames, sunset))
+        scaled <- IO.pure(Scale.scaleKeyFrames(keyFrames, startAt))
         response <- Ok(scaled.map(toScaledModel))
       } yield response
   }
@@ -37,7 +37,7 @@ object KeyFrameApi {
   case class CurvedModel(duration: Long, shutterSpeed: Double, iso: Int, ev: Double)
   case class ScaledModel(time: String, shutterSpeed: Double, iso: Int, ev: Double)
 
-  def toCurvedModel(s: KeyFrame): CurvedModel =
+  def toCurvedModel(s: KeyFrameDomain): CurvedModel =
     CurvedModel(s.duration.toNanos, s.shutterSpeed, s.iso, EvService.ev(s.shutterSpeed, s.iso, s.aperture))
 
   def toScaledModel(s: ScaledSetting): ScaledModel =

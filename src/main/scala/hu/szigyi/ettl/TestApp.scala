@@ -37,7 +37,7 @@ object TestApp extends IOApp with StrictLogging {
       val shellKill = new ShellKill()
       val timeLapseService = new TimelapseService(shellKill, influxDbClient, rateOfBgProcess, clock)
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
-      val storeTask = fs2.Stream.eval(timeLapseService.storeTestTimelapseTask("sunset-curvature"))
+      val storeTask = fs2.Stream.eval(timeLapseService.storeTestSettings("sunset-curvature"))
       storeTask.merge(httpJob.run).compile.drain
     }
       .map(_ => threadPool.shutdown())

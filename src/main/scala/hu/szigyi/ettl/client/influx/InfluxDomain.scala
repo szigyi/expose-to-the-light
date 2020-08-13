@@ -9,32 +9,38 @@ import reflux.{Measurement, Read, TimeColumn, ToMeasurement}
 import scala.concurrent.duration.Duration
 
 object InfluxDomain {
-  case class TimelapseTask(timestamp: TimeColumn,
-                           id: String,
-                           test: Boolean,
-                           created: Instant,
-                           shutterSpeed: Option[Double],
-                           iso: Option[Int],
-                           aperture: Option[Double],
-                           ev: Option[Double])
-  case class Captured(timestamp: TimeColumn,
-                      id: String,
-                      test: Boolean,
-                      shutterSpeed: Double,
-                      iso: Int,
-                      aperture: Double,
-                      ev: Double,
-                      error: Option[String],
-                      suggestion: Option[String])
+  case class ToSetSettingDomain(timestamp: TimeColumn,
+                                id: String,
+                                test: Boolean,
+                                created: Instant,
+                                shutterSpeed: Option[Double],
+                                iso: Option[Int],
+                                aperture: Option[Double],
+                                ev: Option[Double])
 
-  case class KeyFrame(timestamp: TimeColumn,
-                      id: String,
-                      duration: Duration,
-                      shutterSpeed: Double,
-                      shutterSpeedString: String,
-                      iso: Int,
-                      aperture: Double,
-                      ev: Double)
+  case class ToCaptureDomain(timestamp: TimeColumn,
+                             id: String,
+                             order: Int)
+
+  case class CapturedDomain(timestamp: TimeColumn,
+                            id: String,
+                            test: Boolean,
+                            order: Int,
+                            shutterSpeed: Double,
+                            iso: Int,
+                            aperture: Double,
+                            ev: Double,
+                            error: Option[String],
+                            suggestion: Option[String])
+
+  case class KeyFrameDomain(timestamp: TimeColumn,
+                            id: String,
+                            duration: Duration,
+                            shutterSpeed: Double,
+                            shutterSpeedString: String,
+                            iso: Int,
+                            aperture: Double,
+                            ev: Double)
 
   trait InfluxDomainTrait {
     val measurementName: String
@@ -50,22 +56,22 @@ object InfluxDomain {
     def toInstant(str: String): Instant = Instant.parse(str)
   }
 
-  object TimelapseTask extends InfluxDomainTrait {
-    override val measurementName = "timelapse_task"
+  object ToSetSettingDomain extends InfluxDomainTrait {
+    override val measurementName = "settings"
     val idFieldName = "id"
     val testFieldName = "test"
     val createdFieldName = "created"
-    val shutterSpeedFieldName = "shutterSpeed"
+    val shutterSpeedFieldName = "shutter_speed"
     val isoFieldName = "iso"
     val apertureFieldName = "aperture"
     val evFieldName = "ev"
 
-    implicit val reader: Read[TimelapseTask] = Read.instance(r =>
-      TimelapseTask(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Instant](createdFieldName),
+    implicit val reader: Read[ToSetSettingDomain] = Read.instance(r =>
+      ToSetSettingDomain(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Instant](createdFieldName),
         r.getOption(shutterSpeedFieldName).map(_.toDouble), r.getOption(isoFieldName).map(_.toInt),
         r.getOption(apertureFieldName).map(_.toDouble), r.getOption(evFieldName).map(_.toDouble)))
 
-    implicit val writer: ToMeasurement[TimelapseTask] = ToMeasurement.instance(measurementName,
+    implicit val writer: ToMeasurement[ToSetSettingDomain] = ToMeasurement.instance(measurementName,
       r => Measurement(
         Seq(createdFieldName -> asInstant(r.created))
           ++ asOptionT(shutterSpeedFieldName, r.shutterSpeed)(asDouble)
@@ -78,25 +84,27 @@ object InfluxDomain {
       ))
   }
 
-  object Captured extends InfluxDomainTrait {
+  object CapturedDomain extends InfluxDomainTrait {
     override val measurementName = "captured"
     val idFieldName = "id"
     val testFieldName = "test"
-    val shutterSpeedFieldName = "shutterSpeed"
+    val photoOrderFieldName = "photo_order"
+    val shutterSpeedFieldName = "shutter_speed"
     val isoFieldName = "iso"
     val apertureFieldName = "aperture"
     val evFieldName = "ev"
     val errorFieldName = "error"
     val suggestionFieldName = "suggestion"
 
-    implicit val reader: Read[Captured] = Read.instance(r =>
-      Captured(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Double](shutterSpeedFieldName),
-        r.get[Int](isoFieldName), r.get[Double](apertureFieldName), r.get[Double](evFieldName),
-        r.getOption(errorFieldName), r.getOption(suggestionFieldName)))
+    implicit val reader: Read[CapturedDomain] = Read.instance(r =>
+      CapturedDomain(r.time, r.getString(idFieldName), r.getString(testFieldName).toBoolean, r.get[Int](photoOrderFieldName),
+        r.get[Double](shutterSpeedFieldName), r.get[Int](isoFieldName), r.get[Double](apertureFieldName),
+        r.get[Double](evFieldName), r.getOption(errorFieldName), r.getOption(suggestionFieldName)))
 
-    implicit val writer: ToMeasurement[Captured] = ToMeasurement.instance(measurementName,
+    implicit val writer: ToMeasurement[CapturedDomain] = ToMeasurement.instance(measurementName,
       r => Measurement(
         Seq(
+          photoOrderFieldName -> asInt(r.order),
           shutterSpeedFieldName -> asDouble(r.shutterSpeed),
           isoFieldName -> asInt(r.iso),
           apertureFieldName -> asDouble(r.aperture),
@@ -111,22 +119,22 @@ object InfluxDomain {
       ))
   }
 
-  object KeyFrame extends InfluxDomainTrait {
+  object KeyFrameDomain extends InfluxDomainTrait {
     override val measurementName = "key_frame"
     val idFieldName = "id"
     val durationFieldName = "duration"
-    val shutterSpeedFieldName = "shutterSpeed"
-    val shutterSpeedStringFieldName = "shutterSpeedString"
+    val shutterSpeedFieldName = "shutter_speed"
+    val shutterSpeedStringFieldName = "shutter_speed_string"
     val isoFieldName = "iso"
     val apertureFieldName = "aperture"
     val evFieldName = "ev"
 
-    implicit val reader: Read[KeyFrame] = Read.instance(r =>
-      KeyFrame(r.time, r.getString(idFieldName), Duration.fromNanos(r.get[Long](durationFieldName)),
+    implicit val reader: Read[KeyFrameDomain] = Read.instance(r =>
+      KeyFrameDomain(r.time, r.getString(idFieldName), Duration.fromNanos(r.get[Long](durationFieldName)),
         r.get[Double](shutterSpeedFieldName), r.getString(shutterSpeedStringFieldName), r.get[Int](isoFieldName),
         r.get[Double](apertureFieldName), r.get[Double](evFieldName)))
 
-    implicit val writer: ToMeasurement[KeyFrame] = ToMeasurement.instance(measurementName,
+    implicit val writer: ToMeasurement[KeyFrameDomain] = ToMeasurement.instance(measurementName,
       r => Measurement(
         Seq(
           durationFieldName -> asLong(r.duration.toNanos),
@@ -140,7 +148,24 @@ object InfluxDomain {
         time = Some(r.timestamp.time)
       ))
 
-    def apply(timestamp: TimeColumn, id: String, duration: Duration, shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double): KeyFrame =
-      new KeyFrame(timestamp, id, duration, shutterSpeed, shutterSpeedString, iso, aperture, EvService.ev(shutterSpeed, iso, aperture))
+    def apply(timestamp: TimeColumn, id: String, duration: Duration, shutterSpeed: Double, shutterSpeedString: String, iso: Int, aperture: Double): KeyFrameDomain =
+      new KeyFrameDomain(timestamp, id, duration, shutterSpeed, shutterSpeedString, iso, aperture, EvService.ev(shutterSpeed, iso, aperture))
+  }
+
+  object ToCaptureDomain extends InfluxDomainTrait {
+    override val measurementName = "tick"
+    val idFieldName = "id"
+    val photoOrderFieldName = "photo_order"
+
+    implicit val reader: Read[ToCaptureDomain] = Read.instance(r =>
+      ToCaptureDomain(r.time, r.getString(idFieldName), r.get[Int](photoOrderFieldName)))
+
+    implicit val writer: ToMeasurement[ToCaptureDomain] = ToMeasurement.instance(measurementName,
+      r => Measurement(
+        Seq(idFieldName -> asString(r.id), photoOrderFieldName -> asInt(r.order)),
+        Seq(idFieldName -> r.id),
+        time = Some(r.timestamp.time)
+      ))
+
   }
 }

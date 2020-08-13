@@ -21,6 +21,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="curvature.html">Curvature</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manager.html">Manager</a>
+                    </li>
                 </ul>
             </div>
             <div class="col-8">
@@ -29,18 +32,23 @@
         </div>
         <div id="scaled"></div>
         <div class="row">
-            <div class="form-group col-md-3">
-                <select id="key-frame-ids" class="form-control mb-2 mr-sm-2" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+            <div class="form-inline col-md-12">
+                <select id="key-frame-ids" class="form-control mr-2" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
                     <option>Key-frame ids are loading...</option>
                 </select>
-            </div>
-            <div class="form-group col-md-2">
-                <button type="button" class="btn btn-primary" onclick="runTest()">Run test</button>
-            </div>
-            <div class="form-inline col-md-6">
+                <label for="interval" class="form-label">Interval Seconds:</label>
+                <input type="number" min="1" step="1" id="interval" class="form-control col-md-2 mr-2" name="interval" value="1">
+                <label for="count" class="form-label">Count:</label>
+                <input type="number" min="1" step="1" id="count" class="form-control col-md-2 mr-2" name="count" value="100">
                 <label for="startAt" class="form-label">Start at:</label>
-                <input type="datetime-local" id="startAt" class="form-control" name="startAt" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
-                <button type="button" class="btn btn-success" onclick="storeTimelapse()">Store Timelapse</button>
+                <input type="datetime-local" id="startAt" class="form-control col-md-4 mr-2" name="startAt" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-inline col-md-12">
+                <button type="button" class="btn btn-primary mr-2" onclick="runTest()">Run test</button>
+                <button type="button" class="btn btn-success mr-2" onclick="storeSettings()">Store Key Frame Plan</button>
+                <button type="button" class="btn btn-success mr-2" onclick="storeCaptures()">Store Capture Plan</button>
             </div>
         </div>
         <h3>Stored tasks:</h3>

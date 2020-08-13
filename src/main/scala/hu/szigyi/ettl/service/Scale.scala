@@ -3,7 +3,7 @@ package hu.szigyi.ettl.service
 import java.time.ZonedDateTime
 import java.time.{Duration => JDuration}
 
-import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
+import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrameDomain
 import hu.szigyi.ettl.service.KeyFrameService.CurvedSetting
 
 import scala.concurrent.duration.Duration
@@ -29,7 +29,7 @@ object Scale {
     })
   }
 
-  def scaleKeyFrames(keyFrames: Seq[KeyFrame], startAt: ZonedDateTime): Seq[ScaledSetting] = {
+  def scaleKeyFrames(keyFrames: Seq[KeyFrameDomain], startAt: ZonedDateTime): Seq[ScaledSetting] = {
     var timelapseBegins = startAt.minusNanos(0)
     keyFrames.map(s => {
       timelapseBegins += s.duration

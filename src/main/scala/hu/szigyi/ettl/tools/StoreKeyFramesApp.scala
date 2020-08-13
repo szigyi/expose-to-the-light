@@ -7,8 +7,8 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
 import cats.syntax.apply._
 import hu.szigyi.ettl.client.influx.InfluxDbClient
-import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrame
-import KeyFrame._
+import hu.szigyi.ettl.client.influx.InfluxDomain.KeyFrameDomain
+import KeyFrameDomain._
 import hu.szigyi.ettl.service.KeyFrameService.CurvedSetting
 import org.http4s.Uri
 import org.http4s.client.blaze.BlazeClientBuilder
@@ -45,13 +45,13 @@ object StoreKeyFramesApp extends IOApp {
       .as(ExitCode.Success)
   }
 
-  private def static(clock: Clock, id: String): Seq[KeyFrame] =
+  private def static(clock: Clock, id: String): Seq[KeyFrameDomain] =
     sparseInTimeKeyFrames(clock, Seq(
-      KeyFrame(clock.instant(), id, 0.second, 15d, "15", 1600, 2.8d),
-      KeyFrame(clock.instant(), id, 60.minutes, 15d, "15", 1600, 2.8d)
+      KeyFrameDomain(clock.instant(), id, 0.second, 15d, "15", 1600, 2.8d),
+      KeyFrameDomain(clock.instant(), id, 60.minutes, 15d, "15", 1600, 2.8d)
     ))
 
-  private def curvature(clock: Clock, id: String): Seq[KeyFrame] =
+  private def curvature(clock: Clock, id: String): Seq[KeyFrameDomain] =
     sparseInTimeKeyFrames(clock, Seq(
       CurvedSetting(20.0.minutes, 15d, 1600, 2.8),
   //    CurvedSetting(15.0.minutes, 13, 1600, 2.8),
@@ -105,9 +105,9 @@ object StoreKeyFramesApp extends IOApp {
       CurvedSetting(20.0.minutes, 1d / 6400d, 100, 2.8),
       CurvedSetting(20.0.minutes, 1d / 8000d, 100, 2.8)
     )
-    .map(c => KeyFrame(clock.instant(), id, c.duration, c.shutterSpeed, c.shutterSpeedString, c.iso, c.aperture)))
+    .map(c => KeyFrameDomain(clock.instant(), id, c.duration, c.shutterSpeed, c.shutterSpeedString, c.iso, c.aperture)))
 
-  private def playingWithEv(clock: Clock, id: String): Seq[KeyFrame] =
+  private def playingWithEv(clock: Clock, id: String): Seq[KeyFrameDomain] =
     sparseInTimeKeyFrames(clock, Seq(
       CurvedSetting(30.seconds, 8.0,8000,18.0),
       CurvedSetting(30.seconds, 0.5,8000,4.5),
@@ -172,9 +172,9 @@ object StoreKeyFramesApp extends IOApp {
       CurvedSetting(30.seconds, 0.4,6400,4.5),
       CurvedSetting(30.seconds, 0.8,12800,4.5)
     )
-      .map(c => KeyFrame(clock.instant(), id, c.duration, c.shutterSpeed, c.shutterSpeedString, c.iso, c.aperture)))
+      .map(c => KeyFrameDomain(clock.instant(), id, c.duration, c.shutterSpeed, c.shutterSpeedString, c.iso, c.aperture)))
 
-  private def sparseInTimeKeyFrames(clock: Clock, keyFrames: Seq[KeyFrame]): Seq[KeyFrame] = {
+  private def sparseInTimeKeyFrames(clock: Clock, keyFrames: Seq[KeyFrameDomain]): Seq[KeyFrameDomain] = {
     val now = clock.instant()
     val idx = 0 until keyFrames.size
     idx.zip(keyFrames).map {

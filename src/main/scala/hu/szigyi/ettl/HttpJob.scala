@@ -8,7 +8,7 @@ import scala.concurrent.duration.FiniteDuration
 class HttpJob(rate: FiniteDuration, tls: TimelapseService)(implicit timer: Timer[IO]) {
 
   def run: fs2.Stream[IO, Unit] = {
-    schedule(rate, tls.executeCurrentTimelapseTasks)
+    schedule(rate, tls.executeCurrentTask)
   }
 
   private def schedule[A](rate: FiniteDuration , task: IO[A]): fs2.Stream[IO, A] =
