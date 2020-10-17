@@ -2,7 +2,7 @@ package hu.szigyi.ettl
 
 import cats.data.Kleisli
 import cats.effect.{ContextShift, ExitCode, IO, Timer}
-import hu.szigyi.ettl.api.{HealthApi, KeyFrameApi, StaticApi, TimelapseApi}
+import hu.szigyi.ettl.api.{HealthApi, KeyFrameApi, LastCapturedApi, StaticApi, TimelapseApi}
 import hu.szigyi.ettl.util.ManifestReader
 import org.http4s.{Request, Response}
 import org.http4s.server.Router
@@ -10,7 +10,7 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 
 class HttpApi(env: String, port: Int, staticApi: StaticApi, healthApi: HealthApi, keyFrameApi: KeyFrameApi,
-              timelapseApi: TimelapseApi)(implicit timer: Timer[IO], contextShift: ContextShift[IO]) {
+              timelapseApi: TimelapseApi, lastCapturedApi: LastCapturedApi)(implicit timer: Timer[IO], contextShift: ContextShift[IO]) {
 
   def run: fs2.Stream[IO, ExitCode] =
     BlazeServerBuilder[IO]
@@ -21,10 +21,11 @@ class HttpApi(env: String, port: Int, staticApi: StaticApi, healthApi: HealthApi
 
   private def httpApp: Kleisli[IO, Request[IO], Response[IO]] =
     Router(
-      "/"           -> staticApi.service,
-      "/health"     -> healthApi.service,
-      "/key-frames" -> keyFrameApi.service,
-      "/timelapse"  -> timelapseApi.service
+      "/"               -> staticApi.service,
+      "/health"         -> healthApi.service,
+      "/key-frames"     -> keyFrameApi.service,
+      "/timelapse"      -> timelapseApi.service,
+      "/last-captured"  -> lastCapturedApi.service
     ).orNotFound
 
   private def banner(envName: String): String = {

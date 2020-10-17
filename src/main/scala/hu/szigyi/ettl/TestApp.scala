@@ -7,7 +7,7 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
-import hu.szigyi.ettl.service.TimelapseService
+import hu.szigyi.ettl.service.{CapturedImageService, TimelapseService}
 import hu.szigyi.ettl.util.ShellKill
 import org.http4s.Uri
 import org.http4s.client.blaze.BlazeClientBuilder
@@ -35,7 +35,8 @@ object TestApp extends IOApp with StrictLogging {
       val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
       val influxDbClient = InfluxDbClient.apply(influx)
       val shellKill = new ShellKill()
-      val timeLapseService = new TimelapseService(shellKill, influxDbClient, rateOfBgProcess, clock)
+      val capturedImageService = new CapturedImageService()
+      val timeLapseService = new TimelapseService(shellKill, influxDbClient, capturedImageService, rateOfBgProcess, clock)
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
       val storeTask = fs2.Stream.eval(timeLapseService.storeTestSettings("sunset-curvature"))
       storeTask.merge(httpJob.run).compile.drain

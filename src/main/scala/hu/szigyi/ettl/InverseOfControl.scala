@@ -3,9 +3,9 @@ package hu.szigyi.ettl
 import java.time.Clock
 
 import cats.effect.{Blocker, ContextShift, IO, Timer}
-import hu.szigyi.ettl.api.{HealthApi, KeyFrameApi, StaticApi, TimelapseApi}
+import hu.szigyi.ettl.api.{HealthApi, KeyFrameApi, LastCapturedApi, StaticApi, TimelapseApi}
 import hu.szigyi.ettl.client.influx.InfluxDbClient
-import hu.szigyi.ettl.service.TimelapseService
+import hu.szigyi.ettl.service.{CapturedImageService, TimelapseService}
 import hu.szigyi.ettl.util.ShellKill
 import org.http4s.Uri
 import org.http4s.client.Client
@@ -24,13 +24,15 @@ class InverseOfControl(env: String, port: Int, client: Client[IO])(implicit time
 
   val rateOfBgProcess = 1.second
   val shellKill = new ShellKill()
-  val timeLapseService = new TimelapseService(shellKill, influxDbClient, rateOfBgProcess, clock)
+  val capturedImageService = new CapturedImageService()
+  val timeLapseService = new TimelapseService(shellKill, influxDbClient, capturedImageService, rateOfBgProcess, clock)
 
   val staticApi: StaticApi = new StaticApi(blocker)
   val healthApi: HealthApi = new HealthApi(env)
   val keyFrameApi: KeyFrameApi = new KeyFrameApi(influxDbClient)
   val timeLapseAPi = new TimelapseApi(timeLapseService)
+  val lastCapturedApi = new LastCapturedApi(capturedImageService)
 
-  val httpApi = new HttpApi(env, port, staticApi, healthApi, keyFrameApi, timeLapseAPi)
+  val httpApi = new HttpApi(env, port, staticApi, healthApi, keyFrameApi, timeLapseAPi, lastCapturedApi)
   val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
 }

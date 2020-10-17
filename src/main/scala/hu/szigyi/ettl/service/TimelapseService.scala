@@ -7,15 +7,16 @@ import cats.effect.{IO, Timer}
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
-import hu.szigyi.ettl.client.influx.InfluxDomain.{CapturedDomain, ToSetSettingDomain, ToCaptureDomain}
+import hu.szigyi.ettl.client.influx.InfluxDomain.{CapturedDomain, ToCaptureDomain, ToSetSettingDomain}
 import hu.szigyi.ettl.service.CameraService.{CameraError, CapturedCameraModel, SettingsCameraModel}
 import hu.szigyi.ettl.util.ShellKill
-import org.gphoto2.CameraWidgets
+import org.gphoto2.{CameraFile, CameraWidgets}
 
 import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
-class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLimit: Duration,
-                       clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
+class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], capturedImageService: CapturedImageService,
+                       rateLimit: Duration, clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
   def storeSettings(keyFrameId: String, startAt: Instant): IO[Seq[ToSetSettingDomain]] =
   for {
@@ -121,9 +122,15 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], rateLim
 
   private def executeCaptureTick(cameraService: CameraService)(rootWidget: CameraWidgets): IO[Option[CapturedCameraModel]] =
     for {
-      _ <- cameraService.captureImage
-      r <- readOutSettings(cameraService, rootWidget)
-    } yield Some(r)
+      cf  <- cameraService.captureImage
+      r   <- readOutSettings(cameraService, rootWidget)
+    } yield {
+      Try(capturedImageService.saveCapturedImage(cf).unsafeRunSync()) match {
+        case Success(value) => logger.info("Captured image have been stored!")
+        case Failure(exception) => logger.error("Could not store captured image!", exception)
+      }
+      Some(r)
+    }
 
   private def readOutSettings(cameraService: CameraService, rootWidget: CameraWidgets): IO[CapturedCameraModel] =
     cameraService.getSettings(rootWidget)
