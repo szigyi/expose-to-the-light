@@ -18,9 +18,10 @@ class CapturedImageService extends StrictLogging {
 
   def saveCapturedImage(cf: CameraFile): IO[Unit] = {
 //    cf.save(imagePath.toFile.getAbsolutePath)
-    logger.info(s"Saved image to: ${imagePath.toFile.getAbsolutePath}")
-    val img: Array[Byte] = Files.readAllBytes(imagePath)
-    val encoded: String = BaseEncoding.base64().encode(img)
-    image.set(encoded)
+//    logger.info(s"Saved image to: ${imagePath.toFile.getAbsolutePath}")
+//    val img: Array[Byte] = Files.readAllBytes(imagePath)
+//    val encoded: String = BaseEncoding.base64().encode(img)
+//    image.set(encoded)
+    IO.unit
   }
 }

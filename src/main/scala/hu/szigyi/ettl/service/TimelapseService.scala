@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.service
 
-import java.time.{Clock, Instant, ZoneOffset, ZonedDateTime}
+import java.time.{Clock, Instant, ZoneOffset}
 import java.util.UUID
 
 import cats.effect.{IO, Timer}
@@ -10,7 +10,7 @@ import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.{CapturedDomain, ToCaptureDomain, ToSetSettingDomain}
 import hu.szigyi.ettl.service.CameraService.{CameraError, CapturedCameraModel, SettingsCameraModel}
 import hu.szigyi.ettl.util.ShellKill
-import org.gphoto2.{CameraFile, CameraWidgets}
+import org.gphoto2.CameraWidgets
 
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}

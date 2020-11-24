@@ -4,7 +4,7 @@ import java.time.{Clock, Instant}
 
 import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.service.CameraService.{CameraError, CapturedCameraModel, GenericCameraError, OfflineCamera, SettingsCameraModel}
+import hu.szigyi.ettl.service.CameraService.{CameraError, CapturedCameraModel, GenericCameraError, OfflineCamera, SettingsCameraModel, parseFractionDouble}
 import hu.szigyi.ettl.util.{ShellKill, ShutterSpeedMap}
 import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets, GPhotoException}
 
@@ -27,15 +27,20 @@ class CameraService(kill: ShellKill, clock: Clock) extends StrictLogging {
     CameraUtils.closeQuietly(conf)
   }
 
-  def useCamera(restOfTheApp: CameraWidgets => IO[Option[CapturedCameraModel]]): IO[Either[CameraError, Option[CapturedCameraModel]]] = {
-    IO.fromTry(Try(initialise).recoverWith {
+  def recoverInitialise: Try[Unit] = {
+    Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         kill.killGPhoto2Processes
         Try(camera.newConfiguration())
       case unrecoverableException =>
         Failure(unrecoverableException)
+    }
+  }
 
-    }).flatMap(_ => restOfTheApp(camera.newConfiguration())).attempt.map {
+  def useCamera(restOfTheApp: CameraWidgets => IO[Option[CapturedCameraModel]]): IO[Either[CameraError, Option[CapturedCameraModel]]] = {
+    IO.fromTry(recoverInitialise)
+      .flatMap(_ => restOfTheApp(camera.newConfiguration()))
+      .attempt.map {
       case Right(captured) =>
         logger.debug(s"Task is done: $captured")
         Right(captured)
@@ -69,7 +74,7 @@ class CameraService(kill: ShellKill, clock: Clock) extends StrictLogging {
     IO.fromTry(Try {
       CapturedCameraModel(
         clock.instant(),
-        rootWidget.getValue("/capturesettings/shutterspeed").toString.toDouble,
+        parseFractionDouble(rootWidget.getValue("/capturesettings/shutterspeed").toString),
         rootWidget.getValue("/capturesettings/shutterspeed").toString,
         rootWidget.getValue("/imgsettings/iso").toString.toInt,
         rootWidget.getValue("/capturesettings/aperture").toString.toDouble
@@ -114,4 +119,18 @@ object CameraService {
         |""".stripMargin.replaceAll("\n", " "))
   }
   case class GenericCameraError(msg: String, result: Int, suggestion: Option[String]) extends CameraError
+
+  private def parseFractionDouble(s: String): Double = {
+    s.toDoubleOption match {
+      case Some(value) => value
+      case None =>
+        s.split("/").toList match {
+          case Nil => throw new Exception(s"Cannot parse $s as double")
+          case numeratorS :: denominatorS :: Nil =>
+            val numerator = numeratorS.toDouble
+            val denominator = denominatorS.toDouble
+            numerator / denominator
+        }
+    }
+  }
 }
