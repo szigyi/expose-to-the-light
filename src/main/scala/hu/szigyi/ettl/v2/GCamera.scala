@@ -7,21 +7,21 @@ import java.nio.file.{Files, Paths}
 import scala.util.Try
 
 trait GCamera {
-  def initialize(): Try[Unit]
-  def newConfiguration(): Try[GConfiguration]
-  def captureImage(): Try[GFile]
+  def initialize: Try[Unit]
+  def newConfiguration: Try[GConfiguration]
+  def captureImage: Try[GFile]
 }
 
 class GCameraImpl extends GCamera {
-  private val c = new Camera()
+  private val c = new Camera
 
-  override def initialize(): Try[Unit] =
+  override def initialize: Try[Unit] =
     Try(c.initialize())
 
-  override def newConfiguration(): Try[GConfiguration] =
+  override def newConfiguration: Try[GConfiguration] =
     Try(c.newConfiguration()).map(new GConfigurationImpl(_))
 
-  override def captureImage(): Try[GFile] =
+  override def captureImage: Try[GFile] =
     Try(c.captureImage()).map(new GFileImpl(_))
 }
 
@@ -30,7 +30,7 @@ trait GConfiguration {
 
   def setValue(name: String, value: Any): Unit
 
-  def apply(): Unit
+  def apply: Unit
 
   def close: Unit
 }
@@ -42,7 +42,7 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
 
   override def setValue(name: String, value: Any): Unit = w.setValue(name, value)
 
-  override def apply(): Unit = w.apply()
+  override def apply: Unit = w.apply()
 
   override def close: Unit = CameraUtils.closeQuietly(w)
 }

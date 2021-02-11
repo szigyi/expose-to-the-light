@@ -11,7 +11,7 @@ object CameraHandler extends StrictLogging {
     file.getImage
 
   def takePhoto(camera: GCamera): Try[GFile] =
-    camera.captureImage()
+    camera.captureImage
 
   def connectToCamera(camera: GCamera, shellKill: => Unit): Try[GConfiguration] =
     initialiseCamera(camera).recoverWith {
@@ -23,8 +23,8 @@ object CameraHandler extends StrictLogging {
     }
 
   private def initialiseCamera(camera: GCamera): Try[GConfiguration] =
-    camera.initialize().flatMap { _ =>
-      camera.newConfiguration().map { configuration =>
+    camera.initialize.flatMap { _ =>
+      camera.newConfiguration.map { configuration =>
         logger.trace("Getting settings names:")
         logger.trace(configuration.getNames.toString)
         val imageFormat = "RAW"
@@ -32,7 +32,7 @@ object CameraHandler extends StrictLogging {
         configuration.setValue("/imgsettings/imageformat", imageFormat)
         configuration.setValue("/imgsettings/imageformatsd", imageFormat)
         configuration.setValue("/capturesettings/drivemode", "Single silent")
-        configuration.apply()
+        configuration.apply
         configuration
       }
     }

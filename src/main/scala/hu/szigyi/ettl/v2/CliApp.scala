@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] =
-    IO.fromTry(runEttl(new GCameraImpl())).attempt.map {
+    IO.fromTry(runEttl(new GCameraImpl)).attempt.map {
       case Right(v) =>
         logger.info(s"App finished: $v")
         Success(v)
