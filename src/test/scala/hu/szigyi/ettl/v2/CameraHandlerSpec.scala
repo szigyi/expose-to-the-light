@@ -14,15 +14,15 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
     "normal scenario" - {
       "connect to the camera and get back the configuration" in {
         var retried = false
-        val config = capturedConfiguration
+        val config: Try[GConfiguration] = capturedConfiguration
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
           override def initialize(): Try[Unit] = Try()
-          override def newConfiguration(): GConfiguration = config
+          override def newConfiguration(): Try[GConfiguration] = config
           override def captureImage(): GFile = ???
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
-        handler.get shouldBe config
+        handler shouldBe config
       }
     }
 
@@ -30,8 +30,8 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
       "fails to connect to the camera if unhandled exception happens" in {
         var retried = false
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
-          override def initialize(): Try[Unit] = Failure(throw new GPhotoException("bad", -105))
-          override def newConfiguration(): GConfiguration = capturedConfiguration
+          override def initialize(): Try[Unit] = Failure(new GPhotoException("bad", -105))
+          override def newConfiguration(): Try[GConfiguration] = capturedConfiguration
           override def captureImage(): GFile = ???
         }, { retried = true })
 
@@ -47,11 +47,11 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
             count match {
               case 0 =>
                 count += 1
-                Failure(throw new GPhotoException("bad", -53))
+                Failure(new GPhotoException("bad", -53))
               case 1 =>
                 Try()
             }
-          override def newConfiguration(): GConfiguration = capturedConfiguration
+          override def newConfiguration(): Try[GConfiguration] = capturedConfiguration
           override def captureImage(): GFile = ???
         }, { retried = true })
 
@@ -65,7 +65,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
     "take a photo and return the camera file" in {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
         override def initialize(): Try[Unit] = ???
-        override def newConfiguration(): GConfiguration = ???
+        override def newConfiguration(): Try[GConfiguration] = ???
         override def captureImage(): GFile = new GFile {
           override def close: Unit = ???
         }
@@ -77,7 +77,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
     "return error when exception happens during capture" in {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
         override def initialize(): Try[Unit] = ???
-        override def newConfiguration(): GConfiguration = ???
+        override def newConfiguration(): Try[GConfiguration] = ???
         override def captureImage(): GFile = throw new GPhotoException("cannot take photo", -999)
       })
 
@@ -87,7 +87,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
 }
 
 object CameraHandlerSpec {
-  def capturedConfiguration: GConfiguration = new GConfiguration {
+  def capturedConfiguration: Try[GConfiguration] = Try(new GConfiguration {
     var map: Map[String, Any] = Map.empty
 
     override def getNames: Seq[String] = map.keys.toSeq
@@ -98,5 +98,5 @@ object CameraHandlerSpec {
     override def apply(): Unit = ()
 
     override def close: Unit = ()
-  }
+  })
 }
