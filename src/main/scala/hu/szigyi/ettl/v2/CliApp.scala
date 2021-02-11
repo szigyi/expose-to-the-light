@@ -17,9 +17,9 @@ object CliApp extends IOApp with StrictLogging {
 
     IO.fromTry(runEttl(new GCameraImpl, Paths.get(basePath)))
       .attempt.map {
-      case Right(v) =>
-        logger.info(s"App finished: $v")
-        Success(v)
+      case Right(imagePaths) =>
+        logger.info(s"App finished: ${imagePaths.mkString("\n")}")
+        Success(imagePaths)
       case Left(exception) =>
         logger.error(s"App failed", exception)
         Failure(exception)

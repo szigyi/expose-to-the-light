@@ -9,22 +9,26 @@ import scala.util.Try
 
 object EttlApp extends StrictLogging {
 
-  def runEttl(camera: GCamera, imageBasePath: Path): Try[Unit] = {
+  def runEttl(camera: GCamera, imageBasePath: Path): Try[Seq[Path]] =
     for {
-      config      <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      cameraFiles <- scheduledCaptures(camera, imageBasePath)
-    } yield {
-      cameraFiles.foreach(_.close)
-      config.close
-    }
-  }
+      config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
+      imagePaths <- scheduledCaptures(camera, imageBasePath)
+      _          <- config.close
+    } yield imagePaths
 
-  private def scheduledCaptures(camera: GCamera, imageBasePath: Path): Try[Seq[GFile]] = {
+  private def scheduledCaptures(camera: GCamera, imageBasePath: Path): Try[Seq[Path]] = {
     for {
-      first  <- takePhoto(camera)
-      _      <- first.saveImageTo(imageBasePath.resolve("IMG_1.CR2"))
-      second <- takePhoto(camera)
-      _      <- second.saveImageTo(imageBasePath.resolve("IMG_2.CR2"))
+      first  <- capture(camera, imageBasePath.resolve("IMG_1.CR2"))
+      second <- capture(camera, imageBasePath.resolve("IMG_2.CR2"))
     } yield Seq(first, second)
   }
+
+  private def capture(camera: GCamera, imagePath: Path): Try[Path] =
+    for {
+      imgFileOnCamera   <- takePhoto(camera)
+      imgPathOnComputer <- imgFileOnCamera.saveImageTo(imagePath)
+      _                 <- imgFileOnCamera.close
+    } yield imgPathOnComputer
+
+  private def imageNameGenerator: String = ???
 }

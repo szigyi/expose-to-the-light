@@ -26,12 +26,9 @@ class GCameraImpl extends GCamera {
 
 trait GConfiguration {
   def getNames: Seq[String]
-
   def setValue(name: String, value: Any): Unit
-
   def apply: Unit
-
-  def close: Unit
+  def close: Try[Unit]
 }
 
 class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
@@ -44,16 +41,16 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
 
   override def apply: Unit = w.apply()
 
-  override def close: Unit = CameraUtils.closeQuietly(w)
+  override def close: Try[Unit] = Try(w.close)
 }
 
 trait GFile {
-  def close: Unit
+  def close: Try[Unit]
   def saveImageTo(imagePath: Path): Try[Path]
 }
 
 class GFileImpl(f: CameraFile) extends GFile {
-  override def close: Unit = CameraUtils.closeQuietly(f)
+  override def close: Try[Unit] = Try(f.close)
 
   //  val img: Array[Byte] = Files.readAllBytes(Paths.get(imagePath))
   //  val encoded: String = BaseEncoding.base64().encode(img)
