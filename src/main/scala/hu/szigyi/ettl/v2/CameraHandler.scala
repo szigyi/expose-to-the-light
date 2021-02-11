@@ -8,7 +8,7 @@ import scala.util.{Failure, Try}
 object CameraHandler extends StrictLogging {
 
   def takePhoto(camera: GCamera): Try[GFile] =
-    Try(camera.captureImage())
+    camera.captureImage()
 
   def connectToCamera(camera: GCamera, shellKill: => Unit): Try[GConfiguration] =
     initialiseCamera(camera).recoverWith {

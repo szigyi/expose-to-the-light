@@ -18,7 +18,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
           override def initialize(): Try[Unit] = Try()
           override def newConfiguration(): Try[GConfiguration] = config
-          override def captureImage(): GFile = ???
+          override def captureImage(): Try[GFile] = ???
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -32,7 +32,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
           override def initialize(): Try[Unit] = Failure(new GPhotoException("bad", -105))
           override def newConfiguration(): Try[GConfiguration] = capturedConfiguration
-          override def captureImage(): GFile = ???
+          override def captureImage(): Try[GFile] = ???
         }, { retried = true })
 
         handler shouldBe a[Failure[_]]
@@ -52,7 +52,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
                 Try()
             }
           override def newConfiguration(): Try[GConfiguration] = capturedConfiguration
-          override def captureImage(): GFile = ???
+          override def captureImage(): Try[GFile] = ???
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -66,9 +66,9 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
         override def initialize(): Try[Unit] = ???
         override def newConfiguration(): Try[GConfiguration] = ???
-        override def captureImage(): GFile = new GFile {
+        override def captureImage(): Try[GFile] = Try(new GFile {
           override def close: Unit = ???
-        }
+        })
       })
 
       cameraFile shouldBe a[Success[_]]
@@ -78,7 +78,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
         override def initialize(): Try[Unit] = ???
         override def newConfiguration(): Try[GConfiguration] = ???
-        override def captureImage(): GFile = throw new GPhotoException("cannot take photo", -999)
+        override def captureImage(): Try[GFile] = Failure(new GPhotoException("cannot take photo", -999))
       })
 
       cameraFile shouldBe a[Failure[_]]

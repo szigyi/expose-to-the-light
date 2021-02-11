@@ -7,7 +7,7 @@ import scala.util.Try
 trait GCamera {
   def initialize(): Try[Unit]
   def newConfiguration(): Try[GConfiguration]
-  def captureImage(): GFile
+  def captureImage(): Try[GFile]
 }
 
 class GCameraImpl extends GCamera {
@@ -19,8 +19,8 @@ class GCameraImpl extends GCamera {
   override def newConfiguration(): Try[GConfiguration] =
     Try(c.newConfiguration()).map(new GConfigurationImpl(_))
 
-  override def captureImage(): GFile =
-    new GFileImpl(c.captureImage())
+  override def captureImage(): Try[GFile] =
+    Try(c.captureImage()).map(new GFileImpl(_))
 }
 
 trait GConfiguration {
