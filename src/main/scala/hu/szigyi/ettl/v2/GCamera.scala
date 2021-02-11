@@ -4,22 +4,24 @@ import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets}
 
 trait GCamera {
   def initialize(): Unit
-  def newConfiguration(): GCameraConfiguration
-  def captureImage(): CameraFile
+  def newConfiguration(): GConfiguration
+  def captureImage(): GFile
 }
 
-class GCameraImpl() extends GCamera {
+class GCameraImpl extends GCamera {
   private val c = new Camera()
 
-  override def initialize(): Unit = c.initialize()
+  override def initialize(): Unit =
+    c.initialize()
 
-  override def newConfiguration(): GCameraConfiguration =
-    new GCameraConfigurationImpl(c.newConfiguration())
+  override def newConfiguration(): GConfiguration =
+    new GConfigurationImpl(c.newConfiguration())
 
-  override def captureImage(): CameraFile = c.captureImage()
+  override def captureImage(): GFile =
+    new GFileImpl(c.captureImage())
 }
 
-trait GCameraConfiguration {
+trait GConfiguration {
   def getNames: Seq[String]
 
   def setValue(name: String, value: Any): Unit
@@ -29,7 +31,7 @@ trait GCameraConfiguration {
   def close: Unit
 }
 
-class GCameraConfigurationImpl(w: CameraWidgets) extends GCameraConfiguration {
+class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
   import scala.jdk.CollectionConverters._
 
   override def getNames: Seq[String] = w.getNames.asScala.toSeq
@@ -39,4 +41,12 @@ class GCameraConfigurationImpl(w: CameraWidgets) extends GCameraConfiguration {
   override def apply(): Unit = w.apply()
 
   override def close: Unit = CameraUtils.closeQuietly(w)
+}
+
+trait GFile {
+  def close: Unit
+}
+
+class GFileImpl(f: CameraFile) extends GFile {
+  override def close: Unit = CameraUtils.closeQuietly(f)
 }

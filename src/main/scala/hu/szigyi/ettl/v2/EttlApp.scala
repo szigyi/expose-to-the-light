@@ -16,13 +16,13 @@ object EttlApp extends StrictLogging {
       _ <- Try(logger.info("Capturing images..."))
       cameraFiles <- scheduledCaptures(camera)
     } yield {
-      cameraFiles.map(cameraFile => CameraUtils.closeQuietly(cameraFile))
+      cameraFiles.map(_.close)
       config.close
       logger.info("Terminating...")
     }
   }
 
-  private def scheduledCaptures(camera: GCamera): Try[Seq[CameraFile]] = {
+  private def scheduledCaptures(camera: GCamera): Try[Seq[GFile]] = {
     for {
       first <- takePhoto(camera)
       second <- takePhoto(camera)

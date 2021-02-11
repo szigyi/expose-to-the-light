@@ -1,16 +1,16 @@
 package hu.szigyi.ettl.v2
 
 import com.typesafe.scalalogging.StrictLogging
-import org.gphoto2.{CameraFile, GPhotoException}
+import org.gphoto2.GPhotoException
 
 import scala.util.{Failure, Try}
 
 object CameraHandler extends StrictLogging {
 
-  def takePhoto(camera: GCamera): Try[CameraFile] =
+  def takePhoto(camera: GCamera): Try[GFile] =
     Try(camera.captureImage())
 
-  def connectToCamera(camera: GCamera, shellKill: => Unit): Try[GCameraConfiguration] =
+  def connectToCamera(camera: GCamera, shellKill: => Unit): Try[GConfiguration] =
     Try(initialiseCamera(camera)).recoverWith {
       case e: GPhotoException if e.result == -53 =>
         shellKill
@@ -19,7 +19,7 @@ object CameraHandler extends StrictLogging {
         Failure(unrecoverableException)
     }
 
-  private def initialiseCamera(camera: GCamera): GCameraConfiguration = {
+  private def initialiseCamera(camera: GCamera): GConfiguration = {
     camera.initialize()
     val configuration = camera.newConfiguration()
     logger.trace("Getting settings names:")
