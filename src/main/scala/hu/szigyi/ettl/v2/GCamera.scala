@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.v2
 
-import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets}
+import org.gphoto2.{Camera, CameraFile, CameraWidgets}
 
 import java.nio.file.Path
 import scala.util.Try
@@ -26,8 +26,8 @@ class GCameraImpl extends GCamera {
 
 trait GConfiguration {
   def getNames: Seq[String]
-  def setValue(name: String, value: Any): Unit
-  def apply: Unit
+  def setValue(name: String, value: Any): Try[Unit]
+  def apply: Try[Unit]
   def close: Try[Unit]
 }
 
@@ -37,9 +37,9 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
 
   override def getNames: Seq[String] = w.getNames.asScala.toSeq
 
-  override def setValue(name: String, value: Any): Unit = w.setValue(name, value)
+  override def setValue(name: String, value: Any): Try[Unit] = Try(w.setValue(name, value))
 
-  override def apply: Unit = w.apply()
+  override def apply: Try[Unit] = Try(w.apply())
 
   override def close: Try[Unit] = Try(w.close)
 }

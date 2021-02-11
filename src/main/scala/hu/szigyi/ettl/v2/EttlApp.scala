@@ -1,6 +1,7 @@
 package hu.szigyi.ettl.v2
 
 import com.typesafe.scalalogging.StrictLogging
+import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
 
@@ -12,23 +13,45 @@ object EttlApp extends StrictLogging {
   def runEttl(camera: GCamera, imageBasePath: Path): Try[Seq[Path]] =
     for {
       config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      imagePaths <- scheduledCaptures(camera, imageBasePath)
+      imagePaths <- scheduledCaptures(camera, config, imageBasePath)
       _          <- config.close
     } yield imagePaths
 
-  private def scheduledCaptures(camera: GCamera, imageBasePath: Path): Try[Seq[Path]] = {
+  private def scheduledCaptures(camera: GCamera, config: GConfiguration, imageBasePath: Path): Try[Seq[Path]] = {
     for {
-      first  <- capture(camera, imageBasePath.resolve("IMG_1.CR2"))
-      second <- capture(camera, imageBasePath.resolve("IMG_2.CR2"))
+      first  <- capture(camera, config, imageBasePath.resolve("IMG_1.CR2"), SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8)))
+      second <- capture(camera, config, imageBasePath.resolve("IMG_2.CR2"), SettingsCameraModel(Some(1d), Some(100), Some(2.8)))
     } yield Seq(first, second)
   }
 
-  private def capture(camera: GCamera, imagePath: Path): Try[Path] =
+  private def capture(camera: GCamera, config: GConfiguration, imagePath: Path, c: SettingsCameraModel): Try[Path] =
     for {
+      _                 <- adjustSettings(config, c)
       imgFileOnCamera   <- takePhoto(camera)
       imgPathOnComputer <- imgFileOnCamera.saveImageTo(imagePath)
-      _                 <- imgFileOnCamera.close
+      _ <- imgFileOnCamera.close
     } yield imgPathOnComputer
 
-  private def imageNameGenerator: String = ???
+  private def adjustSettings(config: GConfiguration, c: SettingsCameraModel): Try[Unit] = {
+    import cats.implicits._
+
+    def setSS(shutterSpeedString: String): Try[Unit] =
+      config.setValue("/capturesettings/shutterspeed", shutterSpeedString)
+
+    def setI(iso: Int): Try[Unit] =
+      config.setValue("/imgsettings/iso", iso.toString)
+
+    def setA(aperture: Double): Try[Unit] =
+      config.setValue("/capturesettings/aperture", aperture.toString)
+
+    logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
+    val ss = c.shutterSpeedString.map(setSS(_))
+    val i = c.iso.map(setI(_))
+    val a = c.aperture.map(setA(_))
+    val tryChanges: Try[List[Unit]] = List(ss, i, a).flatten.sequence
+    tryChanges.flatMap(changes => {
+      if (changes.nonEmpty) config.apply
+      else Try()
+    })
+  }
 }
