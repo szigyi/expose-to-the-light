@@ -10,7 +10,7 @@ import scala.util.{Failure, Success}
 
 // 1: Can capture image and download it so can view it from computer
 // TODO 2: Can capture consecutive images without camera failure or black screen or camera lag
-// TODO 3: Can succesfully change settings of camera before capturing the image
+// 3: Can successfully change settings of camera before capturing the image
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
