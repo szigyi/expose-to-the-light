@@ -60,6 +60,18 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
       }
     }
   }
+
+  "takePhoto" - {
+    "take a photo and return the camera file" in {
+      val cameraFile: Try[CameraFile] = CameraHandler.takePhoto(new GCamera {
+        override def initialize(): Unit = ()
+        override def newConfiguration(): GCameraConfiguration = capturedConfiguration
+        override def captureImage(): CameraFile = ???
+      })
+
+      cameraFile shouldBe a[Success[_]]
+    }
+  }
 }
 
 object CameraHandlerSpec {

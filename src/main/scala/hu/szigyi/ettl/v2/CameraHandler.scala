@@ -1,7 +1,6 @@
 package hu.szigyi.ettl.v2
 
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.util.ShellKill
 import org.gphoto2.{CameraFile, GPhotoException}
 
 import scala.util.{Failure, Try}
