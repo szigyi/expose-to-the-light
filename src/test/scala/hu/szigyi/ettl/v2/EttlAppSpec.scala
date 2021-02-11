@@ -3,6 +3,7 @@ package hu.szigyi.ettl.v2
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.nio.file.Paths
 import scala.util.Failure
 
 class EttlAppSpec extends AnyFreeSpec with Matchers {
@@ -16,7 +17,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
 
     "Error Scenario" - {
       "when cannot connect to the camera then fast fail and return error" in {
-        val result = EttlApp.runEttl(new GCameraImpl())
+        val result = EttlApp.runEttl(new GCameraImpl(), Paths.get("/"))
         result shouldBe a[Failure[_]]
         result.failed.get.getMessage shouldBe "gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model"
       }

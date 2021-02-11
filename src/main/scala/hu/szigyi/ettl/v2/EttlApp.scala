@@ -4,27 +4,27 @@ import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
 
+import java.nio.file.Path
 import scala.util.Try
 
 object EttlApp extends StrictLogging {
 
-  def runEttl(camera: GCamera): Try[Unit] = {
+  def runEttl(camera: GCamera, imageBasePath: Path): Try[Unit] = {
     for {
       config      <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      cameraFiles <- scheduledCaptures(camera)
+      cameraFiles <- scheduledCaptures(camera, imageBasePath)
     } yield {
       cameraFiles.foreach(_.close)
       config.close
-      logger.info("Terminating...")
     }
   }
 
-  private def scheduledCaptures(camera: GCamera): Try[Seq[GFile]] = {
+  private def scheduledCaptures(camera: GCamera, imageBasePath: Path): Try[Seq[GFile]] = {
     for {
       first  <- takePhoto(camera)
-      _      <- first.getImage
+      _      <- first.getImage(imageBasePath.resolve("IMG_1.CR2"))
       second <- takePhoto(camera)
-      _      <- second.getImage
+      _      <- second.getImage(imageBasePath.resolve("IMG_2.CR2"))
     } yield Seq(first, second)
   }
 }

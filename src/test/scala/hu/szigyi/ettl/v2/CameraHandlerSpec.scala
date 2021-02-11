@@ -1,10 +1,11 @@
 package hu.szigyi.ettl.v2
 
 import hu.szigyi.ettl.v2.CameraHandlerSpec.capturedConfiguration
-import org.gphoto2.{CameraFile, CameraWidgets, GPhotoException}
+import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.nio.file.Path
 import scala.util.{Failure, Success, Try}
 
 class CameraHandlerSpec extends AnyFreeSpec with Matchers {
@@ -68,7 +69,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         override def newConfiguration(): Try[GConfiguration] = ???
         override def captureImage(): Try[GFile] = Try(new GFile {
           override def close: Unit = ???
-          override def getImage: Try[Array[Byte]] = ???
+          override def getImage(imagePath: Path): Try[Path] = ???
         })
       })
 

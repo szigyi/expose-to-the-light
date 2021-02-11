@@ -5,14 +5,18 @@ import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.v2.EttlApp.runEttl
 
+import java.nio.file.Paths
 import scala.util.{Failure, Success}
 
 // TODO 1: Can capture image and download it so can view it from computer
 // TODO 2: Can capture consecutive images without camera failure or black screen or camera lag
 
 object CliApp extends IOApp with StrictLogging {
-  override def run(args: List[String]): IO[ExitCode] =
-    IO.fromTry(runEttl(new GCameraImpl)).attempt.map {
+  override def run(args: List[String]): IO[ExitCode] = {
+    val basePath = "/Users/szabolcs/dev/expose-to-the-light/src/main/resources/"
+
+    IO.fromTry(runEttl(new GCameraImpl, Paths.get(basePath)))
+      .attempt.map {
       case Right(v) =>
         logger.info(s"App finished: $v")
         Success(v)
@@ -20,4 +24,5 @@ object CliApp extends IOApp with StrictLogging {
         logger.error(s"App failed", exception)
         Failure(exception)
     }.as(ExitCode.Success)
+  }
 }
