@@ -19,9 +19,8 @@ object CompareCameraAccessStylesApp extends IOApp with StrictLogging {
 
   override def run(args: List[String]): IO[ExitCode] = {
     val clock = Clock.systemUTC()
-    val shellKill = new ShellKill()
 
-    val cameraService = new CameraService(shellKill, clock)
+    val cameraService = new CameraService(clock)
     val s = SettingsCameraModel(None, None, None)
 
     val r = cameraService.useCamera(captureTask(cameraService, s))

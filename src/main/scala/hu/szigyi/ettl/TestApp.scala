@@ -34,9 +34,8 @@ object TestApp extends IOApp with StrictLogging {
       val clock = Clock.systemUTC()
       val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
       val influxDbClient = InfluxDbClient.apply(influx)
-      val shellKill = new ShellKill()
       val capturedImageService = new CapturedImageService()
-      val timeLapseService = new TimelapseService(shellKill, influxDbClient, capturedImageService, rateOfBgProcess, clock)
+      val timeLapseService = new TimelapseService(influxDbClient, capturedImageService, rateOfBgProcess, clock)
       val httpJob = new HttpJob(rateOfBgProcess, timeLapseService)
       val storeTask = fs2.Stream.eval(timeLapseService.storeTestSettings("sunset-curvature"))
       storeTask.merge(httpJob.run).compile.drain

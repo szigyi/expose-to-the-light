@@ -9,13 +9,12 @@ import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.client.influx.InfluxDbClient
 import hu.szigyi.ettl.client.influx.InfluxDomain.{CapturedDomain, ToCaptureDomain, ToSetSettingDomain}
 import hu.szigyi.ettl.service.CameraService.{CameraError, CapturedCameraModel, SettingsCameraModel}
-import hu.szigyi.ettl.util.ShellKill
 import org.gphoto2.CameraWidgets
 
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
-class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], capturedImageService: CapturedImageService,
+class TimelapseService(influx: InfluxDbClient[IO], capturedImageService: CapturedImageService,
                        rateLimit: Duration, clock: Clock)(implicit timer: Timer[IO]) extends StrictLogging {
 
   def storeSettings(keyFrameId: String, startAt: Instant): IO[Seq[ToSetSettingDomain]] =
@@ -87,7 +86,7 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], capture
 
       case (None, Some(t)) => // only capture image
         logger.info(s"Capture Only: $t")
-        val cameraService = new CameraService(shellKill, clock)
+        val cameraService = new CameraService(clock)
         for {
           res <- cameraService.useCamera(executeCaptureTick(cameraService))
           _   <- storeTask(None, Some(t), res)
@@ -95,14 +94,14 @@ class TimelapseService(shellKill: ShellKill, influx: InfluxDbClient[IO], capture
 
       case (Some(s), None) => // only set new settings
         logger.info(s"Settings Only: $s")
-        val cameraService = new CameraService(shellKill, clock)
+        val cameraService = new CameraService(clock)
         val c = SettingsCameraModel(s.shutterSpeed, s.iso, s.aperture)
         cameraService.useCamera(executeSettings(cameraService, c)) *>
           IO.unit
 
       case (Some(s), Some(t)) => // set new settings and capture image
         logger.info(s"Settings & Capture: $s - $t")
-        val cameraService = new CameraService(shellKill, clock)
+        val cameraService = new CameraService(clock)
         val c = SettingsCameraModel(s.shutterSpeed, s.iso, s.aperture)
         for {
           res <- cameraService.useCamera(executeTasks(cameraService, c))

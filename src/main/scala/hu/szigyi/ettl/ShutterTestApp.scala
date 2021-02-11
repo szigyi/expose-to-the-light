@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 object ShutterTestApp extends IOApp with StrictLogging {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val cam: CameraService = new CameraService(new ShellKill(), Clock.systemUTC())
+    val cam: CameraService = new CameraService(Clock.systemUTC())
     (for {
       _ <- IO(cam.initialise)
       img <- doItAgain(cam)

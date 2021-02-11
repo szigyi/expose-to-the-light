@@ -23,9 +23,8 @@ class InverseOfControl(env: String, port: Int, client: Client[IO])(implicit time
   val influxDbClient = InfluxDbClient.apply(influx)
 
   val rateOfBgProcess = 1.second
-  val shellKill = new ShellKill()
   val capturedImageService = new CapturedImageService()
-  val timeLapseService = new TimelapseService(shellKill, influxDbClient, capturedImageService, rateOfBgProcess, clock)
+  val timeLapseService = new TimelapseService(influxDbClient, capturedImageService, rateOfBgProcess, clock)
 
   val staticApi: StaticApi = new StaticApi(blocker)
   val healthApi: HealthApi = new HealthApi(env)

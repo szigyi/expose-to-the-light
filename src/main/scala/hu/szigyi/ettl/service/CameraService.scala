@@ -10,7 +10,7 @@ import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets, GPhotoExcept
 
 import scala.util.{Failure, Try}
 
-class CameraService(kill: ShellKill, clock: Clock) extends StrictLogging {
+class CameraService(clock: Clock) extends StrictLogging {
   private val camera = new Camera()
 
   def initialise: Unit = {
@@ -30,7 +30,7 @@ class CameraService(kill: ShellKill, clock: Clock) extends StrictLogging {
   def recoverInitialise: Try[Unit] = {
     Try(initialise).recoverWith {
       case e: GPhotoException if e.result == -53 =>
-        kill.killGPhoto2Processes
+        ShellKill.killGPhoto2Processes
         Try(camera.newConfiguration())
       case unrecoverableException =>
         Failure(unrecoverableException)
