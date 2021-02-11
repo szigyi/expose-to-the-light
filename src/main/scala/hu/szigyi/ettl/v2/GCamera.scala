@@ -2,8 +2,10 @@ package hu.szigyi.ettl.v2
 
 import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets}
 
+import scala.util.Try
+
 trait GCamera {
-  def initialize(): Unit
+  def initialize(): Try[Unit]
   def newConfiguration(): GConfiguration
   def captureImage(): GFile
 }
@@ -11,8 +13,8 @@ trait GCamera {
 class GCameraImpl extends GCamera {
   private val c = new Camera()
 
-  override def initialize(): Unit =
-    c.initialize()
+  override def initialize(): Try[Unit] =
+    Try(c.initialize())
 
   override def newConfiguration(): GConfiguration =
     new GConfigurationImpl(c.newConfiguration())
