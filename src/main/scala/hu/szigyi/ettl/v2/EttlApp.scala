@@ -22,9 +22,9 @@ object EttlApp extends StrictLogging {
   private def scheduledCaptures(camera: GCamera, imageBasePath: Path): Try[Seq[GFile]] = {
     for {
       first  <- takePhoto(camera)
-      _      <- first.getImage(imageBasePath.resolve("IMG_1.CR2"))
+      _      <- first.saveImageTo(imageBasePath.resolve("IMG_1.CR2"))
       second <- takePhoto(camera)
-      _      <- second.getImage(imageBasePath.resolve("IMG_2.CR2"))
+      _      <- second.saveImageTo(imageBasePath.resolve("IMG_2.CR2"))
     } yield Seq(first, second)
   }
 }
