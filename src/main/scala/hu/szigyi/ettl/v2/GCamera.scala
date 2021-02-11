@@ -58,3 +58,25 @@ class GFileImpl(f: CameraFile) extends GFile {
   override def saveImageTo(imagePath: Path): Try[Path] =
     Try(f.save(imagePath.toAbsolutePath.toString)).map(_ => imagePath)
 }
+
+object Fixtures {
+  def capturedConfiguration: Try[GConfiguration] = Try(new GConfiguration {
+    var map: Map[String, Any] = Map.empty
+    override def getNames: Seq[String] = map.keys.toSeq
+    override def setValue(name: String, value: Any): Try[Unit] = {
+      map = map + (name -> value)
+      Try()
+    }
+    override def apply: Try[Unit] = Try()
+    override def close: Try[Unit] = Try()
+  })
+
+  def capturedFile: Try[GFile] = Try(new GFile {
+    var list: Seq[Path] = Seq.empty
+    override def close: Try[Unit] = Try()
+    override def saveImageTo(imagePath: Path): Try[Path] = {
+      list = list :+ imagePath
+      Try(imagePath)
+    }
+  })
+}

@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.v2
 
-import hu.szigyi.ettl.v2.CameraHandlerSpec.capturedConfiguration
+import hu.szigyi.ettl.v2.Fixtures.capturedConfiguration
 import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
@@ -86,17 +86,4 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
       cameraFile shouldBe a[Failure[_]]
     }
   }
-}
-
-object CameraHandlerSpec {
-  def capturedConfiguration: Try[GConfiguration] = Try(new GConfiguration {
-    var map: Map[String, Any] = Map.empty
-    override def getNames: Seq[String] = map.keys.toSeq
-    override def setValue(name: String, value: Any): Try[Unit] = {
-      map = map + (name -> value)
-      Try()
-    }
-    override def apply: Try[Unit] = Try()
-    override def close: Try[Unit] = Try()
-  })
 }
