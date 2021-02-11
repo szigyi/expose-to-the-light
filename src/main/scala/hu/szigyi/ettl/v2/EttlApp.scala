@@ -3,7 +3,6 @@ package hu.szigyi.ettl.v2
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
-import org.gphoto2.{CameraFile, CameraUtils}
 
 import scala.util.Try
 
@@ -11,12 +10,10 @@ object EttlApp extends StrictLogging {
 
   def runEttl(camera: GCamera): Try[Unit] = {
     for {
-      _ <- Try(logger.info("Connecting to the camera..."))
-      config <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      _ <- Try(logger.info("Capturing images..."))
+      config      <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
       cameraFiles <- scheduledCaptures(camera)
     } yield {
-      cameraFiles.map(_.close)
+      cameraFiles.foreach(_.close)
       config.close
       logger.info("Terminating...")
     }
