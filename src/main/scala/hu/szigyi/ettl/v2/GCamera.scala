@@ -1,7 +1,9 @@
 package hu.szigyi.ettl.v2
 
+import com.google.common.io.BaseEncoding
 import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets}
 
+import java.nio.file.{Files, Paths}
 import scala.util.Try
 
 trait GCamera {
@@ -47,8 +49,19 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
 
 trait GFile {
   def close: Unit
+  def getImage: Try[Array[Byte]]
 }
 
 class GFileImpl(f: CameraFile) extends GFile {
   override def close: Unit = CameraUtils.closeQuietly(f)
+
+  override def getImage: Try[Array[Byte]] = {
+    val imagePath = "/Users/szabolcs/dev/expose-to-the-light/src/main/resources/get_it_done.cr2"
+    Try(f.save(imagePath)).map { _ =>
+      val img: Array[Byte] = Files.readAllBytes(Paths.get(imagePath))
+      val encoded: String = BaseEncoding.base64().encode(img)
+      println(encoded)
+      img
+    }
+  }
 }

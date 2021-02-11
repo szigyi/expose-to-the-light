@@ -68,6 +68,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         override def newConfiguration(): Try[GConfiguration] = ???
         override def captureImage(): Try[GFile] = Try(new GFile {
           override def close: Unit = ???
+          override def getImage: Try[Array[Byte]] = ???
         })
       })
 
