@@ -18,6 +18,8 @@ resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtoco
 mainClass in assembly := Some("hu.szigyi.ettl.WebApp")
 assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
+scalacOptions += "-deprecation"
+
 val circeVersion  = "0.13.0"
 val http4sVersion = "0.21.0"
 
