@@ -15,10 +15,9 @@ object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val basePath = "/Users/szabolcs/dev/expose-to-the-light/src/main/resources/"
     val appConfig = AppConfiguration(Paths.get(basePath))
-    val ettl = new EttlApp(appConfig)
+    val ettl = new EttlApp(appConfig, new GCameraImpl)
 
-    IO.fromTry(ettl.execute(new GCameraImpl))
-      .attempt.map {
+    IO.fromTry(ettl.execute).attempt.map {
       case Right(imagePaths) =>
         logger.info(s"App finished: ${imagePaths.mkString("\n")}")
         Success(imagePaths)
@@ -29,4 +28,5 @@ object CliApp extends IOApp with StrictLogging {
   }
 
   case class AppConfiguration(imageBasePath: Path)
+
 }

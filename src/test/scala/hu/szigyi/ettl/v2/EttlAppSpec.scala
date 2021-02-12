@@ -15,11 +15,11 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
     "Normal Scenario" - {
       "capture image and returns them" in {
         val configuration = capturedConfiguration
-        val result = new EttlApp(AppConfiguration(Paths.get("/"))).execute(new GCamera {
+        val result = new EttlApp(AppConfiguration(Paths.get("/")), new GCamera {
           override def initialize: Try[Unit] = Try()
           override def newConfiguration: Try[GConfiguration] = configuration
           override def captureImage: Try[GFile] = capturedFile
-        })
+        }).execute
 
         result shouldBe a[Success[_]]
         result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
@@ -37,12 +37,12 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
 
     "Error Scenario" - {
       "when cannot connect to the camera then fast fail and return error" in {
-        val result = new EttlApp(AppConfiguration(Paths.get("/"))).execute(new GCamera {
+        val result = new EttlApp(AppConfiguration(Paths.get("/")), new GCamera {
           override def initialize: Try[Unit] =
             Failure(new GPhotoException("gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model", -105))
           override def newConfiguration: Try[GConfiguration] = ???
           override def captureImage: Try[GFile] = ???
-        })
+        }).execute
 
         result shouldBe a[Failure[_]]
         result.failed.get.getMessage shouldBe "gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model"

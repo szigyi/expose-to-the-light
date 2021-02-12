@@ -9,16 +9,16 @@ import hu.szigyi.ettl.v2.CliApp.AppConfiguration
 import java.nio.file.{Path, Paths}
 import scala.util.Try
 
-class EttlApp(appConfig: AppConfiguration) extends StrictLogging {
+class EttlApp(appConfig: AppConfiguration, camera: GCamera) extends StrictLogging {
 
-  def execute(camera: GCamera): Try[Seq[Path]] =
+  def execute: Try[Seq[Path]] =
     for {
       config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      imagePaths <- scheduledCaptures(camera, config)
+      imagePaths <- scheduledCaptures(config)
       _          <- config.close
     } yield imagePaths
 
-  private def scheduledCaptures(camera: GCamera, config: GConfiguration): Try[Seq[Path]] =
+  private def scheduledCaptures(config: GConfiguration): Try[Seq[Path]] =
     for {
       first  <- capture(camera, config, Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))))
       second <- capture(camera, config, Some(SettingsCameraModel(Some(1d), Some(100), Some(2.8))))
