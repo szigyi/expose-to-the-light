@@ -20,16 +20,16 @@ class EttlApp(appConfig: AppConfiguration) extends StrictLogging {
 
   private def scheduledCaptures(camera: GCamera, config: GConfiguration): Try[Seq[Path]] =
     for {
-      first  <- capture(camera, config, appConfig.imageBasePath.resolve(imageNameGenerator), Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))))
-      second <- capture(camera, config, appConfig.imageBasePath.resolve(imageNameGenerator), Some(SettingsCameraModel(Some(1d), Some(100), Some(2.8))))
+      first  <- capture(camera, config, Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))))
+      second <- capture(camera, config, Some(SettingsCameraModel(Some(1d), Some(100), Some(2.8))))
     } yield Seq(first, second)
 
-  private def capture(camera: GCamera, config: GConfiguration, imagePath: Path, c: Option[SettingsCameraModel]): Try[Path] =
+  private def capture(camera: GCamera, config: GConfiguration, c: Option[SettingsCameraModel]): Try[Path] =
     for {
       _                 <- Try(c.map(adjustSettings(config, _)))
       imgFileOnCamera   <- takePhoto(camera)
-      imgPathOnComputer <- imgFileOnCamera.saveImageTo(imagePath)
-      _ <- imgFileOnCamera.close
+      imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath.resolve(imageNameGenerator))
+      _                 <- imgFileOnCamera.close
     } yield imgPathOnComputer
 
   private def adjustSettings(config: GConfiguration, c: SettingsCameraModel): Try[Unit] = {
