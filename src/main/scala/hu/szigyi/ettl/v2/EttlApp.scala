@@ -45,9 +45,9 @@ class EttlApp(appConfig: AppConfiguration) extends StrictLogging {
       config.setValue("/capturesettings/aperture", aperture.toString)
 
     logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
-    val ss = c.shutterSpeedString.map(setSS(_))
-    val i = c.iso.map(setI(_))
-    val a = c.aperture.map(setA(_))
+    val ss = c.shutterSpeedString.map(setSS)
+    val i = c.iso.map(setI)
+    val a = c.aperture.map(setA)
     val tryChanges: Try[List[Unit]] = List(ss, i, a).flatten.sequence
     tryChanges.flatMap(changes => {
       if (changes.nonEmpty) config.apply
@@ -55,7 +55,7 @@ class EttlApp(appConfig: AppConfiguration) extends StrictLogging {
     })
   }
 
-  var counter = 0
+  private var counter = 0
   private def imageNameGenerator: Path = {
     counter = counter + 1
     Paths.get(s"IMG_$counter.CR2")
