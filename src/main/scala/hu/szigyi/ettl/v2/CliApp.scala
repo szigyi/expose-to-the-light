@@ -5,6 +5,7 @@ import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 
 import java.nio.file.{Path, Paths}
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 // 1: Can capture image and download it so can view it from computer
@@ -16,8 +17,10 @@ object CliApp extends IOApp with StrictLogging {
     val basePath = "/Users/szabolcs/dev/expose-to-the-light/src/main/resources/"
     val appConfig = AppConfiguration(Paths.get(basePath))
     val ettl = new EttlApp(appConfig, new GCameraImpl)
+    val numberOfCaptures = 3
+    val interval = 3.seconds
 
-    IO.fromTry(ettl.execute).attempt.map {
+    IO.fromTry(ettl.execute(numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
         logger.info(s"App finished: ${imagePaths.mkString("\n")}")
         Success(imagePaths)

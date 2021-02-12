@@ -7,6 +7,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.nio.file.Paths
+import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 class EttlAppSpec extends AnyFreeSpec with Matchers {
@@ -19,7 +20,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           override def initialize: Try[Unit] = Try()
           override def newConfiguration: Try[GConfiguration] = configuration
           override def captureImage: Try[GFile] = capturedFile
-        }).execute
+        }).execute(2, 1.nanosecond)
 
         result shouldBe a[Success[_]]
         result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
@@ -42,7 +43,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
             Failure(new GPhotoException("gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model", -105))
           override def newConfiguration: Try[GConfiguration] = ???
           override def captureImage: Try[GFile] = ???
-        }).execute
+        }).execute(1, 1.nanosecond)
 
         result shouldBe a[Failure[_]]
         result.failed.get.getMessage shouldBe "gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model"
