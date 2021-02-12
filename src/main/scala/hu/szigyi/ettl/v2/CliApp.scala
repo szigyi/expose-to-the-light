@@ -3,9 +3,8 @@ package hu.szigyi.ettl.v2
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.v2.EttlApp.runEttl
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import scala.util.{Failure, Success}
 
 // 1: Can capture image and download it so can view it from computer
@@ -15,8 +14,10 @@ import scala.util.{Failure, Success}
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val basePath = "/Users/szabolcs/dev/expose-to-the-light/src/main/resources/"
+    val appConfig = AppConfiguration(Paths.get(basePath))
+    val ettl = new EttlApp(appConfig)
 
-    IO.fromTry(runEttl(new GCameraImpl, Paths.get(basePath)))
+    IO.fromTry(ettl.execute(new GCameraImpl))
       .attempt.map {
       case Right(imagePaths) =>
         logger.info(s"App finished: ${imagePaths.mkString("\n")}")
@@ -26,4 +27,6 @@ object CliApp extends IOApp with StrictLogging {
         Failure(exception)
     }.as(ExitCode.Success)
   }
+
+  case class AppConfiguration(imageBasePath: Path)
 }
