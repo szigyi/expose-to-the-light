@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 token=$1
-version=$2
-#export BUILD_NUMBER="$version"
+buildNumber=$2
+export BUILD_NUMBER="$buildNumber"
+version=$(sbt -Dsbt.supershell=false -error "print version")
 
 echo ""
 echo "Assembling $version jar package..."

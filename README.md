@@ -26,7 +26,9 @@ https://github.com/djspiewak/sbt-github-packages
 
 
 ### Publish artifact to Dropbox
-`./deploy.sh`
+Can generate new token from https://www.dropbox.com/developers/apps
+* `./deploy.sh $dropbox_bearer_token $buildNumber`
+* `./deploy.sh abcd 4`
 
 
 

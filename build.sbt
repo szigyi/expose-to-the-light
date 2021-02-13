@@ -3,9 +3,8 @@ import java.util.jar.Attributes.Name
 import sbt.io.IO.zip
 import Path.flatRebase
 
-def env(name: String) = Option(System.getenv(name)).getOrElse("unknown")
-//val buildNumber: String = env("BUILD_NUMBER")
-val buildNumber: String = "3"
+def env(name: String): String = sys.env.get(name).getOrElse("unknown")
+val buildNumber: String = env("BUILD_NUMBER")
 
 name := "expose-to-the-light"
 organization := "hu.szigyi"
@@ -15,7 +14,7 @@ scalaVersion := scalaMajorVersion + ".3"
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtocol(true)
 
-mainClass in assembly := Some("hu.szigyi.ettl.WebApp")
+mainClass in assembly := Some("hu.szigyi.ettl.v2.CliApp")
 assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
 scalacOptions += "-deprecation"
