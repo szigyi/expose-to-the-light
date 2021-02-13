@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.v2
 
-import hu.szigyi.ettl.v2.Fixtures.capturedConfiguration
+import hu.szigyi.ettl.v2.GCameraFixture._
 import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
