@@ -30,6 +30,8 @@ shared_link=$(
               --header "Content-Type: application/json" \
               --data "{\"path\": \"$asset_dst\",\"settings\": {\"requested_visibility\": \"public\"}}"  | jq -r '.url'
               )
+echo "Shared Link:"
+echo "$shared_link"
 
 new_version_map="version_url_map[\"$version\"]=\"$shared_link\""
 
