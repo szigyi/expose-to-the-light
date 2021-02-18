@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 // 2: Can capture consecutive images without camera failure or black screen or camera lag
 // 3: Can successfully change settings of camera before capturing the image
 // TODO 4: Can download lower resolution of image from camera
-// TODO 5: base path (location of saved images) is coming from app param
+// 5: base path (location of saved images) is coming from app param
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
