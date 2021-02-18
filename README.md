@@ -5,11 +5,16 @@ artifact = https://www.dropbox.com/sh/tjhu0op7hzqvonk/AAACatOs5-DtAsaOV4DFC9hoa?
 
 script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl=0
 
-Download install script
+### Download install script
 `wget https://www.dropbox.com/s/fd88r1lybiscjgb/install.sh?dl=1`
 
-Install the version you want
-`install.sh 0.1.2`
+### Install the version you want
+`./install.sh 0.1.2`
+
+*install script only works on unix, not on macOS as the hashmap datastructure does not work*
+
+### Run the app
+`./run.sh 0.1.2 /home/pi/dev/expose-to-the-light/captured-images/`
 
 
 ## Distribute the app
