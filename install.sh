@@ -24,6 +24,3 @@ jar xf "$artifact" META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
 
 echo "Installing auto-runner..."
 
-
-echo "Starting application..."
-java -jar "$artifact"
