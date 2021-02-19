@@ -13,6 +13,11 @@ import scala.util.{Failure, Success, Try}
 // 3: Can successfully change settings of camera before capturing the image
 // TODO 4: Can download lower resolution of image from camera
 // 5: base path (location of saved images) is coming from app param
+// TODO 6: measure exact timing between captures and decide does it need more precise
+// TODO 7: can view the downloaded images via webapp
+// TODO 8: add auto startup, systemd config with log location
+// TODO 9: webapp can start and stop systemd process
+// TODO 10: webapp can view the log
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
