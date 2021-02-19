@@ -9,6 +9,7 @@
     <logger name="org.http4s.server.blaze" level="info"/>
     <logger name="org.http4s.blaze.channel" level="warn"/>
     <logger name="org.http4s.blaze.pipeline" level="error"/>
+    <logger name="hu.szigyi.ettl" level="debug"/>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>
