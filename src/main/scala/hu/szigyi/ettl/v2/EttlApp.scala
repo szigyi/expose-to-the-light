@@ -12,18 +12,17 @@ import scala.util.Try
 
 class EttlApp(appConfig: AppConfiguration, camera: GCamera) extends StrictLogging {
 
-  def execute(numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
+  def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
       config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      imagePaths <- scheduledCaptures(config, numberOfCaptures, interval)
+      imagePaths <- scheduledCaptures(config, setting, numberOfCaptures, interval)
       _          <- config.close
     } yield imagePaths
 
-  private def scheduledCaptures(config: GConfiguration, numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] = {
+  private def scheduledCaptures(config: GConfiguration, setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] = {
     import cats.implicits._
-    val settings = SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))
     (0 until numberOfCaptures).toList.traverse { _ =>
-      val imagePath = capture(camera, config, Some(settings))
+      val imagePath = capture(camera, config, setting)
       Thread.sleep(interval.toMillis)
       imagePath
     }
