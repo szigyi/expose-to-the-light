@@ -45,7 +45,7 @@ object CliApp extends IOApp with StrictLogging {
     val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, 100.milliseconds))
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val numberOfCaptures = 3
-    val interval = 1.seconds // TODO: validate interval should not be less than 1 milliseconds
+    val interval = 5.seconds // TODO: validate interval should not be less than 1 milliseconds
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>

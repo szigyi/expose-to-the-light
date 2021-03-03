@@ -7,7 +7,6 @@ import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
 import hu.szigyi.ettl.v2.CliApp.AppConfiguration
 
 import java.nio.file.{Path, Paths}
-import java.time.Clock
 import scala.concurrent.duration.Duration
 import scala.util.Try
 
