@@ -24,10 +24,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
   private def scheduledCaptures(config: GConfiguration, setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration, clock: Clock): Try[Seq[Path]] = {
     import cats.implicits._
     (0 until numberOfCaptures).toList.traverse { _ =>
-//      val imagePath = capture(camera, config, setting)
-//      Thread.sleep(interval.toMillis)
-//      imagePath
-      val capt: () => Try[Path] = () => capture(camera, config, setting)
+      def capt: Try[Path] = capture(camera, config, setting)
       time("Schedule took", scheduler.schedule(Instant.now(clock), interval, capt))
     }
   }

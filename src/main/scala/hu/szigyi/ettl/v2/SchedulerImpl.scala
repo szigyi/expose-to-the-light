@@ -10,13 +10,13 @@ import scala.concurrent.duration.Duration
 import scala.util.Try
 
 trait Scheduler {
-  def schedule[T](lastCaptureTime: Instant, interval: Duration, task: () => T): T
-  def schedule[T](numberOfTasks: Int, interval: Duration, task: () => Try[T]): Try[Seq[T]]
+  def schedule[T](lastCaptureTime: Instant, interval: Duration, task: => T): T
+  def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]]
 }
 
 class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler with StrictLogging {
 
-  override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T = {
+  override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
     logger.debug(s"last: ${lastCaptureTime}")
@@ -25,7 +25,7 @@ class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler 
     logger.debug(s"elapsed: ${elapsed.toMillis}")
     logger.debug(s"interva: ${interval.toMillis}")
     if (elapsed >= interval) {
-      capture()
+      capture // can it does problem that there is no explicit apply?
     } else {
       logger.debug("feeling sleepy...")
       Thread.sleep(frequencyToCheck.toMillis)
@@ -33,7 +33,7 @@ class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler 
     }
   }
 
-  override def schedule[T](numberOfTasks: Int, interval: Duration, task: () => Try[T]): Try[Seq[T]] = {
+  override def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]] = {
     val start = Instant.now(clock)
     (0 until numberOfTasks).toList.traverse { index =>
       val lastTimeStarted = start.plusMillis(interval.toMillis * index)
