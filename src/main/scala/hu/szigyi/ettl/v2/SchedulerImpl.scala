@@ -10,7 +10,7 @@ trait Scheduler {
   def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T
 }
 
-class SchedulerImpl(clock: Clock) extends Scheduler with StrictLogging {
+class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler with StrictLogging {
 
   override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T = {
     val now = Instant.now(clock)
@@ -24,7 +24,7 @@ class SchedulerImpl(clock: Clock) extends Scheduler with StrictLogging {
       capture()
     } else {
       logger.debug("feeling sleepy...")
-      Thread.sleep(100)
+      Thread.sleep(frequencyToCheck.toMillis)
       schedule(lastCaptureTime, interval, capture)
     }
   }

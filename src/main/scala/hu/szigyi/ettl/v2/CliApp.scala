@@ -40,7 +40,7 @@ object CliApp extends IOApp with StrictLogging {
   private def runApp(basePath: String, setSettings: Boolean): IO[Try[Seq[Path]]] = {
     val clock = Clock.systemDefaultZone()
     val appConfig = AppConfiguration(Paths.get(basePath))
-    val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock))
+    val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, 100.milliseconds))
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val numberOfCaptures = 100
     val interval = 2.seconds // TODO: validate interval should not be less than 1 milliseconds
