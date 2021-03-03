@@ -8,10 +8,10 @@ import scala.util.Try
 object SchedulerFixture {
 
   def immediateScheduler: Scheduler = new Scheduler {
-    override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T =
-      capture()
+    override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T =
+      capture
 
-    override def schedule[T](numberOfTasks: Int, interval: Duration, task: () => Try[T]): Try[Seq[T]] =
-      (0 until numberOfTasks).toList.traverse { _ => task() }
+    override def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]] =
+      (0 until numberOfTasks).toList.traverse { _ => task }
   }
 }
