@@ -4,6 +4,7 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
+import org.rogach.scallop._
 
 import java.nio.file.{Path, Paths}
 import java.time.Clock
@@ -24,24 +25,15 @@ import scala.util.{Failure, Success, Try}
 // 12: camera settings for capture is optional - just trigger capture without overwrite settings in camera
 // 13: can set number of images to be taken from command line
 // 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
-// TODO 15: use named arguments to get the command line args
+// 15: use named arguments to get the command line args
 // TODO 16: interval is coming from command line as well
 // TODO 17: use better logging to inform user -> useful for task 11
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
-    if (args.size != 3) {
-      logger.error("Base Path as first program argument is missing")
-      logger.error("Set Settings as second program argument is missing")
-      logger.error("Number of images to capture as third program argument is missing")
-      IO.pure(ExitCode.Error)
-    } else {
-      val basePath = args(0)
-      val setSettings = args(1).toBoolean
-      val numberOfCaptures = args(2).toInt
-      runApp(basePath, setSettings, numberOfCaptures)
-        .as(ExitCode.Success)
-    }
+    val conf = new Conf(args)
+    runApp(conf.imagesBasePath.apply(), conf.setSettings.apply(), conf.numberOfCaptures.apply())
+      .as(ExitCode.Success)
   }
 
   private def runApp(basePath: String, setSettings: Boolean, numberOfCaptures: Int): IO[Try[Seq[Path]]] = {
@@ -59,6 +51,13 @@ object CliApp extends IOApp with StrictLogging {
         logger.error(s"App failed", exception)
         Failure(exception)
     }
+  }
+
+  class Conf(args: Seq[String]) extends ScallopConf(args) {
+    val imagesBasePath = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")
+    val setSettings = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
+    val numberOfCaptures = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
+    verify()
   }
 
   case class AppConfiguration(imageBasePath: Path)

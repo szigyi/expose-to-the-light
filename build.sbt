@@ -32,6 +32,7 @@ libraryDependencies ++= Seq(
   "com.github.dorinp.reflux"  %% "reflux-generic"     % "0.0.13",
   "org.apache.commons"        %  "commons-text"       % "1.8",
   "com.google.jimfs"          %  "jimfs"              % "1.1",
+  "org.rogach"                %% "scallop"            % "4.0.2",
 
   "org.http4s"                %% "http4s-circe"       % http4sVersion,
   "org.http4s"                %% "http4s-dsl"         % http4sVersion,
