@@ -28,7 +28,7 @@ import scala.util.{Failure, Success, Try}
 // 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
 // 15: use named arguments to get the command line args
 // 16: interval is coming from command line as well
-// TODO 17: use better logging to inform user -> useful for task 11
+// 17: use better logging to inform user -> useful for task 11
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
