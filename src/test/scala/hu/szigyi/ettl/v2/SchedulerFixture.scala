@@ -11,7 +11,7 @@ object SchedulerFixture {
     override def scheduleOne[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T =
       capture
 
-    override def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]] =
-      (0 until numberOfTasks).toList.traverse { _ => task }
+    override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] =
+      (0 until numberOfTasks).toList.traverse { i => task(i) }
   }
 }

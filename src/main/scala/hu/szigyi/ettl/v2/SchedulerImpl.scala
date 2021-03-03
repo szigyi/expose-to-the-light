@@ -11,7 +11,7 @@ import scala.util.Try
 
 trait Scheduler {
   def scheduleOne[T](lastCaptureTime: Instant, interval: Duration, task: => T): T
-  def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]]
+  def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]]
 }
 
 class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler with StrictLogging {
@@ -19,10 +19,7 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
   override def scheduleOne[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
-    logger.trace(s"last: $lastCaptureTime")
-    logger.trace(s"now : $now")
-    logger.trace(s"elapsed: ${elapsed.toMillis}")
-    logger.trace(s"interva: ${interval.toMillis}")
+    logger.trace(s"Waiting: ${lastCaptureTime.plusMillis(interval.toMillis)} - remaining: ${interval.minus(elapsed).toMillis} milliseconds")
     if (elapsed >= interval) {
       capture // Can it cause problem? There is no explicit apply!
     } else {
@@ -32,15 +29,16 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
     }
   }
 
-  override def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]] = {
+  override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] = {
     val start = Instant.now(clock)
     logger.trace(s"Schedule starts: $start")
     (-1 until (numberOfTasks - 1)).toList.traverse {
       case -1 =>
-        time("Schedule took", task)
+        time("[1] Schedule took", task(1))
       case index =>
         val lastTimeStarted = start.plusMillis(interval.toMillis * index)
-        time("Schedule took", scheduleOne(lastTimeStarted, interval, task))
+        val imageCount = index + 2
+        time(s"[$imageCount] Schedule took", scheduleOne(lastTimeStarted, interval, task(imageCount)))
     }
   }
 }

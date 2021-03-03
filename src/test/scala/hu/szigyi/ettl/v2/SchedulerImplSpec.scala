@@ -30,7 +30,7 @@ class SchedulerImplSpec extends AnyFreeSpec with Matchers {
     val clock = AcceleratedClock("2021-02-19T13:00:00Z", realtimeTick, acceleratedTick)
     val scheduler = new SchedulerImpl(clock, 10.milliseconds)
     val interval = 1.seconds
-    def capture: Try[Instant] = Try(clock.instant())
+    def capture(i: Int): Try[Instant] = Try(clock.instant())
 
     val result = scheduler.schedule[Instant](3, interval, capture)
 
@@ -50,7 +50,7 @@ class SchedulerImplSpec extends AnyFreeSpec with Matchers {
     val scheduler = new SchedulerImpl(clock, 10.milliseconds)
     val interval = 1.seconds
     val bufferInTimeForExecutingTask = 300.milliseconds
-    def capture: Try[Instant] =
+    def capture(i: Int): Try[Instant] =
       Try {
         val timesToTickTheClockToImitateSleeping = bufferInTimeForExecutingTask / acceleratedTick
         (0 until timesToTickTheClockToImitateSleeping.toInt).foreach(_ => clock.instant())
@@ -76,7 +76,7 @@ class SchedulerImplSpec extends AnyFreeSpec with Matchers {
     val scheduler = new SchedulerImpl(clock, 10.milliseconds)
     val interval = 1.seconds
     var bufferInTimeForExecutingTask: FiniteDuration = 1000.milliseconds
-    def capture: Try[Instant] =
+    def capture(i: Int): Try[Instant] =
       Try {
         val timesToTickTheClockToImitateSleeping = bufferInTimeForExecutingTask / acceleratedTick
         (0 until timesToTickTheClockToImitateSleeping.toInt).foreach(_ => clock.instant())
