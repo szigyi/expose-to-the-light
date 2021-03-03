@@ -44,9 +44,12 @@ object CliApp extends IOApp with StrictLogging {
   private def runApp(basePath: String, setSettings: Boolean, numberOfCaptures: Int, intervalSeconds: Double): IO[Try[Seq[Path]]] = {
     val clock = Clock.systemDefaultZone()
     val appConfig = AppConfiguration(Paths.get(basePath))
-    val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, 100.milliseconds))
+    val schedulerAwakingFrequency = 100.milliseconds
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
+
+//    val ettl = realEttlApp(appConfig, clock, schedulerAwakingFrequency)
+    val ettl = dummyEttlApp(appConfig, clock, schedulerAwakingFrequency)
 
     logger.info(s"           Clock: $clock")
     logger.info(s"Images Base Path: $basePath")
@@ -63,6 +66,12 @@ object CliApp extends IOApp with StrictLogging {
         Failure(exception)
     }
   }
+
+  private def realEttlApp(appConfig: AppConfiguration, clock: Clock, schedulerAwakingFrequency: Duration): EttlApp =
+    new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, schedulerAwakingFrequency))
+
+  private def dummyEttlApp(appConfig: AppConfiguration, clock: Clock, schedulerAwakingFrequency: Duration): EttlApp =
+    new EttlApp(appConfig, new DummyCamera, new SchedulerImpl(clock, schedulerAwakingFrequency))
 
   class Conf(args: Seq[String]) extends ScallopConf(args) {
     val imagesBasePath = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")

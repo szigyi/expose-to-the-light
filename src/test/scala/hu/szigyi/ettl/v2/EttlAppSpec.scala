@@ -2,7 +2,6 @@ package hu.szigyi.ettl.v2
 
 import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.v2.CliApp.AppConfiguration
-import hu.szigyi.ettl.v2.GCameraFixture.DummyCamera
 import hu.szigyi.ettl.v2.SchedulerFixture.immediateScheduler
 import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec

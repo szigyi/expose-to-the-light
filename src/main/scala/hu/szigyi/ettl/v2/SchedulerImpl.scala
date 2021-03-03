@@ -14,20 +14,20 @@ trait Scheduler {
   def schedule[T](numberOfTasks: Int, interval: Duration, task: => Try[T]): Try[Seq[T]]
 }
 
-class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler with StrictLogging {
+class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler with StrictLogging {
 
   override def scheduleOne[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
-    logger.trace(s"last: ${lastCaptureTime}")
-    logger.trace(s"now : ${now}")
+    logger.trace(s"last: $lastCaptureTime")
+    logger.trace(s"now : $now")
     logger.trace(s"elapsed: ${elapsed.toMillis}")
     logger.trace(s"interva: ${interval.toMillis}")
     if (elapsed >= interval) {
       capture // Can it cause problem? There is no explicit apply!
     } else {
       logger.trace("feeling sleepy...")
-      Thread.sleep(frequencyToCheck.toMillis)
+      Thread.sleep(awakingFrequency.toMillis)
       scheduleOne(lastCaptureTime, interval, capture)
     }
   }
