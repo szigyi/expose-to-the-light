@@ -1,5 +1,7 @@
 package hu.szigyi.ettl.v2
 
+import com.typesafe.scalalogging.StrictLogging
+
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.duration._
 
@@ -7,9 +9,6 @@ object TestClock {
 
   /**
    * Every time the time is asked, the clock ticks, moves ahead by @tickDuration
-   * @param start
-   * @param tickDuration
-   * @param zone
    */
   class TickingClock(start: Instant, tickDuration: Duration, zone: ZoneId = ZoneId.of("UTC")) extends Clock {
     private var now: Instant = start
@@ -26,11 +25,8 @@ object TestClock {
    * @acceleration is the duration that will be multiplied the elapsed milliseconds
    * which means if the acceleration is 1 second then
    * if 1 millisecond is elapsed then it will be seen as 1 second
-   * @param clock
-   * @param acceleration
-   * @param zone
    */
-  class AcceleratedClock(start: Instant, createClock: Instant => Clock, acceleration: Duration, zone: ZoneId = ZoneId.of("UTC")) extends Clock {
+  class AcceleratedClock(start: Instant, createClock: Instant => Clock, acceleration: Duration, zone: ZoneId = ZoneId.of("UTC")) extends Clock with StrictLogging {
     private var previousRead: Instant = start
     private var clock: Clock = createClock(start)
     override def getZone: ZoneId = zone
@@ -40,10 +36,10 @@ object TestClock {
       val now = clock.instant()
       val elapsedMillisInNormal = now.toEpochMilli - previousRead.toEpochMilli
       val elapsedMillisAccelerated = elapsedMillisInNormal * acceleration.toMillis
-//      println(s"previousRead: $previousRead")
-//      println(s"now:          $now")
-//      println(s"elapsedMillisInNormal:    $elapsedMillisInNormal")
-//      println(s"elapsedMillisAccelerated: $elapsedMillisAccelerated")
+      logger.trace(s"previousRead: $previousRead")
+      logger.trace(s"now:          $now")
+      logger.trace(s"elapsedMillisInNormal:    $elapsedMillisInNormal")
+      logger.trace(s"elapsedMillisAccelerated: $elapsedMillisAccelerated")
       previousRead = previousRead.plusMillis(elapsedMillisAccelerated)
       clock = createClock(previousRead)
       previousRead
