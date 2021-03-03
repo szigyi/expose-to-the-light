@@ -93,15 +93,14 @@ class SchedulerImplSpec extends AnyFreeSpec with Matchers {
       "2021-02-19T13:00:01.200Z",
 
       // +100 millis when running the test method, capture to get the instant
-      // +100 millis unknown
+      // +100 millis when hu.szigyi.ettl.v2.SchedulerImpl.scheduleOne gets now
       // +500 millis when sleeping, taking long time to finish the task
       "2021-02-19T13:00:01.900Z",
 
       // +100 millis when running the test method, capture to get the instant
-      // +100 millis unknown
+      // +100 millis when hu.szigyi.ettl.v2.SchedulerImpl.scheduleOne gets now
       // +250 millis when sleeping, taking long time to finish the task
       "2021-02-19T13:00:02.400Z", // back to original timing now
-      // TODO find out what is happening with the plus millis, plus clock.instant() invocation maybe?
     )
   }
 }
