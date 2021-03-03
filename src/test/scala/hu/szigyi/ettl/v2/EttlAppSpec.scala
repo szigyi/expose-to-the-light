@@ -9,20 +9,17 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.nio.file.Paths
-import java.time.{Clock, ZoneOffset}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 class EttlAppSpec extends AnyFreeSpec with Matchers {
-
-  val clock = Clock.tickMillis(ZoneOffset.UTC)
 
   "runEttl" - {
     "Normal Scenario" - {
       "set camera then capture images with custom settings and returns image paths" in {
         val camera = new TestCamera
         val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
-          .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond, clock)
+          .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond)
 
         result shouldBe a[Success[_]]
         result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
@@ -43,7 +40,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
       "set camera then capture images and returns image paths" in {
         val camera = new TestCamera
         val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
-          .execute(None,2, 10.millisecond, clock)
+          .execute(None,2, 10.millisecond)
 
         result shouldBe a[Success[_]]
         result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
@@ -65,13 +62,15 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           override def newConfiguration: Try[GConfiguration] = ???
 
           override def captureImage: Try[GFile] = ???
-        }, immediateScheduler).execute(None, 1, 10.millisecond, clock)
+        }, immediateScheduler).execute(None, 1, 10.millisecond)
 
         result shouldBe a[Failure[_]]
         result.failed.get.getMessage shouldBe "gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model"
       }
 
-      "when capture settings are invalid and image cannot be taken"
+      "when capture settings are invalid and image cannot be taken" ignore {
+
+      }
     }
   }
 }

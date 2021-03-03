@@ -19,10 +19,10 @@ class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler 
   override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
-    logger.trace(s"last: ${lastCaptureTime}")
-    logger.trace(s"now : ${now}")
-    logger.trace(s"elapsed: ${elapsed.toMillis}")
-    logger.trace(s"interva: ${interval.toMillis}")
+    logger.debug(s"last: ${lastCaptureTime}")
+    logger.debug(s"now : ${now}")
+    logger.debug(s"elapsed: ${elapsed.toMillis}")
+    logger.debug(s"interva: ${interval.toMillis}")
     if (elapsed >= interval) {
       capture // Can it cause problem? There is no explicit apply!
     } else {
@@ -36,6 +36,8 @@ class SchedulerImpl(clock: Clock, frequencyToCheck: Duration) extends Scheduler 
     val start = Instant.now(clock)
     (0 until numberOfTasks).toList.traverse { index =>
       val lastTimeStarted = start.plusMillis(interval.toMillis * index)
+      logger.debug(s"Started        : $start")
+      logger.debug(s"lastTimeStarted: $lastTimeStarted")
       time("Schedule took", schedule(lastTimeStarted, interval, task))
     }
   }

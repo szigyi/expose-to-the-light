@@ -22,6 +22,8 @@ import scala.util.{Failure, Success, Try}
 // TODO 10: webapp can start and stop systemd process
 // TODO 11: webapp can view the log
 // 12: camera settings for capture is optional - just trigger capture without overwrite settings in camera
+// TODO 13: can set number of images to be taken from command line
+// TODO 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
@@ -42,10 +44,10 @@ object CliApp extends IOApp with StrictLogging {
     val appConfig = AppConfiguration(Paths.get(basePath))
     val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, 100.milliseconds))
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
-    val numberOfCaptures = 100
-    val interval = 2.seconds // TODO: validate interval should not be less than 1 milliseconds
+    val numberOfCaptures = 3
+    val interval = 1.seconds // TODO: validate interval should not be less than 1 milliseconds
 
-    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval, clock)).attempt.map {
+    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
         logger.info(s"App finished: \n${imagePaths.mkString("\n")}")
         Success(imagePaths)
