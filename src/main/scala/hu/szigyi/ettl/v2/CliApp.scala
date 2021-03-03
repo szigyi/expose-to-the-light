@@ -16,7 +16,7 @@ import scala.util.{Failure, Success, Try}
 // TODO 4: Can download lower resolution of image from camera
 // 5: base path (location of saved images) is coming from app param
 // 6: measure exact timing between captures and decide does it need to be more precise
-// TODO 7: change the timing from sleep to precise elapsed time as interval
+// 7: change the timing from sleep to precise elapsed time as interval
 // TODO 8: can view the downloaded images via webapp
 // TODO 9: add auto startup, systemd config with log location
 // TODO 10: webapp can start and stop systemd process
