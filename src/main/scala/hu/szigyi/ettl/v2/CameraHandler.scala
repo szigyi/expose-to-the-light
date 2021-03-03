@@ -1,16 +1,15 @@
 package hu.szigyi.ettl.v2
 
 import com.typesafe.scalalogging.StrictLogging
+import hu.szigyi.ettl.v2.tool.Timing.time
 import org.gphoto2.GPhotoException
 
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.Duration
 import scala.util.{Failure, Try}
 
 object CameraHandler extends StrictLogging {
 
   def takePhoto(camera: GCamera): Try[GFile] =
-    captureTimings(camera)
+    time("Capture took", camera.captureImage)
 
   def connectToCamera(camera: GCamera, shellKill: => Unit): Try[GConfiguration] =
     initialiseCamera(camera).recoverWith {
@@ -35,13 +34,4 @@ object CameraHandler extends StrictLogging {
         configuration
       }
     }
-
-  private def captureTimings(camera: GCamera): Try[GFile] = {
-    val started = System.nanoTime()
-    val result = camera.captureImage
-    val finished = System.nanoTime()
-    val duration = Duration.apply(finished - started, TimeUnit.NANOSECONDS)
-    logger.debug(s"Capture took: ${duration.toMillis}ms | ${duration.toNanos}ns")
-    result
-  }
 }

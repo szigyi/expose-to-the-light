@@ -5,26 +5,30 @@ import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
 import hu.szigyi.ettl.v2.CliApp.AppConfiguration
+import hu.szigyi.ettl.v2.tool.Timing.time
 
 import java.nio.file.{Path, Paths}
+import java.time.{Clock, Instant}
 import scala.concurrent.duration.Duration
 import scala.util.Try
 
-class EttlApp(appConfig: AppConfiguration, camera: GCamera) extends StrictLogging {
+class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler) extends StrictLogging {
 
-  def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
+  def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration, clock: Clock): Try[Seq[Path]] =
     for {
       config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      imagePaths <- scheduledCaptures(config, setting, numberOfCaptures, interval)
+      imagePaths <- scheduledCaptures(config, setting, numberOfCaptures, interval, clock)
       _          <- config.close
     } yield imagePaths
 
-  private def scheduledCaptures(config: GConfiguration, setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] = {
+  private def scheduledCaptures(config: GConfiguration, setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration, clock: Clock): Try[Seq[Path]] = {
     import cats.implicits._
     (0 until numberOfCaptures).toList.traverse { _ =>
-      val imagePath = capture(camera, config, setting)
-      Thread.sleep(interval.toMillis)
-      imagePath
+//      val imagePath = capture(camera, config, setting)
+//      Thread.sleep(interval.toMillis)
+//      imagePath
+      val capt: () => Try[Path] = () => capture(camera, config, setting)
+      time("Schedule took", scheduler.schedule(Instant.now(clock), interval, clock, capt))
     }
   }
 

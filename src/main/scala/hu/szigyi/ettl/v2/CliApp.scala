@@ -6,6 +6,7 @@ import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 
 import java.nio.file.{Path, Paths}
+import java.time.Clock
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
@@ -14,12 +15,13 @@ import scala.util.{Failure, Success, Try}
 // 3: Can successfully change settings of camera before capturing the image
 // TODO 4: Can download lower resolution of image from camera
 // 5: base path (location of saved images) is coming from app param
-// TODO 6: measure exact timing between captures and decide does it need to be more precise
-// TODO 7: can view the downloaded images via webapp
-// TODO 8: add auto startup, systemd config with log location
-// TODO 9: webapp can start and stop systemd process
-// TODO 10: webapp can view the log
-// 11: camera settings for capture is optional - just trigger capture without overwrite settings in camera
+// 6: measure exact timing between captures and decide does it need to be more precise
+// TODO 7: change the timing from sleep to precise elapsed time as interval
+// TODO 8: can view the downloaded images via webapp
+// TODO 9: add auto startup, systemd config with log location
+// TODO 10: webapp can start and stop systemd process
+// TODO 11: webapp can view the log
+// 12: camera settings for capture is optional - just trigger capture without overwrite settings in camera
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
@@ -36,13 +38,14 @@ object CliApp extends IOApp with StrictLogging {
   }
 
   private def runApp(basePath: String, setSettings: Boolean): IO[Try[Seq[Path]]] = {
+    val clock = Clock.systemDefaultZone()
     val appConfig = AppConfiguration(Paths.get(basePath))
-    val ettl = new EttlApp(appConfig, new GCameraImpl)
+    val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl)
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val numberOfCaptures = 100
-    val interval = 2.seconds
+    val interval = 2.seconds // TODO: validate interval should not be less than 1 milliseconds
 
-    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
+    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval, clock)).attempt.map {
       case Right(imagePaths) =>
         logger.info(s"App finished: \n${imagePaths.mkString("\n")}")
         Success(imagePaths)
@@ -53,5 +56,4 @@ object CliApp extends IOApp with StrictLogging {
   }
 
   case class AppConfiguration(imageBasePath: Path)
-
 }
