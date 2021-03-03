@@ -2,7 +2,7 @@ package hu.szigyi.ettl.v2
 
 import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.v2.CliApp.AppConfiguration
-import hu.szigyi.ettl.v2.GCameraFixture.TestCamera
+import hu.szigyi.ettl.v2.GCameraFixture.DummyCamera
 import hu.szigyi.ettl.v2.SchedulerFixture.immediateScheduler
 import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec
@@ -17,7 +17,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
   "runEttl" - {
     "Normal Scenario" - {
       "set camera then capture images with custom settings and returns image paths" in {
-        val camera = new TestCamera
+        val camera = new DummyCamera
         val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
           .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond)
 
@@ -38,7 +38,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
       }
 
       "set camera then capture images and returns image paths" in {
-        val camera = new TestCamera
+        val camera = new DummyCamera
         val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
           .execute(None,2, 10.millisecond)
 

@@ -48,9 +48,15 @@ object CliApp extends IOApp with StrictLogging {
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
 
+    logger.info(s"           Clock: $clock")
+    logger.info(s"Images Base Path: $basePath")
+    logger.info(s"    Set Settings: $setSettings")
+    logger.info(s"        Interval: $interval")
+
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
-        logger.info(s"App finished: \n${imagePaths.mkString("\n")}")
+        logger.info(s"App finished:")
+        imagePaths.foreach(p => logger.info(p.toString))
         Success(imagePaths)
       case Left(exception) =>
         logger.error(s"App failed", exception)

@@ -16,7 +16,7 @@ object GCameraFixture {
     override def close: Try[Unit] = Try()
   })
 
-  class TestCamera extends GCamera {
+  class DummyCamera extends GCamera {
     var savedImages: Seq[Path] = Seq.empty
     var adjustedCameraSettings: Map[String, Any] = Map.empty
     override def initialize: Try[Unit] = Try()
