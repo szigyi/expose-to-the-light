@@ -34,11 +34,11 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
     logger.trace(s"Schedule starts: $start")
     (-1 until (numberOfTasks - 1)).toList.traverse {
       case -1 =>
-        time("[1] Schedule took", task(1))
+        time(s"[1/$numberOfTasks] Schedule took", task(1))
       case index =>
         val lastTimeStarted = start.plusMillis(interval.toMillis * index)
         val imageCount = index + 2
-        time(s"[$imageCount] Schedule took", scheduleOne(lastTimeStarted, interval, task(imageCount)))
+        time(s"[$imageCount/$numberOfTasks] Schedule took", scheduleOne(lastTimeStarted, interval, task(imageCount)))
     }
   }
 }

@@ -16,27 +16,27 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
   def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
       config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
-      imagePaths <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, _, setting))
+      imagePaths <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting))
       _          <- config.close
     } yield imagePaths
 
-  private def capture(camera: GCamera, config: GConfiguration, imageCount: Int, c: Option[SettingsCameraModel]): Try[Path] =
+  private def capture(camera: GCamera, config: GConfiguration, numberOfCaptures: Int, c: Option[SettingsCameraModel])(imageCount: Int): Try[Path] =
     for {
-      _                 <- Try(c.map(adjustSettings(config, _, imageCount)))
-      imgFileOnCamera   <- capturePhoto(camera, imageCount)
+      _                 <- Try(c.map(adjustSettings(config, _, imageCount, numberOfCaptures)))
+      imgFileOnCamera   <- capturePhoto(camera, imageCount, numberOfCaptures)
       imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath.resolve(imageNameGenerator))
       _                 <- imgFileOnCamera.close
     } yield {
-      logger.info(s"[$imageCount] Saved image: ${imgPathOnComputer.toString}")
+      logger.info(s"[$imageCount/$numberOfCaptures] Saved image: ${imgPathOnComputer.toString}")
       imgPathOnComputer
     }
 
-  private def capturePhoto(camera: GCamera, imageCount: Int): Try[GFile] = {
-    logger.info(s"[$imageCount] Taking photo...")
-    time(s"[$imageCount] Capture took", takePhoto(camera))
+  private def capturePhoto(camera: GCamera, imageCount: Int, numberOfCaptures: Int): Try[GFile] = {
+    logger.info(s"[$imageCount/$numberOfCaptures] Taking photo...")
+    time(s"[$imageCount/$numberOfCaptures] Capture took", takePhoto(camera))
   }
 
-  private def adjustSettings(config: GConfiguration, c: SettingsCameraModel, imageCount: Int): Try[Unit] = {
+  private def adjustSettings(config: GConfiguration, c: SettingsCameraModel, imageCount: Int, numberOfCaptures: Int): Try[Unit] = {
     import cats.implicits._
 
     def setSS(shutterSpeedString: String): Try[Unit] =
@@ -48,7 +48,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
     def setA(aperture: Double): Try[Unit] =
       config.setValue("/capturesettings/aperture", aperture.toString)
 
-    logger.info(s"[$imageCount] Adjusting settings: [ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
+    logger.info(s"[$imageCount/$numberOfCaptures] Adjusting settings: [ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
     val ss = c.shutterSpeedString.map(setSS)
     val i = c.iso.map(setI)
     val a = c.aperture.map(setA)
