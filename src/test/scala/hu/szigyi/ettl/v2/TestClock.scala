@@ -40,10 +40,10 @@ object TestClock {
       val now = clock.instant()
       val elapsedMillisInNormal = now.toEpochMilli - previousRead.toEpochMilli
       val elapsedMillisAccelerated = elapsedMillisInNormal * acceleration.toMillis
-      println(s"previousRead: $previousRead")
-      println(s"now:          $now")
-      println(s"elapsedMillisInNormal:    $elapsedMillisInNormal")
-      println(s"elapsedMillisAccelerated: $elapsedMillisAccelerated")
+//      println(s"previousRead: $previousRead")
+//      println(s"now:          $now")
+//      println(s"elapsedMillisInNormal:    $elapsedMillisInNormal")
+//      println(s"elapsedMillisAccelerated: $elapsedMillisAccelerated")
       previousRead = previousRead.plusMillis(elapsedMillisAccelerated)
       clock = createClock(previousRead)
       previousRead
