@@ -23,7 +23,7 @@ import scala.util.{Failure, Success, Try}
 // TODO 11: webapp can view the log
 // 12: camera settings for capture is optional - just trigger capture without overwrite settings in camera
 // TODO 13: can set number of images to be taken from command line
-// TODO 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
+// 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
