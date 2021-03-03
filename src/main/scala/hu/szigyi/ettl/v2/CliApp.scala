@@ -8,6 +8,7 @@ import org.rogach.scallop._
 
 import java.nio.file.{Path, Paths}
 import java.time.Clock
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
@@ -26,22 +27,26 @@ import scala.util.{Failure, Success, Try}
 // 13: can set number of images to be taken from command line
 // 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
 // 15: use named arguments to get the command line args
-// TODO 16: interval is coming from command line as well
+// 16: interval is coming from command line as well
 // TODO 17: use better logging to inform user -> useful for task 11
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val conf = new Conf(args)
-    runApp(conf.imagesBasePath.apply(), conf.setSettings.apply(), conf.numberOfCaptures.apply())
-      .as(ExitCode.Success)
+    runApp(
+      conf.imagesBasePath.apply(),
+      conf.setSettings.apply(),
+      conf.numberOfCaptures.apply(),
+      conf.intervalSeconds.apply()
+    ).as(ExitCode.Success)
   }
 
-  private def runApp(basePath: String, setSettings: Boolean, numberOfCaptures: Int): IO[Try[Seq[Path]]] = {
+  private def runApp(basePath: String, setSettings: Boolean, numberOfCaptures: Int, intervalSeconds: Double): IO[Try[Seq[Path]]] = {
     val clock = Clock.systemDefaultZone()
     val appConfig = AppConfiguration(Paths.get(basePath))
     val ettl = new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, 100.milliseconds))
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
-    val interval = 5.seconds // TODO: validate interval should not be less than 1 milliseconds
+    val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
@@ -57,8 +62,10 @@ object CliApp extends IOApp with StrictLogging {
     val imagesBasePath = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")
     val setSettings = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
     val numberOfCaptures = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
+    val intervalSeconds = opt[Double](name = "intervalSeconds", required = true, descr = "Seconds between two captures", validate = _ > 0.1)
     verify()
   }
 
   case class AppConfiguration(imageBasePath: Path)
+
 }

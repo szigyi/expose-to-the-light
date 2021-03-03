@@ -14,7 +14,7 @@ script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl
 *install script only works on unix, not on macOS as the hashmap datastructure does not work*
 
 ### Run the app
-`./run.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5`
+`./run.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5`
 
 
 ## Distribute the app
