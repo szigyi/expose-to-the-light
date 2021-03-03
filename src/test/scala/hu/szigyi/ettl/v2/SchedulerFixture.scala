@@ -5,7 +5,7 @@ import scala.concurrent.duration.Duration
 object SchedulerFixture {
 
   def immediateScheduler: Scheduler = new Scheduler {
-    override def schedule[T](lastCaptureTime: Instant, interval: Duration, clock: Clock, capture: () => T): T =
+    override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T =
       capture()
   }
 }

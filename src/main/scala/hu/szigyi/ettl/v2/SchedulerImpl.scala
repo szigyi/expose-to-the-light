@@ -7,12 +7,12 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 
 trait Scheduler {
-  def schedule[T](lastCaptureTime: Instant, interval: Duration, clock: Clock, capture: () => T): T
+  def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T
 }
 
-class SchedulerImpl extends Scheduler with StrictLogging {
+class SchedulerImpl(clock: Clock) extends Scheduler with StrictLogging {
 
-  override def schedule[T](lastCaptureTime: Instant, interval: Duration, clock: Clock, capture: () => T): T = {
+  override def schedule[T](lastCaptureTime: Instant, interval: Duration, capture: () => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
     logger.debug(s"last: ${lastCaptureTime}")
@@ -25,7 +25,7 @@ class SchedulerImpl extends Scheduler with StrictLogging {
     } else {
       logger.debug("feeling sleepy...")
       Thread.sleep(100)
-      schedule(lastCaptureTime, interval, clock, capture)
+      schedule(lastCaptureTime, interval, capture)
     }
   }
 }

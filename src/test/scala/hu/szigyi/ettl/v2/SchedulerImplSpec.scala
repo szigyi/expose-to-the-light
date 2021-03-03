@@ -14,11 +14,11 @@ class SchedulerImplSpec extends AnyFreeSpec with Matchers {
     val realtimeTick = 1.millisecond
     val acceleratedTick = 100.millisecond
     val clock = AcceleratedClock("2021-02-19T13:00:00Z", realtimeTick, acceleratedTick)
-    val scheduler = new SchedulerImpl
+    val scheduler = new SchedulerImpl(clock)
     val interval = 1.seconds
     val capture: () => Instant = () => clock.instant()
 
-    val result = scheduler.schedule[Instant](instant("2021-02-19T13:00:00Z"), interval, clock, capture)
+    val result = scheduler.schedule[Instant](instant("2021-02-19T13:00:00Z"), interval, capture)
 
     result.toString shouldBe "2021-02-19T13:00:01.100Z"
   }

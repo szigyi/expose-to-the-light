@@ -28,7 +28,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
 //      Thread.sleep(interval.toMillis)
 //      imagePath
       val capt: () => Try[Path] = () => capture(camera, config, setting)
-      time("Schedule took", scheduler.schedule(Instant.now(clock), interval, clock, capt))
+      time("Schedule took", scheduler.schedule(Instant.now(clock), interval, capt))
     }
   }
 
