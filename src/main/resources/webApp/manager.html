@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    <title>manager - ettl</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Main</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="curvature.html">Curvature</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="manager.html">Manager</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="image.html">Image</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-8">
+                <h1>Expose to the Light</h1>
+            </div>
+        </div>
+
+        <h3>Stored Settings</h3>
+        <div id="scaled"></div>
+
+        <div class="form-inline col-md-12">
+            <select id="key-frame-ids" class="form-control mr-2" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+                <option>Key-frame ids are loading...</option>
+            </select>
+        </div>
+    </div>
+    <script src="chart.js"></script>
+    <script src="api.js"></script>
+<!--    <script src="curvature.js"></script>-->
+</body>
+</html>

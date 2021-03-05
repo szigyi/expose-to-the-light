@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    <title>ettl</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body onload="setupIndexPage()">
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Main</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="curvature.html">Curvature</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manager.html">Manager</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="image.html">Image</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-8">
+                <h1>Expose to the Light</h1>
+            </div>
+        </div>
+        <div id="scaled"></div>
+        <div class="row">
+            <div class="form-inline col-md-12">
+                <select id="key-frame-ids" class="form-control mr-2" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+                    <option>Key-frame ids are loading...</option>
+                </select>
+                <label for="interval" class="form-label">Interval Seconds:</label>
+                <input type="number" min="1" step="1" id="interval" class="form-control col-md-2 mr-2" name="interval" value="1">
+                <label for="count" class="form-label">Count:</label>
+                <input type="number" min="1" step="1" id="count" class="form-control col-md-2 mr-2" name="count" value="100">
+                <label for="startAt" class="form-label">Start at:</label>
+                <input type="datetime-local" id="startAt" class="form-control col-md-4 mr-2" name="startAt" onchange="showKeyFrames(getSelectedKeyFrameId(), getDatetimePickerValue())">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-inline col-md-12">
+                <button type="button" class="btn btn-primary mr-2" onclick="runTest()">Run test</button>
+                <button type="button" class="btn btn-success mr-2" onclick="storeSettings()">Store Key Frame Plan</button>
+                <button type="button" class="btn btn-success mr-2" onclick="storeCaptures()">Store Capture Plan</button>
+            </div>
+        </div>
+        <h3>Stored tasks:</h3>
+        <ul id="storedTasks" class="list-group log-view">
+        </ul>
+        <h3>Executed tasks:</h3>
+        <ul id="executedTasks" class="list-group log-view">
+        </ul>
+    </div>
+    <script src="chart.js"></script>
+    <script src="api.js"></script>
+</body>
+</html>
