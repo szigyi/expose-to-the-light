@@ -1,4 +1,4 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl.v2.hal
 
 import java.nio.file.Path
 import scala.util.Try

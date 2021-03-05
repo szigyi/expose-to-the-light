@@ -1,5 +1,7 @@
 package hu.szigyi.ettl.v2
 
+import hu.szigyi.ettl.v2.hal.GConfiguration
+
 import scala.util.Try
 
 object GCameraFixture {

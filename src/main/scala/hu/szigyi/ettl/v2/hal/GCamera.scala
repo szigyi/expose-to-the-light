@@ -1,4 +1,4 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl.v2.hal
 
 import org.gphoto2.{Camera, CameraFile, CameraWidgets}
 

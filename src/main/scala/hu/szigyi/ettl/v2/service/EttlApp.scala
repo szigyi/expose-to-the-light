@@ -1,10 +1,11 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl.v2.service
 
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.util.ShellKill
-import hu.szigyi.ettl.v2.CameraHandler.{connectToCamera, takePhoto}
-import hu.szigyi.ettl.v2.CliApp.AppConfiguration
+import hu.szigyi.ettl.v2.app.CliApp.AppConfiguration
+import hu.szigyi.ettl.v2.hal.{GCamera, GConfiguration, GFile}
+import hu.szigyi.ettl.v2.service.CameraHandler.{connectToCamera, takePhoto}
 import hu.szigyi.ettl.v2.tool.Timing.time
 
 import java.nio.file.{Path, Paths}

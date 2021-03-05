@@ -1,6 +1,8 @@
 package hu.szigyi.ettl.v2
 
 import cats.implicits._
+import hu.szigyi.ettl.v2.service.Scheduler
+
 import java.time.{Clock, Instant}
 import scala.concurrent.duration.Duration
 import scala.util.Try

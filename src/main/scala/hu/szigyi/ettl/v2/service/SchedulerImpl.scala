@@ -1,4 +1,4 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl.v2.service
 
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
