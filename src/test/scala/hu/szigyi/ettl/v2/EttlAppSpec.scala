@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.v2
 
-import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
+import hu.szigyi.ettl.v1.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.v2.app.CliApp.AppConfiguration
 import hu.szigyi.ettl.v2.SchedulerFixture.immediateScheduler
 import hu.szigyi.ettl.v2.hal.{DummyCamera, GCamera, GConfiguration, GFile}

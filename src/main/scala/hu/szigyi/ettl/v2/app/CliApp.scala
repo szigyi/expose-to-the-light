@@ -3,7 +3,7 @@ package hu.szigyi.ettl.v2.app
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits.toFunctorOps
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.service.CameraService.SettingsCameraModel
+import hu.szigyi.ettl.v1.service.CameraService.SettingsCameraModel
 import hu.szigyi.ettl.v2.hal.{DummyCamera, GCameraImpl}
 import hu.szigyi.ettl.v2.service.{EttlApp, SchedulerImpl}
 import org.rogach.scallop.ScallopConf
