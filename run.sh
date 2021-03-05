@@ -9,5 +9,7 @@ artifact="expose-to-the-light_2.13-"$version".jar"
 shift
 args=$*
 
+export LOG_LOCATION=/tmp/ettl/log
+
 echo "Starting application..."
 java -jar "$artifact" "$args"
