@@ -13,6 +13,17 @@ script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl
 
 *install script only works on unix, not on macOS as the hashmap datastructure does not work*
 
+### Install dependencies // TODO verify these steps
+#### On Mac Os
+* `brew install pkg-config`
+* `brew install gphoto2`
+* `brew install gnuplot`
+
+#### On Raspberry Pi (unix)
+* `sudo apt install pkg-config`
+* `sudo apt install gphoto2`
+* `sudo apt install gnuplot`
+
 ### Run the app
 `./run.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5`
 
@@ -43,25 +54,6 @@ Can generate new token from https://www.dropbox.com/developers/apps
 - [X] use sunset and sunrise times to adjust curvature
 - [ ] add http UI to start the app and see logs, curvature plots
 - [ ] consider time of year to adjust length of curvature ??
-
-## Dependencies
-> order is important. First install system dependencies and then python dependencies!
-Install the actual gphoto2 and other as system dependency
-
-You need first `python3`
-
-On Mac Os
-   * `brew install pkg-config`
-   * `brew install gphoto2`
-   * `brew install gnuplot`
-
-On Raspberry Pi (unix)
-   * `sudo apt install pkg-config`
-   * `sudo apt install gphoto2`
-   * `sudo apt install gnuplot`
-
-Install the python wrapper lib as python dependency
-   * `sudo pip install -v gphoto2`
 
 ## Install
 In the root folder of this project.

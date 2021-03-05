@@ -34,6 +34,7 @@ object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val conf = new Conf(args)
     runApp(
+      conf.dummyCamera.apply(),
       conf.imagesBasePath.apply(),
       conf.setSettings.apply(),
       conf.numberOfCaptures.apply(),
@@ -41,21 +42,27 @@ object CliApp extends IOApp with StrictLogging {
     ).as(ExitCode.Success)
   }
 
-  private def runApp(basePath: String, setSettings: Boolean, numberOfCaptures: Int, intervalSeconds: Double): IO[Try[Seq[Path]]] = {
+  private def runApp(dummyCamera: Boolean,
+                     basePath: String,
+                     setSettings: Boolean,
+                     numberOfCaptures: Int,
+                     intervalSeconds: Double): IO[Try[Seq[Path]]] = {
     val clock = Clock.systemDefaultZone()
     val appConfig = AppConfiguration(Paths.get(basePath))
     val schedulerAwakingFrequency = 100.milliseconds
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
 
-//    val ettl = realEttlApp(appConfig, clock, schedulerAwakingFrequency)
-    val ettl = dummyEttlApp(appConfig, clock, schedulerAwakingFrequency)
+    val ettl =
+      if (dummyCamera) new EttlApp(appConfig, new DummyCamera, new SchedulerImpl(clock, schedulerAwakingFrequency))
+      else new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, schedulerAwakingFrequency))
 
     logger.info(s"           Clock: $clock")
+    logger.info(s"    Dummy Camera: $dummyCamera")
     logger.info(s"Images Base Path: $basePath")
+    logger.info(s"   # of Captures: $numberOfCaptures")
     logger.info(s"    Set Settings: $setSettings")
     logger.info(s"        Interval: $interval")
-    logger.info(s"   # of Captures: $numberOfCaptures")
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
@@ -68,13 +75,8 @@ object CliApp extends IOApp with StrictLogging {
     }
   }
 
-  private def realEttlApp(appConfig: AppConfiguration, clock: Clock, schedulerAwakingFrequency: Duration): EttlApp =
-    new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, schedulerAwakingFrequency))
-
-  private def dummyEttlApp(appConfig: AppConfiguration, clock: Clock, schedulerAwakingFrequency: Duration): EttlApp =
-    new EttlApp(appConfig, new DummyCamera, new SchedulerImpl(clock, schedulerAwakingFrequency))
-
   class Conf(args: Seq[String]) extends ScallopConf(args) {
+    val dummyCamera = opt[Boolean](name = "dummyCamera", required = false, descr = "Use dummy camera so can simulate capturing photos")
     val imagesBasePath = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")
     val setSettings = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
     val numberOfCaptures = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
