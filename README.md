@@ -30,6 +30,8 @@ script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl
 You can explicitly tell the app where to put the log files if you set the environment variable before running.
 `export LOG_LOCATION=/tmp/ettl/log`
 
+You can use dummy camera to run a test and check your settings. Just use `--dummyCamera` as programme argument.
+
 ## Distribute the app
 
 ### Assembly jar
