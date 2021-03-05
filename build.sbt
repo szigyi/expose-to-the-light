@@ -10,7 +10,7 @@ name := "expose-to-the-light"
 organization := "hu.szigyi"
 version := s"0.1.$buildNumber"
 val scalaMajorVersion = "2.13"
-scalaVersion := scalaMajorVersion + ".3"
+scalaVersion := scalaMajorVersion + ".5"
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtocol(true)
 
