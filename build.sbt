@@ -1,7 +1,3 @@
-import java.util.jar.Attributes.Name
-
-import sbt.io.IO.zip
-import Path.flatRebase
 
 def env(name: String): String = sys.env.get(name).getOrElse("unknown")
 val buildNumber: String = env("BUILD_NUMBER")
