@@ -27,7 +27,7 @@ object CameraHandler extends StrictLogging {
       camera.newConfiguration.map { configuration =>
         logger.trace("Getting settings names:")
         logger.trace(configuration.getNames.toString)
-        val imageFormat = "RAW + Tiny JPEG"
+        val imageFormat = "RAW + Tiny JPEG" // This is important as we want to download the JPG version to use it later
         configuration.setValue("/settings/capturetarget", "Memory card")
         configuration.setValue("/imgsettings/imageformat", imageFormat)
         configuration.setValue("/imgsettings/imageformatsd", imageFormat)
