@@ -2,6 +2,7 @@ package org.gphoto2;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import hu.szigyi.ettl.v2.hal.GFile;
 import org.gphoto2.jna.GPhoto2Native;
 
 import java.io.Closeable;
@@ -65,9 +66,7 @@ public class CameraFile implements Closeable {
     }
 
     public Path(GPhoto2Native.CameraFilePath path) {
-      String name = CameraUtils.toString(path.name);
-      String jpeg = name.substring(0, name.length() - 3) + "JPG";
-      this.filename = jpeg;
+      this.filename = GFile.rawFileNameToJpg(CameraUtils.toString(path.name));
       this.path = CameraUtils.toString(path.folder);
     }
 

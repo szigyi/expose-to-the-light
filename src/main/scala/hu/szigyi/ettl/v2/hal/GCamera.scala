@@ -49,6 +49,12 @@ trait GFile {
   def saveImageTo(imagePath: Path): Try[Path]
 }
 
+object GFile {
+  // https://stackoverflow.com/a/4731270
+  def rawFileNameToJpg(rawName: String): String =
+    rawName.replaceAll("\\.[^.]*$", "") + ".JPG"
+}
+
 class GFileImpl(f: CameraFile) extends GFile {
   override def close: Try[Unit] = Try(f.close)
 
