@@ -6,7 +6,7 @@ import hu.szigyi.ettl.v1.util.ShellKill
 import hu.szigyi.ettl.v2.app.CliApp.AppConfiguration
 import hu.szigyi.ettl.v2.hal.{GCamera, GConfiguration, GFile}
 import hu.szigyi.ettl.v2.service.CameraHandler.{connectToCamera, takePhoto}
-import hu.szigyi.ettl.v2.tool.Timing.time
+import hu.szigyi.ettl.v2.util.Timing.time
 
 import java.nio.file.{Path, Paths}
 import scala.concurrent.duration.Duration
