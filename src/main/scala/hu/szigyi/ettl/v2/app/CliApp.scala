@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 // 1: Can capture image and download it so can view it from computer
 // 2: Can capture consecutive images without camera failure or black screen or camera lag
 // 3: Can successfully change settings of camera before capturing the image
-// TODO 4: Can download lower resolution of image from camera
+// 4: Can download lower resolution of image from camera
 // 5: base path (location of saved images) is coming from app param
 // 6: measure exact timing between captures and decide does it need to be more precise
 // 7: change the timing from sleep to precise elapsed time as interval
