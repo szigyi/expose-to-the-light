@@ -66,7 +66,7 @@ public class CameraFile implements Closeable {
     }
 
     public Path(GPhoto2Native.CameraFilePath path) {
-      this.filename = GFile.rawFileNameToJpg(CameraUtils.toString(path.name));
+      this.filename = CameraUtils.toString(path.name);
       this.path = CameraUtils.toString(path.folder);
     }
 
@@ -84,6 +84,8 @@ public class CameraFile implements Closeable {
       boolean returnedOk = false;
       final CameraFile cf = new CameraFile();
       try {
+        // use instead of filename when https://github.com/gphoto/gphoto2/issues/48 is solved
+        String jpgName = GFile.rawFileNameToJpg(this.filename); // Use it later when gphoto2 can read images when photo was taken with RAW+JPG mode
         CameraUtils.check(GPhoto2Native.INSTANCE.gp_camera_file_get(cam, path, filename, GPhoto2Native.GP_FILE_TYPE_NORMAL, cf.cf, CameraList.CONTEXT), "gp_camera_file_get");
         returnedOk = true;
         return cf;
