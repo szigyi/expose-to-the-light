@@ -25,7 +25,7 @@ script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl
 * `sudo apt install gnuplot`
 
 ### Run the app
-`./run.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5`
+`./run.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5 --rawFileExtension CR2`
 
 You can explicitly tell the app where to put the log files if you set the environment variable before running.
 `export LOG_LOCATION=/tmp/ettl/log`

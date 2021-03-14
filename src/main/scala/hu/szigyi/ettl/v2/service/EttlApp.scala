@@ -63,6 +63,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
   private var counter = 0
   private def imageNameGenerator: Path = {
     counter = counter + 1
-    Paths.get(s"IMG_$counter.CR2")
+    val counterName = f"$counter%04d"
+    Paths.get(s"IMG_$counterName.${appConfig.rawFileExtension}")
   }
 }

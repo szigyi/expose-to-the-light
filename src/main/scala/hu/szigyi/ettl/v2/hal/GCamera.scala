@@ -32,16 +32,16 @@ trait GConfiguration {
 }
 
 class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
-
   import scala.jdk.CollectionConverters._
 
-  override def getNames: Seq[String] = w.getNames.asScala.toSeq
-
-  override def setValue(name: String, value: Any): Try[Unit] = Try(w.setValue(name, value))
-
-  override def apply: Try[Unit] = Try(w.apply())
-
-  override def close: Try[Unit] = Try(w.close)
+  override def getNames: Seq[String] =
+    w.getNames.asScala.toSeq
+  override def setValue(name: String, value: Any): Try[Unit] =
+    Try(w.setValue(name, value))
+  override def apply: Try[Unit] =
+    Try(w.apply())
+  override def close: Try[Unit] =
+    Try(w.close)
 }
 
 trait GFile {
@@ -56,13 +56,8 @@ object GFile {
 }
 
 class GFileImpl(f: CameraFile) extends GFile {
-  override def close: Try[Unit] = Try(f.close)
-
-  //  val img: Array[Byte] = Files.readAllBytes(Paths.get(imagePath))
-  //  val encoded: String = BaseEncoding.base64().encode(img)
-  //  println(encoded)
-  override def saveImageTo(imagePath: Path): Try[Path] = {
-
+  override def close: Try[Unit] =
+    Try(f.close)
+  override def saveImageTo(imagePath: Path): Try[Path] =
     Try(f.save(imagePath.toAbsolutePath.toString)).map(_ => imagePath)
-  }
 }

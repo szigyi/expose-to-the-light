@@ -18,12 +18,12 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
   "runEttl" - {
     "Normal Scenario" - {
       "set camera then capture images with custom settings and returns image paths" in {
-        val camera = new DummyCamera
-        val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
+        val camera = new DummyCamera(testing = true)
+        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler)
           .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond)
 
         result shouldBe a[Success[_]]
-        result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
+        result.get shouldBe Seq(Paths.get("/IMG_0001.CR2"), Paths.get("/IMG_0002.CR2"))
         camera.adjustedCameraSettings.keys.toSeq should contain theSameElementsAs Seq(
           "/imgsettings/imageformatsd",
           "/imgsettings/iso",
@@ -34,17 +34,17 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           "/capturesettings/aperture"
         )
         camera.savedImages.map(_.toString) should contain theSameElementsAs Seq(
-          "/IMG_1.CR2", "/IMG_2.CR2"
+          "/IMG_0001.CR2", "/IMG_0002.CR2"
         )
       }
 
       "set camera then capture images and returns image paths" in {
-        val camera = new DummyCamera
-        val result = new EttlApp(AppConfiguration(Paths.get("/")), camera, immediateScheduler)
+        val camera = new DummyCamera(testing = true)
+        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler)
           .execute(None,2, 10.millisecond)
 
         result shouldBe a[Success[_]]
-        result.get shouldBe Seq(Paths.get("/IMG_1.CR2"), Paths.get("/IMG_2.CR2"))
+        result.get shouldBe Seq(Paths.get("/IMG_0001.CR2"), Paths.get("/IMG_0002.CR2"))
         camera.adjustedCameraSettings.keys.toSeq should contain theSameElementsAs Seq(
           "/imgsettings/imageformatsd",
           "/imgsettings/imageformat",
@@ -56,7 +56,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
 
     "Error Scenario" - {
       "when cannot connect to the camera then fast fail and return error" in {
-        val result = new EttlApp(AppConfiguration(Paths.get("/")), new GCamera {
+        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), new GCamera {
           override def initialize: Try[Unit] =
             Failure(new GPhotoException("gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model", -105))
 

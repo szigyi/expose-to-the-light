@@ -32,7 +32,7 @@ import scala.util.{Failure, Success, Try}
 // 15: use named arguments to get the command line args
 // 16: interval is coming from command line as well
 // 17: use better logging to inform user -> useful for task 11
-// TODO 18: DummyCamera create fake images - numbered images
+// TODO 18: DummyCamera create fake images - numbered images - https://www.baeldung.com/java-add-text-to-image
 // TODO 19: do not rename image file names, leave as original
 
 object CliApp extends IOApp with StrictLogging {
@@ -43,7 +43,8 @@ object CliApp extends IOApp with StrictLogging {
       conf.imagesBasePath.apply(),
       conf.setSettings.apply(),
       conf.numberOfCaptures.apply(),
-      conf.intervalSeconds.apply()
+      conf.intervalSeconds.apply(),
+      conf.rawFileExtension.apply()
     ).as(ExitCode.Success)
   }
 
@@ -51,9 +52,10 @@ object CliApp extends IOApp with StrictLogging {
                      basePath: String,
                      setSettings: Boolean,
                      numberOfCaptures: Int,
-                     intervalSeconds: Double): IO[Try[Seq[Path]]] = {
+                     intervalSeconds: Double,
+                     rawFileExtension: String): IO[Try[Seq[Path]]] = {
     val clock = Clock.systemDefaultZone()
-    val appConfig = AppConfiguration(Paths.get(basePath))
+    val appConfig = AppConfiguration(Paths.get(basePath), if (dummyCamera) "JPG" else rawFileExtension)
     val schedulerAwakingFrequency = 100.milliseconds
     val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
@@ -62,12 +64,13 @@ object CliApp extends IOApp with StrictLogging {
       if (dummyCamera) new EttlApp(appConfig, new DummyCamera, new SchedulerImpl(clock, schedulerAwakingFrequency))
       else new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, schedulerAwakingFrequency))
 
-    logger.info(s"           Clock: $clock")
-    logger.info(s"    Dummy Camera: $dummyCamera")
-    logger.info(s"Images Base Path: $basePath")
-    logger.info(s"   # of Captures: $numberOfCaptures")
-    logger.info(s"    Set Settings: $setSettings")
-    logger.info(s"        Interval: $interval")
+    logger.info(s"             Clock: $clock")
+    logger.info(s"      Dummy Camera: $dummyCamera")
+    logger.info(s"  Images Base Path: $basePath")
+    logger.info(s"     # of Captures: $numberOfCaptures")
+    logger.info(s"      Set Settings: $setSettings")
+    logger.info(s"          Interval: $interval")
+    logger.info(s"Raw File Extension: $interval")
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
@@ -86,9 +89,10 @@ object CliApp extends IOApp with StrictLogging {
     val setSettings = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
     val numberOfCaptures = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
     val intervalSeconds = opt[Double](name = "intervalSeconds", required = true, descr = "Seconds between two captures", validate = _ > 0.1)
+    val rawFileExtension = opt[String](name = "rawFileExtension", required = true, descr = "Extension of your Raw file ie: CR2, NEF")
     verify()
   }
 
-  case class AppConfiguration(imageBasePath: Path)
+  case class AppConfiguration(imageBasePath: Path, rawFileExtension: String)
 
 }
