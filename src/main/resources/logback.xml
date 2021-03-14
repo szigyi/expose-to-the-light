@@ -2,7 +2,7 @@
     <timestamp key="startTimestamp" datePattern="yyyy_MM_dd_HH_mm_ss"/>
     <appender name="StartupRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}:::[%thread] %.-1level %-30(%logger{25}) %msg%n</Pattern>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}:::%.-1level %msg%n</Pattern>
         </layout>
 
         <file>${LOG_LOCATION}/ettl-app-${startTimestamp}.log</file>
