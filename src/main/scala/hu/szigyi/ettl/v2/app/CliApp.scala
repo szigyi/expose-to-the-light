@@ -32,8 +32,9 @@ import scala.util.{Failure, Success, Try}
 // 15: use named arguments to get the command line args
 // 16: interval is coming from command line as well
 // 17: use better logging to inform user -> useful for task 11
-// TODO 18: DummyCamera create fake images - numbered images - https://www.baeldung.com/java-add-text-to-image
+// 18: DummyCamera create fake images - numbered images - https://www.baeldung.com/java-add-text-to-image
 // TODO 19: do not rename image file names, leave as original
+// TODO 17 remove unnecessary info from logs
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
