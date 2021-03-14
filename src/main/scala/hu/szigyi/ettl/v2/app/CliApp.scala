@@ -22,16 +22,18 @@ import scala.util.{Failure, Success, Try}
 // 5: base path (location of saved images) is coming from app param
 // 6: measure exact timing between captures and decide does it need to be more precise
 // 7: change the timing from sleep to precise elapsed time as interval
-// TODO 8: can view the downloaded images via webapp
-// TODO 9: add auto startup, systemd config with log location
-// TODO 10: webapp can start and stop systemd process
-// TODO 11: webapp can view the log
+// 8: can view the downloaded images via webapp           -- not part of this project
+// 9: add auto startup, systemd config with log location  -- not part of this project
+// 10: webapp can start and stop systemd process          -- not part of this project
+// 11: webapp can view the log                            -- not part of this project
 // 12: camera settings for capture is optional - just trigger capture without overwrite settings in camera
 // 13: can set number of images to be taken from command line
 // 14: capture image when schedule starts, do not wait until the first schedule finishes to trigger capture
 // 15: use named arguments to get the command line args
 // 16: interval is coming from command line as well
 // 17: use better logging to inform user -> useful for task 11
+// TODO 18: DummyCamera create fake images - numbered images
+// TODO 19: do not rename image file names, leave as original
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
