@@ -34,7 +34,8 @@ import scala.util.{Failure, Success, Try}
 // 17: use better logging to inform user -> useful for task 11
 // 18: DummyCamera create fake images - numbered images - https://www.baeldung.com/java-add-text-to-image
 // TODO 19: do not rename image file names, leave as original
-// 17 remove unnecessary info from logs
+// 20: remove unnecessary info from logs
+// TODO 21: store files of one session in a dedicated timestamped directory
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
