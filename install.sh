@@ -3,7 +3,7 @@
 version=$1
 artifact="expose-to-the-light_2.13-"$version".jar"
 
-if [[ ! -n $(which java) ]]; then
+if [[ -z $(which java) ]]; then
   echo "Installing jdk as did not found it on this machine..."
   sudo apt-get update
   sudo apt-get install default-jdk
@@ -18,10 +18,22 @@ version_url_map["0.1.5"]="https://www.dropbox.com/s/9prulf84m9k1fh0/expose-to-th
 ##_new_version_url_map_here
 
 echo "Downloading artifact..."
-wget -O "$artifact" ${version_url_map["$version"]}
+curl ${version_url_map["$version"]} -o "$artifact"
 
 echo "Artifact's Manifest file:"
 jar xf "$artifact" META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
 
 echo "Installing auto-runner..."
-
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  echo "linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "macOS"
+  mkdir -p /usr/local/opt/ettl
+  cp "$artifact" /usr/local/opt/ettl
+  cp ettl.sh /usr/local/opt/ettl
+  ln -s ettl.sh /usr/local/bin/ettl.sh
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+  echo "freebsd"
+else
+  echo "big problemo! No OSTYPE"
+fi
