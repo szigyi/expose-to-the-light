@@ -1,6 +1,6 @@
 package hu.szigyi.ettl.v2.hal
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.util.Try
 
 class DummyCamera(testing: Boolean = false) extends GCamera {
@@ -19,17 +19,27 @@ class DummyCamera(testing: Boolean = false) extends GCamera {
 
   override def captureImage: Try[GFile] = Try(new GFile {
     override def close: Try[Unit] = Try()
-    override def saveImageTo(imagePath: Path): Try[Path] =
-    if (testing) {
-      savedImages = savedImages :+ imagePath
-      Try(imagePath)
-    } else {
-      generateNewImage(imagePath).map { _ =>
+
+    override def saveImageTo(imageBasePath: Path): Try[Path] = {
+      val imagePath = imageBasePath.resolve(imageNameGenerator)
+      if (testing) {
         savedImages = savedImages :+ imagePath
-        imagePath
+        Try(imagePath)
+      } else {
+        generateNewImage(imagePath).map { _ =>
+          savedImages = savedImages :+ imagePath
+          imagePath
+        }
       }
-    }
+  }
   })
+
+  private var counter = 0
+  private def imageNameGenerator: Path = {
+    counter = counter + 1
+    val counterName = f"$counter%04d"
+    Paths.get(s"IMG_$counterName.JPG")
+  }
 
   private def generateNewImage(imagePath: Path): Try[Unit] = {
     import javax.imageio.ImageIO

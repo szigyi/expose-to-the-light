@@ -25,7 +25,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
     for {
       _                 <- Try(c.map(adjustSettings(config, _, imageCount, numberOfCaptures)))
       imgFileOnCamera   <- capturePhoto(camera, imageCount, numberOfCaptures)
-      imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath.resolve(imageNameGenerator))
+      imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath)
       _                 <- imgFileOnCamera.close
     } yield {
       logger.info(s"[$imageCount/$numberOfCaptures] Saved image: ${imgPathOnComputer.toString}")
@@ -58,12 +58,5 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
       if (changes.nonEmpty) config.apply
       else Try()
     })
-  }
-
-  private var counter = 0
-  private def imageNameGenerator: Path = {
-    counter = counter + 1
-    val counterName = f"$counter%04d"
-    Paths.get(s"IMG_$counterName.${appConfig.rawFileExtension}")
   }
 }

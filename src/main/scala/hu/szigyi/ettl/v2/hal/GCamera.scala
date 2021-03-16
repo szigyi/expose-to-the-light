@@ -1,6 +1,7 @@
 package hu.szigyi.ettl.v2.hal
 
-import org.gphoto2.{Camera, CameraFile, CameraWidgets}
+import hu.szigyi.ettl.v2.hal.GFile.saveTo
+import org.gphoto2.{CameraFileMod, CameraMod, CameraWidgets}
 
 import java.nio.file.Path
 import scala.util.Try
@@ -12,7 +13,7 @@ trait GCamera {
 }
 
 class GCameraImpl extends GCamera {
-  private val c = new Camera
+  private val c = new CameraMod
 
   override def initialize: Try[Unit] =
     Try(c.initialize())
@@ -46,18 +47,25 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
 
 trait GFile {
   def close: Try[Unit]
-  def saveImageTo(imagePath: Path): Try[Path]
+  def saveImageTo(imageBasePath: Path): Try[Path]
 }
 
 object GFile {
   // https://stackoverflow.com/a/4731270
   def rawFileNameToJpg(rawName: String): String =
     rawName.replaceAll("\\.[^.]*$", "") + ".JPG"
+
+  def saveTo(imageBasePath: Path, fileName: String, saving: String => Unit): Try[Path] =
+    Try{
+      val imageFilePath = imageBasePath.resolve(fileName).toAbsolutePath
+      saving(imageFilePath.toString)
+      imageFilePath
+    }
 }
 
-class GFileImpl(f: CameraFile) extends GFile {
+class GFileImpl(f: CameraFileMod) extends GFile {
   override def close: Try[Unit] =
     Try(f.close)
-  override def saveImageTo(imagePath: Path): Try[Path] =
-    Try(f.save(imagePath.toAbsolutePath.toString)).map(_ => imagePath)
+  override def saveImageTo(imageBasePath: Path): Try[Path] =
+    saveTo(imageBasePath, f.getPath.getFilename(), f.save)
 }
