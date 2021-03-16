@@ -36,6 +36,7 @@ import scala.util.{Failure, Success, Try}
 // 19: do not rename image file names, leave as original
 // 20: remove unnecessary info from logs
 // TODO 21: store files of one session in a dedicated timestamped directory
+// TODO 22: make script that installs the app and make it runnable from commandline to macOS and debian
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
