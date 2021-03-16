@@ -33,7 +33,7 @@ import scala.util.{Failure, Success, Try}
 // 16: interval is coming from command line as well
 // 17: use better logging to inform user -> useful for task 11
 // 18: DummyCamera create fake images - numbered images - https://www.baeldung.com/java-add-text-to-image
-// TODO 19: do not rename image file names, leave as original
+// 19: do not rename image file names, leave as original
 // 20: remove unnecessary info from logs
 // TODO 21: store files of one session in a dedicated timestamped directory
 
