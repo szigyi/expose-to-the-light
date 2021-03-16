@@ -23,7 +23,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond)
 
         result shouldBe a[Success[_]]
-        result.get shouldBe Seq(Paths.get("/IMG_0001.CR2"), Paths.get("/IMG_0002.CR2"))
+        result.get shouldBe Seq(Paths.get("/IMG_0001.JPG"), Paths.get("/IMG_0002.JPG"))
         camera.adjustedCameraSettings.keys.toSeq should contain theSameElementsAs Seq(
           "/imgsettings/imageformatsd",
           "/imgsettings/iso",
@@ -34,7 +34,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           "/capturesettings/aperture"
         )
         camera.savedImages.map(_.toString) should contain theSameElementsAs Seq(
-          "/IMG_0001.CR2", "/IMG_0002.CR2"
+          "/IMG_0001.JPG", "/IMG_0002.JPG"
         )
       }
 
@@ -44,7 +44,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           .execute(None,2, 10.millisecond)
 
         result shouldBe a[Success[_]]
-        result.get shouldBe Seq(Paths.get("/IMG_0001.CR2"), Paths.get("/IMG_0002.CR2"))
+        result.get shouldBe Seq(Paths.get("/IMG_0001.JPG"), Paths.get("/IMG_0002.JPG"))
         camera.adjustedCameraSettings.keys.toSeq should contain theSameElementsAs Seq(
           "/imgsettings/imageformatsd",
           "/imgsettings/imageformat",
