@@ -16,8 +16,8 @@ asset_src="target/scala-2.13/$artifact"
 asset_dst="/artifact/$artifact"
 install_src="install.sh"
 install_dst="/script/install.sh"
-ettl_src="ettl.sh"
-ettl_dst="/script/ettl.sh"
+ettl_src="ettl"
+ettl_dst="/script/ettl"
 
 curl https://content.dropboxapi.com/2/files/upload \
     --header "Authorization: Bearer $token" \
@@ -47,7 +47,7 @@ replace_string() {
 
 echo ""
 echo "Updating install and ettl scripts to use the $version version..."
-replace_string "artifact=.*" "artifact=\"$artifact\"" "ettl.sh"
+replace_string "artifact=.*" "artifact=\"$artifact\"" "ettl"
 replace_string "artifact=.*" "artifact=\"$artifact\"" "install.sh"
 replace_string "shared_link=.*" "shared_link=\"$shared_link\"" "install.sh"
 
