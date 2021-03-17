@@ -3,7 +3,7 @@
 token=$1
 buildNumber=$2
 export BUILD_NUMBER="$buildNumber"
-version=$(sbt -Dsbt.supershell=false -error "print version")
+version="0.1.$buildNumber"
 
 echo ""
 echo "Assembling $version jar package..."
@@ -11,12 +11,15 @@ sbt clean assembly
 
 echo ""
 echo "Deploying $version jar package to Dropbox..."
-asset_src="target/scala-2.13/expose-to-the-light_2.13-$version.jar"
-asset_dst="/artifact/expose-to-the-light_2.13-$version.jar"
+artifact="expose-to-the-light_2.13-$version.jar"
+asset_src="target/scala-2.13/$artifact"
+asset_dst="/artifact/$artifact"
 install_src="install.sh"
 install_dst="/script/install.sh"
+ettl_src="ettl.sh"
+ettl_dst="/script/ettl.sh"
 
-curl -X POST https://content.dropboxapi.com/2/files/upload \
+curl https://content.dropboxapi.com/2/files/upload \
     --header "Authorization: Bearer $token" \
     --header "Dropbox-API-Arg: {\"path\": \"$asset_dst\"}" \
     --header "Content-Type: application/octet-stream" \
@@ -25,26 +28,42 @@ curl -X POST https://content.dropboxapi.com/2/files/upload \
 echo ""
 echo "Making uploaded artifact public..."
 shared_link=$(
-          curl -X POST https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings \
-              --header "Authorization: Bearer $token" \
-              --header "Content-Type: application/json" \
-              --data "{\"path\": \"$asset_dst\",\"settings\": {\"requested_visibility\": \"public\"}}"  | jq -r '.url'
-              )
+  curl https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings \
+      --header "Authorization: Bearer $token" \
+      --header "Content-Type: application/json" \
+      --data "{\"path\": \"$asset_dst\",\"settings\": {\"requested_visibility\": \"public\"}}"  | jq -r '.url')
+
 echo "Shared Link:"
 echo "$shared_link"
 
-new_version_map="version_url_map[\"$version\"]=\"$shared_link\""
+replace_string() {
+  placeholder=$1
+  new_string=$2
+  file_name=$3
+  ESCAPED_REPLACE=$(printf '%s\n' "$new_string" | sed -e 's/[\/&]/\\&/g')
 
-ESCAPED_REPLACE=$(printf '%s\n' "$new_version_map" | sed -e 's/[\/&]/\\&/g')
-ESCAPED_REPLACE="$ESCAPED_REPLACE\\
-##_new_version_url_map_here"
+  sed -i '' -e "s/$placeholder/$ESCAPED_REPLACE/" "$file_name"
+}
 
-sed -i '' -e "s/##_new_version_url_map_here/$ESCAPED_REPLACE/" install.sh
+echo ""
+echo "Updating install and ettl scripts to use the $version version..."
+replace_string "artifact=.*" "artifact=\"$artifact\"" "ettl.sh"
+replace_string "artifact=.*" "artifact=\"$artifact\"" "install.sh"
+replace_string "shared_link=.*" "shared_link=\"$shared_link\"" "install.sh"
+
 
 echo ""
 echo "Deploying $version install script..."
-curl -X POST https://content.dropboxapi.com/2/files/upload \
+curl https://content.dropboxapi.com/2/files/upload \
     --header "Authorization: Bearer $token" \
     --header "Dropbox-API-Arg: {\"path\": \"$install_dst\", \"mode\": \"overwrite\"}" \
     --header "Content-Type: application/octet-stream" \
-    --data-binary @$install_src
+    --data-binary @$install_src | jq -r '.path_lower'
+
+echo ""
+echo "Deploying $version ettl/run script..."
+curl https://content.dropboxapi.com/2/files/upload \
+    --header "Authorization: Bearer $token" \
+    --header "Dropbox-API-Arg: {\"path\": \"$ettl_dst\", \"mode\": \"overwrite\"}" \
+    --header "Content-Type: application/octet-stream" \
+    --data-binary @$ettl_src | jq -r '.path_lower'

@@ -3,8 +3,7 @@
 # -help
 # ettl.sh --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5 --rawFileExtension CR2
 
-version=$1
-artifact="expose-to-the-light_2.13-"$version".jar"
+artifact="expose-to-the-light_2.13-0.1.6.jar"
 
 shift
 args=$*
