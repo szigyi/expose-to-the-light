@@ -33,6 +33,9 @@ shared_link=$(
       --header "Content-Type: application/json" \
       --data "{\"path\": \"$asset_dst\",\"settings\": {\"requested_visibility\": \"public\"}}"  | jq -r '.url')
 
+# making the link downloadable
+shared_link="$(echo "$shared_link" | sed 's/.$//')1"
+
 echo "Shared Link:"
 echo "$shared_link"
 
@@ -47,7 +50,7 @@ replace_string() {
 
 echo ""
 echo "Updating install and ettl scripts to use the $version version..."
-replace_string "artifact=.*" "artifact=\"$artifact\"" "ettl"
+replace_string "artif=.*" "artif=\"$artifact\"" "ettl"
 replace_string "artifact=.*" "artifact=\"$artifact\"" "install.sh"
 replace_string "shared_link=.*" "shared_link=\"$shared_link\"" "install.sh"
 

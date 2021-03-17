@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-shared_link="https://www.dropbox.com/s/2yfi8nrp255ym15/expose-to-the-light_2.13-0.1.6.jar?dl=1"
+replace_string() {
+  placeholder=$1
+  new_string=$2
+  file_name=$3
+  ESCAPED_REPLACE=$(printf '%s\n' "$new_string" | sed -e 's/[\/&]/\\&/g')
+
+  sed -i '' -e "s/$placeholder/$ESCAPED_REPLACE/" "$file_name"
+}
+
+shared_link="https://www.dropbox.com/s/q7f9lvyz3vxopgo/expose-to-the-light_2.13-0.1.6.jar?dl=1"
 artifact="expose-to-the-light_2.13-0.1.6.jar"
 
 echo "Downloading artifact..."
@@ -17,6 +26,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   mkdir -p /usr/local/opt/ettl
   cp "$artifact" /usr/local/opt/ettl
   cp ettl /usr/local/opt/ettl
+
+  cd /usr/local/opt/ettl
+  replace_string "artif=.*" "artif=\"/usr/local/opt/ettl/$artifact\"" "ettl"
+
   cd /usr/local/bin
   ln -fs /usr/local/opt/ettl/ettl ettl
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
