@@ -22,14 +22,18 @@ echo "Installing and adding to PATH..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  echo "Install to macOS"
+  echo "Detected OS is macOS"
+  echo "Installing application to /usr/local/opt/ettl"
   mkdir -p /usr/local/opt/ettl
   cp "$artifact" /usr/local/opt/ettl
   cp ettl /usr/local/opt/ettl
+  rm "$artifact"
+#  rm ettl
 
   cd /usr/local/opt/ettl
   replace_string "artif=.*" "artif=\"/usr/local/opt/ettl/$artifact\"" "ettl"
 
+  echo "Installing ettl command to /usr/local/bin"
   cd /usr/local/bin
   ln -fs /usr/local/opt/ettl/ettl ettl
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
