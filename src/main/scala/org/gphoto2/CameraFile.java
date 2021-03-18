@@ -4,22 +4,24 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import org.gphoto2.jna.GPhoto2Native;
 
-public class CameraFileMod extends CameraFile {
+import java.io.Closeable;
+
+public class CameraFile implements Closeable {
 
     final Pointer cf;
 
-    public PathMod p;
+    public Path p;
 
     /**
      * Creates a new file link. The file is not yet linked to any particular camera file - the link is performed later on, by invoking gphoto functions.
      */
-    CameraFileMod() {
+    CameraFile() {
         final PointerByReference p = new PointerByReference();
         CameraUtils.check(GPhoto2Native.INSTANCE.gp_file_new(p), "gp_file_new");
         cf = p.getValue();
     }
 
-    CameraFileMod(PathMod path) {
+    CameraFile(Path path) {
         this();
         this.p = path;
     }
@@ -52,7 +54,7 @@ public class CameraFileMod extends CameraFile {
         CameraUtils.check(GPhoto2Native.INSTANCE.gp_file_unref(cf), "gp_file_unref");
     }
 
-    public PathMod getPath() {
+    public Path getPath() {
         return this.p;
     }
 
