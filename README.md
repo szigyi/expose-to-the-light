@@ -1,19 +1,15 @@
 # expose-to-the-light
 
 ## Install application on Raspberry Pi
-artifact = https://www.dropbox.com/sh/tjhu0op7hzqvonk/AAACatOs5-DtAsaOV4DFC9hoa?dl=0
-
-script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl=0
-
 ### Download install script
 `wget https://www.dropbox.com/s/fd88r1lybiscjgb/install.sh?dl=1`
 
-### Install the version you want
-`./install.sh 0.1.2`
+### Install
+`./install.sh`
 
-*install script only works on unix, not on macOS as the hashmap datastructure does not work*
+The install script downloads the latest jar and script files and then setup them to your PATH so you can use it later as any other unix command.
 
-### Install dependencies // TODO verify these steps
+### Install runtime dependencies // TODO verify these steps
 #### On Mac Os
 * `brew install pkg-config`
 * `brew install gphoto2`
@@ -25,10 +21,9 @@ script = https://www.dropbox.com/sh/rndmhfrp1xni4h5/AAD2LiDVxeInX6LtV7R8hGzCa?dl
 * `sudo apt install gnuplot`
 
 ### Run the app
-`./ettl.sh 0.1.2 --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5 --rawFileExtension CR2`
+`ettl /home/pi/dev/expose-to-the-light/logs/ --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5 --rawFileExtension CR2`
 
-You can explicitly tell the app where to put the log files if you set the environment variable before running.
-`export LOG_LOCATION=/tmp/ettl/log`
+First argument is the location of the logs file.
 
 You can use dummy camera to run a test and check your settings. Just use `--dummyCamera` as programme argument.
 
@@ -85,8 +80,6 @@ pi        1461  0.0  0.0   7348   572 pts/0    S+   14:28   0:00 grep --color=au
 
 ## Useful docs
    * http://www.gphoto.org/doc/remote/
-   * https://github.com/jim-easterbrook/python-gphoto2
-   * https://github.com/jim-easterbrook/python-gphoto2/blob/master/examples/time_lapse.py
    * http://gphoto-software.10949.n7.nabble.com/Beginner-Using-libgphoto2-how-to-find-set-config-values-td16449.html
 
 ### Remote monitoring
