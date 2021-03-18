@@ -11,9 +11,9 @@ object GCameraFixture {
     override def getNames: Seq[String] = adjustedCameraSettings.keys.toSeq
     override def setValue(name: String, value: Any): Try[Unit] = {
       adjustedCameraSettings = adjustedCameraSettings + (name -> value)
-      Try()
+      Try(())
     }
-    override def apply: Try[Unit] = Try()
-    override def close: Try[Unit] = Try()
+    override def apply: Try[Unit] = Try(())
+    override def close: Try[Unit] = Try(())
   })
 }

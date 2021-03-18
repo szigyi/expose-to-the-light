@@ -16,7 +16,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
 
   def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
-      config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes)
+      config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes())
       imagePaths <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting))
       _          <- config.close
     } yield imagePaths
@@ -56,7 +56,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
     val tryChanges: Try[List[Unit]] = List(ss, i, a).flatten.sequence
     tryChanges.flatMap(changes => {
       if (changes.nonEmpty) config.apply
-      else Try()
+      else Try(())
     })
   }
 }

@@ -19,7 +19,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         var retried = false
         val config: Try[GConfiguration] = capturedConfiguration
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
-          override def initialize: Try[Unit] = Try()
+          override def initialize: Try[Unit] = Try(())
           override def newConfiguration: Try[GConfiguration] = config
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
         }, { retried = true })
@@ -52,7 +52,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
                 count += 1
                 Failure(new GPhotoException("bad", -53))
               case 1 =>
-                Try()
+                Try(())
             }
           override def newConfiguration: Try[GConfiguration] = capturedConfiguration
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()

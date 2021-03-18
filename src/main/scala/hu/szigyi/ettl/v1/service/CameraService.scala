@@ -28,9 +28,9 @@ class CameraService(clock: Clock) extends StrictLogging {
   }
 
   def recoverInitialise: Try[Unit] = {
-    Try(initialise).recoverWith {
+    Try(initialise()).recoverWith {
       case e: GPhotoException if e.result == -53 =>
-        ShellKill.killGPhoto2Processes
+        ShellKill.killGPhoto2Processes()
         Try(camera.newConfiguration())
       case unrecoverableException =>
         Failure(unrecoverableException)
@@ -130,6 +130,7 @@ object CameraService {
             val numerator = numeratorS.toDouble
             val denominator = denominatorS.toDouble
             numerator / denominator
+          case _ => throw new NumberFormatException(s"Cannot parse '$s' as Double")
         }
     }
   }

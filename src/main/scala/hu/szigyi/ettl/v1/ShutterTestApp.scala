@@ -14,7 +14,7 @@ object ShutterTestApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val cam: CameraService = new CameraService(Clock.systemUTC())
     (for {
-      _ <- IO(cam.initialise)
+      _ <- IO(cam.initialise())
       img <- doItAgain(cam)
     } yield img).as(ExitCode.Success)
   }
