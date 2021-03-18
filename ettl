@@ -3,7 +3,7 @@
 # -help
 # ettl /home/pi/dev/expose-to-the-light/logs/ --imagesBasePath /home/pi/dev/expose-to-the-light/captured-images/ --setSettings --numberOfCaptures 5 --intervalSeconds 5 --rawFileExtension CR2
 
-artif="expose-to-the-light_2.13-0.1.7.jar"
+artif="expose-to-the-light_2.13-0.1.8.jar"
 export LOG_LOCATION=$1
 
 shift

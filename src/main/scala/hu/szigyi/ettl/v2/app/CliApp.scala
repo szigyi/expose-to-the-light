@@ -39,7 +39,7 @@ import scala.util.{Failure, Success, Try}
 // TODO 23: can provide camera's settings for every capture (evaluated at the time of capture if it is possible)
 // TODO 24: emergency shutdown: cancel the execution (cancel fs2 stream?)
 // TODO 25: make the install script download the ettl script as well not just the artifact
-// TODO 26: copy gphoto2-java into the project and compile with the app
+// 26: copy gphoto2-java into the project and compile with the app
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
