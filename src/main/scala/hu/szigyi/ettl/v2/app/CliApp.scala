@@ -74,7 +74,7 @@ object CliApp extends IOApp with StrictLogging {
     logger.info(s"     # of Captures: $numberOfCaptures")
     logger.info(s"      Set Settings: $setSettings")
     logger.info(s"          Interval: $interval")
-    logger.info(s"Raw File Extension: $interval")
+    logger.info(s"Raw File Extension: $rawFileExtension")
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
