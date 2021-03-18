@@ -45,7 +45,7 @@ object InfluxDomain {
   trait InfluxDomainTrait {
     val measurementName: String
     implicit def toTimeColumn(t: Instant): TimeColumn = TimeColumn(t)
-    val dtFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    val dtFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     def asString(str: String): String = s""""$str""""
     def asInt(n: Int): String = s"${n.toString}i"
     def asLong(l: Long): String = s"${l.toString}i"

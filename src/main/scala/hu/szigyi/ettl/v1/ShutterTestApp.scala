@@ -20,7 +20,7 @@ object ShutterTestApp extends IOApp with StrictLogging {
   }
 
   def doItAgain(cam: CameraService): IO[Seq[CameraFile]] =
-    (0 until 10).toList.traverse { e =>
+    (0 until 10).toList.traverse { _ =>
       IO.sleep(1.second).flatMap(_ => cam.captureImage)
     }
 }

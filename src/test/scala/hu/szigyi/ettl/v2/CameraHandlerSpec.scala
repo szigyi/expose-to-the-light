@@ -21,7 +21,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
           override def initialize: Try[Unit] = Try()
           override def newConfiguration: Try[GConfiguration] = config
-          override def captureImage: Try[GFile] = ???
+          override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -35,7 +35,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         val handler: Try[GConfiguration] = CameraHandler.connectToCamera(new GCamera {
           override def initialize: Try[Unit] = Failure(new GPhotoException("bad", -105))
           override def newConfiguration: Try[GConfiguration] = capturedConfiguration
-          override def captureImage: Try[GFile] = ???
+          override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Failure[_]]
@@ -55,7 +55,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
                 Try()
             }
           override def newConfiguration: Try[GConfiguration] = capturedConfiguration
-          override def captureImage: Try[GFile] = ???
+          override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -67,11 +67,11 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
   "takePhoto" - {
     "take a photo and return the camera file" in {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
-        override def initialize: Try[Unit] = ???
-        override def newConfiguration: Try[GConfiguration] = ???
+        override def initialize: Try[Unit] = throw new UnsupportedOperationException()
+        override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
         override def captureImage: Try[GFile] = Try(new GFile {
-          override def close: Try[Unit] = ???
-          override def saveImageTo(imageBasePath: Path): Try[Path] = ???
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
+          override def saveImageTo(imageBasePath: Path): Try[Path] = throw new UnsupportedOperationException()
         })
       })
 
@@ -80,8 +80,8 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
 
     "return error when exception happens during capture" in {
       val cameraFile: Try[GFile] = CameraHandler.takePhoto(new GCamera {
-        override def initialize: Try[Unit] = ???
-        override def newConfiguration: Try[GConfiguration] = ???
+        override def initialize: Try[Unit] = throw new UnsupportedOperationException()
+        override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
         override def captureImage: Try[GFile] = Failure(new GPhotoException("cannot take photo", -999))
       })
 

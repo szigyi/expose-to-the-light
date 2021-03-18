@@ -12,8 +12,8 @@ import org.http4s.dsl.io._
 
 class HealthApi(env: String) {
 
-  val service = HttpRoutes.of[IO] {
-    case GET -> Root => Ok(HealthModel(Instant.now(), env, false))
+  val service: HttpRoutes[IO] = HttpRoutes.of[IO] {
+    case GET -> Root => Ok(HealthModel(Instant.now(), env, running = false))
   }
 }
 

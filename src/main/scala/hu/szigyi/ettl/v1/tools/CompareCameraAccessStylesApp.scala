@@ -31,8 +31,8 @@ object CompareCameraAccessStylesApp extends IOApp with StrictLogging {
   private def captureTask(cameraService: CameraService,
                           settings: SettingsCameraModel)(rootWidget: CameraWidgets): IO[Option[CapturedCameraModel]] = {
     for {
-      s <- cameraService.setEvSettings(rootWidget, settings)
-      c <- cameraService.captureImage
+      _ <- cameraService.setEvSettings(rootWidget, settings)
+      _ <- cameraService.captureImage
       cm <- cameraService.getSettings(rootWidget)
     } yield Some(cm)
   }

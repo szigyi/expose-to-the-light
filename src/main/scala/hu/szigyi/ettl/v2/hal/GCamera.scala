@@ -42,7 +42,7 @@ class GConfigurationImpl(w: CameraWidgets) extends GConfiguration {
   override def apply: Try[Unit] =
     Try(w.apply())
   override def close: Try[Unit] =
-    Try(w.close)
+    Try(w.close())
 }
 
 trait GFile {
@@ -65,7 +65,7 @@ object GFile {
 
 class GFileImpl(f: CameraFileMod) extends GFile {
   override def close: Try[Unit] =
-    Try(f.close)
+    Try(f.close())
   override def saveImageTo(imageBasePath: Path): Try[Path] =
-    saveTo(imageBasePath, f.getPath.getFilename(), f.save)
+    saveTo(imageBasePath, f.getPath.getFilename, f.save)
 }

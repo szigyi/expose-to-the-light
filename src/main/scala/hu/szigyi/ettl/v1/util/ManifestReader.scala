@@ -14,7 +14,7 @@ class ManifestReader(clazz: Class[_]) {
     new java.util.jar.Manifest(new URL(manifestUrl).openStream())
   }.toOption
 
-  def manifestInfo() = ManifestInfo(
+  def manifestInfo(): ManifestInfo = ManifestInfo(
     buildNumber = stringFromManifest("Implementation-Version"),
     buildTimeStamp = stringFromManifest("Build-Timestamp"),
     gitHash = stringFromManifest("Git-Hash"),

@@ -176,7 +176,7 @@ object StoreKeyFramesApp extends IOApp {
 
   private def sparseInTimeKeyFrames(clock: Clock, keyFrames: Seq[KeyFrameDomain]): Seq[KeyFrameDomain] = {
     val now = clock.instant()
-    val idx = 0 until keyFrames.size
+    val idx = keyFrames.indices
     idx.zip(keyFrames).map {
       case (i, k) =>
         k.copy(timestamp = now.plusSeconds(i))

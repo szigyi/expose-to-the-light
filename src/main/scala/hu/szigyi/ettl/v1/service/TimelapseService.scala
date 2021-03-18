@@ -25,7 +25,7 @@ class TimelapseService(influx: InfluxDbClient[IO], capturedImageService: Capture
     id        = UUID.randomUUID().toString
     tasks     = scaled.map(s => {
       import ToSetSettingDomain._
-      ToSetSettingDomain(s.time.toInstant, id, false, now, Some(s.shutterSpeed), Some(s.iso), Some(s.aperture),
+      ToSetSettingDomain(s.time.toInstant, id, test = false, now, Some(s.shutterSpeed), Some(s.iso), Some(s.aperture),
         Some(EvService.ev(s.shutterSpeed, s.iso, s.aperture)))
     })
     _         <- influx.writeSettings(tasks)
@@ -46,7 +46,7 @@ class TimelapseService(influx: InfluxDbClient[IO], capturedImageService: Capture
       tasks             = time.zip(scaled).map {
         case (time, scaled) =>
           import ToSetSettingDomain._
-          ToSetSettingDomain(time, id, true, now, Some(scaled.shutterSpeed), Some(scaled.iso), Some(scaled.aperture),
+          ToSetSettingDomain(time, id, test = true, now, Some(scaled.shutterSpeed), Some(scaled.iso), Some(scaled.aperture),
             Some(EvService.ev(scaled.shutterSpeed, scaled.iso, scaled.aperture)))
       }
       _                 <- influx.writeSettings(tasks)
@@ -125,7 +125,7 @@ class TimelapseService(influx: InfluxDbClient[IO], capturedImageService: Capture
       r   <- readOutSettings(cameraService, rootWidget)
     } yield {
       Try(capturedImageService.saveCapturedImage(cf).unsafeRunSync()) match {
-        case Success(value) => logger.info("Captured image have been stored!")
+        case Success(_) => logger.info("Captured image have been stored!")
         case Failure(exception) => logger.error("Could not store captured image!", exception)
       }
       Some(r)
@@ -159,7 +159,7 @@ class TimelapseService(influx: InfluxDbClient[IO], capturedImageService: Capture
         import CapturedDomain._
         val time = clock.instant()
         val id = getOrDefault(s.map(_.id), t.map(_.id), "UNKNOWN")
-        val test = s.map(_.test).getOrElse(false)
+        val test = s.exists(_.test)
         val order = t.map(_.order).getOrElse(-1)
         val shutterSpeed = s.flatMap(_.shutterSpeed).getOrElse(0.0d)
         val iso = s.flatMap(_.iso).getOrElse(0)

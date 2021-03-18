@@ -22,7 +22,7 @@ object TestClock {
   }
 
   /**
-   * @acceleration is the duration that will be multiplied the elapsed milliseconds
+   * acceleration is the duration that will be multiplied the elapsed milliseconds
    * which means if the acceleration is 1 second then
    * if 1 millisecond is elapsed then it will be seen as 1 second
    */

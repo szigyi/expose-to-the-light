@@ -15,12 +15,12 @@ class InverseOfControl(env: String, port: Int, client: Client[IO])(implicit time
 
   val blocker: Blocker = Blocker[IO].allocated.unsafeRunSync()._1
 
-  val clock = Clock.systemUTC()
+  val clock: Clock = Clock.systemUTC()
 
   val influx = new InfluxClient[IO](client, Uri.unsafeFromString("http://localhost:8086"))
-  val influxDbClient = InfluxDbClient.apply(influx)
+  val influxDbClient: InfluxDbClient[IO] = InfluxDbClient.apply(influx)
 
-  val rateOfBgProcess = 1.second
+  val rateOfBgProcess: FiniteDuration = 1.second
   val capturedImageService = new CapturedImageService()
   val timeLapseService = new TimelapseService(influxDbClient, capturedImageService, rateOfBgProcess, clock)
 

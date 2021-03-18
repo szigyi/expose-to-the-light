@@ -15,6 +15,7 @@ class CapturedImageService extends StrictLogging {
 //    val img: Array[Byte] = Files.readAllBytes(imagePath)
 //    val encoded: String = BaseEncoding.base64().encode(img)
 //    image.set(encoded)
+    logger.trace(s"Saving: $cf")
     IO.unit
   }
 }

@@ -1,5 +1,5 @@
 
-def env(name: String): String = sys.env.get(name).getOrElse("unknown")
+def env(name: String): String = sys.env.getOrElse(name, "unknown")
 val buildNumber: String = env("BUILD_NUMBER")
 
 name := "expose-to-the-light"

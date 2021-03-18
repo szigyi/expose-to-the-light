@@ -13,7 +13,7 @@ import scala.util.{Failure, Try}
 class CameraService(clock: Clock) extends StrictLogging {
   private val camera = new Camera()
 
-  def initialise: Unit = {
+  def initialise(): Unit = {
     camera.initialize()
     val conf = camera.newConfiguration()
     logger.trace("Getting settings names:")
@@ -63,9 +63,9 @@ class CameraService(clock: Clock) extends StrictLogging {
   def setEvSettings(rootWidget: CameraWidgets, c: SettingsCameraModel): IO[Unit] =
     IO.fromTry(Try {
       logger.info(s"[ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
-      c.shutterSpeedString.map(rootWidget.setValue("/capturesettings/shutterspeed", _))
-      c.iso.map(iso => rootWidget.setValue("/imgsettings/iso", iso.toString))
-      c.aperture.map(aperture => rootWidget.setValue("/capturesettings/aperture", aperture.toString))
+      c.shutterSpeedString.foreach(rootWidget.setValue("/capturesettings/shutterspeed", _))
+      c.iso.foreach(iso => rootWidget.setValue("/imgsettings/iso", iso.toString))
+      c.aperture.foreach(aperture => rootWidget.setValue("/capturesettings/aperture", aperture.toString))
       val isAnyValueHasBeenSet = Seq(c.shutterSpeedString, c.iso.map(_.toString), c.aperture.map(_.toString)).flatten
       if (isAnyValueHasBeenSet.nonEmpty) rootWidget.apply()
     })

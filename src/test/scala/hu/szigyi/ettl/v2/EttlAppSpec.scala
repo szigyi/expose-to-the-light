@@ -60,9 +60,9 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           override def initialize: Try[Unit] =
             Failure(new GPhotoException("gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model", -105))
 
-          override def newConfiguration: Try[GConfiguration] = ???
+          override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
 
-          override def captureImage: Try[GFile] = ???
+          override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
         }, immediateScheduler).execute(None, 1, 10.millisecond)
 
         result shouldBe a[Failure[_]]
