@@ -32,10 +32,15 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
   cd /usr/local/opt/ettl
   replace_string "artif=.*" "artif=\"/usr/local/opt/ettl/$artifact\"" "ettl"
+  replace_string "vm_options=.*" "vm_options=\"-Djna.library.path=/usr/local/Cellar/libgphoto2/2.5.27/lib\"" "ettl"
 
   echo "Installing ettl command to /usr/local/bin"
   cd /usr/local/bin
   ln -fs /usr/local/opt/ettl/ettl ettl
+
+  echo "Installing dependencies"
+  brew install gphoto2 ?
+  brew install libgphoto2 ? // TODO which one is needed ot both?
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
   echo "freebsd"
 else

@@ -11,9 +11,11 @@ The install script downloads the latest jar and script files and then setup them
 
 ### Install runtime dependencies // TODO verify these steps
 #### On Mac Os
-* `brew install pkg-config`
+
+[comment]: <> (* `brew install pkg-config`)
 * `brew install gphoto2`
-* `brew install gnuplot`
+* `brew install libgphoto2`
+[comment]: <> (* `brew install gnuplot`)
 
 #### On Raspberry Pi (unix)
 * `sudo apt install pkg-config`
