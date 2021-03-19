@@ -81,7 +81,7 @@ object CliEttlApp extends IOApp with StrictLogging {
 
     IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
       case Right(imagePaths) =>
-        logger.info(s"App finished:")
+        logger.info(s"App finished")
         Success(imagePaths)
       case Left(exception) =>
         logger.error(s"App failed", exception)
