@@ -14,12 +14,12 @@ import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
-class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler, now: Instant) extends StrictLogging {
+class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler, dir: DirectoryService, now: Instant) extends StrictLogging {
 
   def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
       sessionFolderName <- Try(nowToSessionId(now))
-      _                 <- createSessionFolder(sessionFolderName)
+      _                 <- dir.createFolder(appConfig.imageBasePath.resolve(sessionFolderName))
       config            <- connectToCamera(camera, ShellKill.killGPhoto2Processes())
       imagePaths        <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting, sessionFolderName))
       _                 <- config.close

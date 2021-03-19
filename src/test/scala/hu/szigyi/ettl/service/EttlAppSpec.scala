@@ -9,8 +9,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.time.Instant.{parse => instant}
-
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
@@ -20,7 +19,10 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
     "Normal Scenario" - {
       "set camera then capture images with custom settings" in {
         val camera = new DummyCamera(testing = true)
-        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler, instant("2021-03-19T19:00:00Z"))
+        val result = new EttlApp(
+          AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler, new DirectoryService() {
+            override def createFolder(folderPath: Path): Try[Unit] = Try(())
+          }, instant("2021-03-19T19:00:00Z"))
           .execute(Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))), 2, 10.millisecond)
 
         result shouldBe a[Success[_]]
@@ -38,7 +40,9 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
 
       "set camera then capture images without custom settings" in {
         val camera = new DummyCamera(testing = true)
-        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler, instant("2021-03-19T19:00:00Z"))
+        val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler, new DirectoryService {
+          override def createFolder(folderPath: Path): Try[Unit] = Try(())
+        }, instant("2021-03-19T19:00:00Z"))
           .execute(None,2, 10.millisecond)
 
         result shouldBe a[Success[_]]
@@ -61,7 +65,9 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
 
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
-        }, immediateScheduler, instant("2021-03-19T19:00:00Z")).execute(None, 1, 10.millisecond)
+        }, immediateScheduler, new DirectoryService {
+          override def createFolder(folderPath: Path): Try[Unit] = Try(())
+        }, instant("2021-03-19T19:00:00Z")).execute(None, 1, 10.millisecond)
 
         result shouldBe a[Failure[_]]
         result.failed.get.getMessage shouldBe "gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model"

@@ -4,7 +4,7 @@ import cats.effect.{ExitCode, IO, IOApp}
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.hal.{DummyCamera, GCameraImpl}
 import hu.szigyi.ettl.model.Model.SettingsCameraModel
-import hu.szigyi.ettl.service.{EttlApp, SchedulerImpl}
+import hu.szigyi.ettl.service.{DirectoryService, EttlApp, SchedulerImpl}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 import java.nio.file.{Path, Paths}
@@ -12,7 +12,6 @@ import java.time.Clock
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
-
 
 // 1: Can capture image and download it so can view it from computer
 // 2: Can capture consecutive images without camera failure or black screen or camera lag
@@ -55,21 +54,18 @@ object CliEttlApp extends IOApp with StrictLogging {
     ).as(ExitCode.Success)
   }
 
-  private def runApp(dummyCamera: Boolean,
-                     basePath: String,
-                     setSettings: Boolean,
-                     numberOfCaptures: Int,
-                     intervalSeconds: Double,
-                     rawFileExtension: String): IO[Try[Seq[Path]]] = {
-    val clock = Clock.systemDefaultZone()
-    val appConfig = AppConfiguration(Paths.get(basePath), if (dummyCamera) "JPG" else rawFileExtension)
+  private def runApp(dummyCamera: Boolean, basePath: String, setSettings: Boolean, numberOfCaptures: Int, intervalSeconds: Double, rawFileExtension: String): IO[Try[Seq[Path]]] = {
+    val clock                     = Clock.systemDefaultZone()
+    val appConfig                 = AppConfiguration(Paths.get(basePath), if (dummyCamera) "JPG" else rawFileExtension)
     val schedulerAwakingFrequency = 100.milliseconds
-    val setting = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
-    val interval = Duration(intervalSeconds, TimeUnit.SECONDS)
+    val setting                   = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
+    val interval                  = Duration(intervalSeconds, TimeUnit.SECONDS)
 
+    val scheduler = new SchedulerImpl(clock, schedulerAwakingFrequency)
+    val dir       = new DirectoryService
     val ettl =
-      if (dummyCamera) new EttlApp(appConfig, new DummyCamera, new SchedulerImpl(clock, schedulerAwakingFrequency), clock.instant())
-      else new EttlApp(appConfig, new GCameraImpl, new SchedulerImpl(clock, schedulerAwakingFrequency), clock.instant())
+      if (dummyCamera) new EttlApp(appConfig, new DummyCamera, scheduler, dir, clock.instant())
+      else new EttlApp(appConfig, new GCameraImpl, scheduler, dir, clock.instant())
 
     logger.info(s"             Clock: $clock")
     logger.info(s"      Dummy Camera: $dummyCamera")
@@ -90,11 +86,11 @@ object CliEttlApp extends IOApp with StrictLogging {
   }
 
   class Conf(args: Seq[String]) extends ScallopConf(args) {
-    val dummyCamera: ScallopOption[Boolean] = opt[Boolean](name = "dummyCamera", required = false, descr = "Use dummy camera so can simulate capturing photos")
-    val imagesBasePath: ScallopOption[String] = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")
-    val setSettings: ScallopOption[Boolean] = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
-    val numberOfCaptures: ScallopOption[Int] = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
-    val intervalSeconds: ScallopOption[Double] = opt[Double](name = "intervalSeconds", required = true, descr = "Seconds between two captures", validate = _ > 0.1)
+    val dummyCamera: ScallopOption[Boolean]     = opt[Boolean](name = "dummyCamera", required = false, descr = "Use dummy camera so can simulate capturing photos")
+    val imagesBasePath: ScallopOption[String]   = opt[String](name = "imagesBasePath", required = true, descr = "Folder where the captured images will be stored")
+    val setSettings: ScallopOption[Boolean]     = opt[Boolean](name = "setSettings", descr = "Do you want the app to override the camera settings before capturing an image?")
+    val numberOfCaptures: ScallopOption[Int]    = opt[Int](name = "numberOfCaptures", required = true, descr = "How many photos do you want to take?")
+    val intervalSeconds: ScallopOption[Double]  = opt[Double](name = "intervalSeconds", required = true, descr = "Seconds between two captures", validate = _ > 0.1)
     val rawFileExtension: ScallopOption[String] = opt[String](name = "rawFileExtension", required = true, descr = "Extension of your Raw file ie: CR2, NEF")
     verify()
   }
