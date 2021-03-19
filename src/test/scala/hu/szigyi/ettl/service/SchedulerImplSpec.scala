@@ -1,7 +1,6 @@
-package hu.szigyi.ettl
+package hu.szigyi.ettl.service
 
-import hu.szigyi.ettl.service.SchedulerImpl
-import TestClock.AcceleratedClock
+import hu.szigyi.ettl.testing.TestClock.AcceleratedClock
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 

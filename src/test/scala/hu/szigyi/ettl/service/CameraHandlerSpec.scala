@@ -1,8 +1,7 @@
-package hu.szigyi.ettl
+package hu.szigyi.ettl.service
 
-import hu.szigyi.ettl.GCameraFixture._
+import hu.szigyi.ettl.testing.GCameraFixture._
 import hu.szigyi.ettl.hal.{GCamera, GConfiguration, GFile}
-import hu.szigyi.ettl.service.CameraHandler
 import org.gphoto2.GPhotoException
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers

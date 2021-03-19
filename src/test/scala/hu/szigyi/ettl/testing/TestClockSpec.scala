@@ -1,8 +1,9 @@
-package hu.szigyi.ettl
+package hu.szigyi.ettl.testing
 
-import TestClock.{AcceleratedClock, TickingClock}
+import hu.szigyi.ettl.testing.TestClock.{AcceleratedClock, TickingClock}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+
 import java.time.Instant.{parse => instant}
 import scala.concurrent.duration._
 

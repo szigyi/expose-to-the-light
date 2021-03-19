@@ -1,9 +1,10 @@
-package hu.szigyi.ettl
+package hu.szigyi.ettl.testing
 
 import cats.implicits._
+
 import hu.szigyi.ettl.service.Scheduler
 
-import java.time.{Clock, Instant}
+import java.time.Instant
 import scala.concurrent.duration.Duration
 import scala.util.Try
 
@@ -14,6 +15,8 @@ object SchedulerFixture {
       capture
 
     override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] =
-      (0 until numberOfTasks).toList.traverse { i => task(i) }
+      (0 until numberOfTasks).toList.traverse { i =>
+        task(i)
+      }
   }
 }
