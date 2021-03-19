@@ -39,8 +39,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   ln -fs /usr/local/opt/ettl/ettl ettl
 
   echo "Installing dependencies"
-  brew install gphoto2 ?
-  brew install libgphoto2 ? // TODO which one is needed ot both?
+  brew install gphoto2
+  brew install libgphoto2
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
   echo "freebsd"
 else
