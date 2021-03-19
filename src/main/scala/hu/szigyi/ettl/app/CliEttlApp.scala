@@ -42,7 +42,7 @@ import scala.util.{Failure, Success, Try}
 // 26: copy gphoto2-java into the project and compile with the app
 // 27: revert copying gphoto2-java - my mistake, it is not needed but I had no better idea at midnight
 
-object CliApp extends IOApp with StrictLogging {
+object CliEttlApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
     val conf = new Conf(args)
     runApp(

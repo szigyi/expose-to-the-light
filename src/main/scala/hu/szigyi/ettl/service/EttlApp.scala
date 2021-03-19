@@ -1,7 +1,7 @@
 package hu.szigyi.ettl.service
 
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.app.CliApp.AppConfiguration
+import hu.szigyi.ettl.app.CliEttlApp.AppConfiguration
 import hu.szigyi.ettl.hal.{GCamera, GConfiguration, GFile}
 import hu.szigyi.ettl.model.Model.SettingsCameraModel
 import hu.szigyi.ettl.service.CameraHandler.{connectToCamera, takePhoto}
