@@ -1,4 +1,4 @@
-package hu.szigyi.ettl.v1.util
+package hu.szigyi.ettl.v2.model
 
 object ShutterSpeedMap {
   private val canonShutterSpeeds: Map[Double, String] = Map(
