@@ -5,26 +5,31 @@ import hu.szigyi.ettl.app.CliEttlApp.AppConfiguration
 import hu.szigyi.ettl.hal.{GCamera, GConfiguration, GFile}
 import hu.szigyi.ettl.model.Model.SettingsCameraModel
 import hu.szigyi.ettl.service.CameraHandler.{connectToCamera, takePhoto}
+import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.util.Timing.time
 
 import java.nio.file.Path
+import java.time.{Instant, ZoneId}
+import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.Duration
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
-class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler) extends StrictLogging {
+class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler, now: Instant) extends StrictLogging {
 
   def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
-      config     <- connectToCamera(camera)
-      imagePaths <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting))
-      _          <- config.close
+      sessionFolderName <- Try(nowToSessionId(now))
+      _                 <- createSessionFolder(sessionFolderName)
+      config            <- connectToCamera(camera, ShellKill.killGPhoto2Processes())
+      imagePaths        <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting, sessionFolderName))
+      _                 <- config.close
     } yield imagePaths
 
-  private def capture(camera: GCamera, config: GConfiguration, numberOfCaptures: Int, c: Option[SettingsCameraModel])(imageCount: Int): Try[Path] =
+  private def capture(camera: GCamera, config: GConfiguration, numberOfCaptures: Int, c: Option[SettingsCameraModel], sessionFolderName: String)(imageCount: Int): Try[Path] =
     for {
       _                 <- Try(c.map(adjustSettings(config, _, imageCount, numberOfCaptures)))
       imgFileOnCamera   <- capturePhoto(camera, imageCount, numberOfCaptures)
-      imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath)
+      imgPathOnComputer <- imgFileOnCamera.saveImageTo(appConfig.imageBasePath.resolve(sessionFolderName))
       _                 <- imgFileOnCamera.close
     } yield {
       logger.info(s"[$imageCount/$numberOfCaptures] Saved image: ${imgPathOnComputer.toString}")
@@ -50,12 +55,22 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
 
     logger.info(s"[$imageCount/$numberOfCaptures] Adjusting settings: [ss: ${c.shutterSpeedString}, i: ${c.iso}, a: ${c.aperture}]")
     val ss = c.shutterSpeedString.map(setSS)
-    val i = c.iso.map(setI)
-    val a = c.aperture.map(setA)
-    val tryChanges: Try[List[Unit]] = List(ss, i, a).flatten.sequence
-    tryChanges.flatMap(changes => {
+    val i  = c.iso.map(setI)
+    val a  = c.aperture.map(setA)
+    List(ss, i, a).flatten.sequence.flatMap(changes => {
       if (changes.nonEmpty) config.apply
       else Try(())
     })
   }
+
+  private def nowToSessionId(now: Instant): String =
+    DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").withZone(ZoneId.systemDefault()).format(now)
+
+  private def createSessionFolder(sessionFolderName: String): Try[Unit] =
+    appConfig.imageBasePath.resolve(sessionFolderName).toFile.mkdirs() match {
+      case true =>
+        Success(())
+      case false =>
+        Failure(new Exception(s"Could not create session folder: ${appConfig.imageBasePath.resolve(sessionFolderName).toAbsolutePath}"))
+    }
 }

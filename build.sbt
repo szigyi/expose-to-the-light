@@ -15,8 +15,7 @@ assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" 
 scalacOptions ++= Seq(
   "-Xfatal-warnings",
   "-deprecation",
-  "-unchecked",
-  "-language:implicitConversions"
+  "-unchecked"
 )
 
 libraryDependencies ++= Seq(
