@@ -5,7 +5,6 @@ import hu.szigyi.ettl.app.CliEttlApp.AppConfiguration
 import hu.szigyi.ettl.hal.{GCamera, GConfiguration, GFile}
 import hu.szigyi.ettl.model.Model.SettingsCameraModel
 import hu.szigyi.ettl.service.CameraHandler.{connectToCamera, takePhoto}
-import hu.szigyi.ettl.util.ShellKill
 import hu.szigyi.ettl.util.Timing.time
 
 import java.nio.file.Path
@@ -16,7 +15,7 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
 
   def execute(setting: Option[SettingsCameraModel], numberOfCaptures: Int, interval: Duration): Try[Seq[Path]] =
     for {
-      config     <- connectToCamera(camera, ShellKill.killGPhoto2Processes())
+      config     <- connectToCamera(camera)
       imagePaths <- scheduler.schedule(numberOfCaptures, interval, capture(camera, config, numberOfCaptures, setting))
       _          <- config.close
     } yield imagePaths
