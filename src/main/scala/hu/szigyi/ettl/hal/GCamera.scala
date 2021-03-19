@@ -1,6 +1,6 @@
-package hu.szigyi.ettl.v2.hal
+package hu.szigyi.ettl.hal
 
-import hu.szigyi.ettl.v2.hal.GFile.saveTo
+import GFile.saveTo
 import org.gphoto2.{CameraFileMod, CameraMod, CameraWidgets}
 
 import java.nio.file.Path

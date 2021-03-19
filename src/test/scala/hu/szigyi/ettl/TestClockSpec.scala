@@ -1,6 +1,6 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl
 
-import hu.szigyi.ettl.v2.TestClock.{AcceleratedClock, TickingClock}
+import TestClock.{AcceleratedClock, TickingClock}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import java.time.Instant.{parse => instant}

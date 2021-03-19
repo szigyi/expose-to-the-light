@@ -2,7 +2,7 @@ package org.gphoto2;
 
 
 import com.sun.jna.Pointer;
-import hu.szigyi.ettl.v2.hal.GFile;
+import hu.szigyi.ettl.hal.GFile;
 import org.gphoto2.jna.GPhoto2Native;
 import org.gphoto2.jna.GPhoto2Native.CameraFilePath;
 

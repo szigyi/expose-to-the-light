@@ -1,6 +1,6 @@
-package hu.szigyi.ettl.v2.util
+package hu.szigyi.ettl.util
 
-import hu.szigyi.ettl.v2.model.ShutterSpeedMap
+import hu.szigyi.ettl.model.ShutterSpeedMap
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 

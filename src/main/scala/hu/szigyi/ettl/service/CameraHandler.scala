@@ -1,7 +1,7 @@
-package hu.szigyi.ettl.v2.service
+package hu.szigyi.ettl.service
 
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.v2.hal.{GCamera, GConfiguration, GFile}
+import hu.szigyi.ettl.hal.{GCamera, GConfiguration, GFile}
 import org.gphoto2.GPhotoException
 
 import scala.util.{Failure, Try}

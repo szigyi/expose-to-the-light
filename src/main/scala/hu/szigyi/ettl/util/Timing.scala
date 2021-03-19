@@ -1,4 +1,4 @@
-package hu.szigyi.ettl.v2.util
+package hu.szigyi.ettl.util
 
 import com.typesafe.scalalogging.StrictLogging
 

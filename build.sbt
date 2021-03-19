@@ -10,7 +10,7 @@ scalaVersion := scalaMajorVersion + ".5"
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtocol(true)
 
-mainClass in assembly := Some("hu.szigyi.ettl.v2.app.CliApp")
+mainClass in assembly := Some("hu.szigyi.ettl.app.CliApp")
 assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
 scalacOptions += "-deprecation"

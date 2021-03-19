@@ -1,8 +1,8 @@
-package hu.szigyi.ettl.v2.service
+package hu.szigyi.ettl.service
 
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.v2.util.Timing.time
+import hu.szigyi.ettl.util.Timing.time
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit

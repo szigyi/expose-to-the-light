@@ -1,6 +1,6 @@
-package hu.szigyi.ettl.v2
+package hu.szigyi.ettl
 
-import hu.szigyi.ettl.v2.hal.GConfiguration
+import hu.szigyi.ettl.hal.GConfiguration
 
 import scala.util.Try
 

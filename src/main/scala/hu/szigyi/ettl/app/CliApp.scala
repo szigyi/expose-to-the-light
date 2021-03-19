@@ -1,10 +1,10 @@
-package hu.szigyi.ettl.v2.app
+package hu.szigyi.ettl.app
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.v2.hal.{DummyCamera, GCameraImpl}
-import hu.szigyi.ettl.v2.model.Model.SettingsCameraModel
-import hu.szigyi.ettl.v2.service.{EttlApp, SchedulerImpl}
+import hu.szigyi.ettl.hal.{DummyCamera, GCameraImpl}
+import hu.szigyi.ettl.model.Model.SettingsCameraModel
+import hu.szigyi.ettl.service.{EttlApp, SchedulerImpl}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 import java.nio.file.{Path, Paths}
