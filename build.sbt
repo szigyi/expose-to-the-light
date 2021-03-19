@@ -1,6 +1,5 @@
-
 def env(name: String): String = sys.env.getOrElse(name, "unknown")
-val buildNumber: String = env("BUILD_NUMBER")
+val buildNumber: String       = env("BUILD_NUMBER")
 
 name := "expose-to-the-light"
 organization := "hu.szigyi"
@@ -13,27 +12,19 @@ resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtoco
 mainClass in assembly := Some("hu.szigyi.ettl.app.CliEttlApp")
 assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
-scalacOptions += "-deprecation"
-
-val circeVersion  = "0.13.0"
-val http4sVersion = "0.21.0"
+scalacOptions ++= Seq(
+  "-Xfatal-warnings",
+  "-deprecation",
+  "-unchecked",
+  "-language:implicitConversions"
+)
 
 libraryDependencies ++= Seq(
-  "io.circe"                   %% "circe-generic"       % circeVersion,
-  "io.circe"                   %% "circe-parser"        % circeVersion,
-  "io.circe"                   %% "circe-literal"       % circeVersion,
-  "com.github.pureconfig"      %% "pureconfig"          % "0.14.1",
-  "org.rogach"                 %% "scallop"             % "4.0.2",
-
-  "org.gphoto"                 %  "gphoto2-java"        % "1.5",
-  "com.github.dorinp.reflux"   %% "reflux-generic"      % "0.0.14",
-
-  "org.http4s"                 %% "http4s-circe"        % http4sVersion,
-  "org.http4s"                 %% "http4s-dsl"          % http4sVersion,
-  "org.http4s"                 %% "http4s-blaze-server" % http4sVersion,
-
-  "ch.qos.logback"             %  "logback-classic"     % "1.2.3",
-  "com.typesafe.scala-logging" %% "scala-logging"       % "3.9.2",
-
-  "org.scalatest"              %% "scalatest"           % "3.2.5"  % Test
+  "ch.qos.logback"             % "logback-classic" % "1.2.3",
+  "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.2",
+  "com.github.pureconfig"      %% "pureconfig"     % "0.14.1",
+  "org.rogach"                 %% "scallop"        % "4.0.2",
+  "org.gphoto"                 % "gphoto2-java"    % "1.5",
+  "org.typelevel"              %% "cats-effect"    % "2.3.3",
+  "org.scalatest"              %% "scalatest"      % "3.2.5" % Test
 )
