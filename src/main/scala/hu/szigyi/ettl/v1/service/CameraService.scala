@@ -6,12 +6,12 @@ import cats.effect.IO
 import com.typesafe.scalalogging.StrictLogging
 import hu.szigyi.ettl.v1.service.CameraService.{CameraError, CapturedCameraModel, GenericCameraError, OfflineCamera, SettingsCameraModel, parseFractionDouble}
 import hu.szigyi.ettl.v1.util.{ShellKill, ShutterSpeedMap}
-import org.gphoto2.{Camera, CameraFile, CameraUtils, CameraWidgets, GPhotoException}
+import org.gphoto2.{CameraMod, CameraFileMod, CameraUtils, CameraWidgets, GPhotoException}
 
 import scala.util.{Failure, Try}
 
 class CameraService(clock: Clock) extends StrictLogging {
-  private val camera = new Camera()
+  private val camera = new CameraMod()
 
   def initialise(): Unit = {
     camera.initialize()
@@ -81,7 +81,7 @@ class CameraService(clock: Clock) extends StrictLogging {
       )
     })
 
-  def captureImage: IO[CameraFile] =
+  def captureImage: IO[CameraFileMod] =
     IO.fromTry(Try {
       val cameraFile = camera.captureImage()
       CameraUtils.closeQuietly(cameraFile)

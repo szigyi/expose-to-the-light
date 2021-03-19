@@ -1,7 +1,7 @@
 package hu.szigyi.ettl.v2.hal
 
 import hu.szigyi.ettl.v2.hal.GFile.saveTo
-import org.gphoto2.{CameraFile, Camera, CameraWidgets}
+import org.gphoto2.{CameraFileMod, CameraMod, CameraWidgets}
 
 import java.nio.file.Path
 import scala.util.Try
@@ -13,7 +13,7 @@ trait GCamera {
 }
 
 class GCameraImpl extends GCamera {
-  private val c = new Camera
+  private val c = new CameraMod
 
   override def initialize: Try[Unit] =
     Try(c.initialize())
@@ -63,7 +63,7 @@ object GFile {
     }
 }
 
-class GFileImpl(f: CameraFile) extends GFile {
+class GFileImpl(f: CameraFileMod) extends GFile {
   override def close: Try[Unit] =
     Try(f.close())
   override def saveImageTo(imageBasePath: Path): Try[Path] =

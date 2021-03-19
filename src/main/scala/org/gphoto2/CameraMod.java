@@ -23,21 +23,20 @@ import com.sun.jna.ptr.PointerByReference;
 import org.gphoto2.jna.GPhoto2Native;
 import org.gphoto2.jna.GPhoto2Native.CameraFilePath;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * Represents a camera. Thread-unsafe.
  * @author Martin Vysny
  */
-public class Camera implements Closeable {
+public class CameraMod extends Camera {
 
     final Pointer camera;
 
     /**
      * Creates a reference to the first connected camera.
      */
-    public Camera() {
+    public CameraMod() {
         final PointerByReference ref = new PointerByReference();
         CameraUtils.check(GPhoto2Native.INSTANCE.gp_camera_new(ref), "gp_camera_new");
         camera = ref.getValue();
@@ -98,10 +97,10 @@ public class Camera implements Closeable {
      * Captures a quick preview image on the camera.
      * @return camera file, never null. Must be closed afterwards.
      */
-    public CameraFile capturePreview() {
+    public CameraFileMod capturePreview() {
         checkNotClosed();
         boolean returnedOk = false;
-        final CameraFile cfile = new CameraFile();
+        final CameraFileMod cfile = new CameraFileMod();
         try {
             CameraUtils.check(GPhoto2Native.INSTANCE.gp_camera_capture_preview(camera, cfile.cf, CameraList.CONTEXT), "gp_camera_capture_preview");
             returnedOk = true;
@@ -126,11 +125,11 @@ public class Camera implements Closeable {
      * Captures a full-quality image image on the camera.
      * @return camera file, never null. Must be closed afterwards.
      */
-    public CameraFile captureImage() {
+    public CameraFileMod captureImage() {
         checkNotClosed();
         final CameraFilePath path = new CameraFilePath.ByReference();
         CameraUtils.check(GPhoto2Native.INSTANCE.gp_camera_capture(camera, GPhoto2Native.GP_CAPTURE_IMAGE, path, CameraList.CONTEXT), "gp_camera_capture");
-        final Path p = new Path(path);
+        final PathMod p = new PathMod(path);
         return p.newFile(camera);
     }
 

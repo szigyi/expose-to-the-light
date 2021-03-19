@@ -40,7 +40,7 @@ import scala.util.{Failure, Success, Try}
 // TODO 24: emergency shutdown: cancel the execution (cancel fs2 stream?)
 // TODO 25: make the install script download the ettl script as well not just the artifact
 // 26: copy gphoto2-java into the project and compile with the app
-// TODO 27: revert copying gphoto2-java - my mistake, it is not needed but I had no better idea at midnight
+// 27: revert copying gphoto2-java - my mistake, it is not needed but I had no better idea at midnight
 
 object CliApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
