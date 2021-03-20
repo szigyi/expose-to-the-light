@@ -9,9 +9,9 @@ replace_string() {
   sed -i '' -e "s/$placeholder/$ESCAPED_REPLACE/" "$file_name"
 }
 
-artifact_link="https://www.dropbox.com/s/9nzw7u4ku8mzt1y/expose-to-the-light_2.13-0.1.10.jar?dl=1"
-ettl_link="https://www.dropbox.com/s/cs7ozhei0seffz3/ettl?dl=1"
-artifact="expose-to-the-light_2.13-0.1.10.jar"
+artifact_link="https://www.dropbox.com/s/4scetka9x040jtp/expose-to-the-light_2.13-0.1.11.jar?dl=1"
+ettl_link="https://www.dropbox.com/s/ocwg664en5bb0ie/ettl?dl=1"
+artifact="expose-to-the-light_2.13-0.1.11.jar"
 
 echo "Creating app folder at /usr/local/opt/ettl"
 mkdir -p /usr/local/opt/ettl
@@ -39,7 +39,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
   echo "Installing dependencies"
 #  sudo apt install gphoto2
-#  source
+  source ~/.bashrc
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   echo "Detected OS is macOS"

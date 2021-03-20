@@ -15,7 +15,7 @@ delete_file() {
   curl https://api.dropboxapi.com/2/files/delete_v2 \
       --header "Authorization: Bearer $token" \
       --header "Content-Type: application/json" \
-      --data "{\"path\": \"$destination\"}"
+      --data "{\"path\": \"$destination\"}" | jq -r '.path_lower'
 }
 
 upload_artifact() {
