@@ -14,7 +14,8 @@ ettl_link="https://www.dropbox.com/s/oeuwrwmrrgw7fzz/ettl?dl=1"
 artifact="expose-to-the-light_2.13-0.1.11.jar"
 
 echo "Creating app folder at /usr/local/opt/ettl"
-mkdir -p /usr/local/opt/ettl
+sudo mkdir -p /usr/local/opt/ettl
+sudo chown -R pi /usr/local/opt/ettl
 cd /usr/local/opt/ettl
 
 echo "Downloading artifact to /usr/local/opt/ettl..."
@@ -22,6 +23,8 @@ curl -L -o "$artifact" "$artifact_link"
 
 echo "Downloading ettl script to /usr/local/opt/ettl..."
 curl -L -o "ettl" "$ettl_link"
+
+sudo chmod u+x ettl
 
 echo "Artifact's Manifest file:"
 jar xf "$artifact" META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
@@ -35,10 +38,11 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Detected OS is Linux"
   echo "Installing ettl command to /usr/local/bin"
   cd /usr/local/bin
-  ln -fs /usr/local/opt/ettl/ettl ettl
+  sudo ln -fs /usr/local/opt/ettl/ettl ettl
+  sudo chown -R pi /usr/local/bin/ettl
 
   echo "Installing dependencies"
-#  sudo apt install gphoto2
+  #  sudo apt install gphoto2
   source ~/.bashrc
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -48,7 +52,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
   echo "Installing ettl command to /usr/local/bin"
   cd /usr/local/bin
-  ln -fs /usr/local/opt/ettl/ettl ettl
+  sudo ln -fs /usr/local/opt/ettl/ettl ettl
 
   echo "Installing dependencies"
   brew install gphoto2
@@ -56,8 +60,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
   source "$ZSH"/oh-my-zsh.sh
 
-elif [[ "$OSTYPE" == "freebsd"* ]]; then
-  echo "freebsd"
 else
   echo "big problemo! No OSTYPE"
 fi
