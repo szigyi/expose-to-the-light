@@ -16,6 +16,9 @@ artifact="expose-to-the-light_2.13-0.1.10.jar"
 echo "Downloading artifact..."
 curl -L -o "$artifact" "$artifact_link"
 
+echo "Downloading ettl script..."
+curl -L -o "ettl" "$ettl_link"
+
 echo "Artifact's Manifest file:"
 jar xf "$artifact" META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
 
@@ -29,7 +32,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   cp "$artifact" /usr/local/opt/ettl
   cp ettl /usr/local/opt/ettl
   rm "$artifact"
-#  rm ettl
+  rm ettl
 
   cd /usr/local/opt/ettl
   replace_string "artif=.*" "artif=\"/usr/local/opt/ettl/$artifact\"" "ettl"
