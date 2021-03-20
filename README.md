@@ -12,13 +12,14 @@ The install script downloads the latest jar and script files and then setup them
 
 ### Install runtime dependencies // TODO verify these steps
 #### On Mac Os
-
+* java 11
 [comment]: <> (* `brew install pkg-config`)
 * `brew install gphoto2`
 * `brew install libgphoto2`
 [comment]: <> (* `brew install gnuplot`)
 
 #### On Raspberry Pi (unix)
+* java 11
 * `sudo apt install pkg-config`
 * `sudo apt install gphoto2`
 * `sudo apt install gnuplot`

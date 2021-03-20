@@ -12,7 +12,13 @@ resolvers += ("baka.sk" at "http://www.baka.sk/maven2").withAllowInsecureProtoco
 mainClass in assembly := Some("hu.szigyi.ettl.app.CliEttlApp")
 assemblyJarName in assembly := "expose-to-the-light_" + scalaMajorVersion + "-" + version.value + ".jar"
 
+javacOptions ++= Seq(
+  "-source", "11",
+  "-target", "11"
+)
+
 scalacOptions ++= Seq(
+  "-target:11",
   "-Xfatal-warnings",
   "-deprecation",
   "-unchecked"
