@@ -42,7 +42,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   sudo chown -R pi /usr/local/bin/ettl
 
   echo "Installing dependencies"
-  #  sudo apt install gphoto2
+  # https://github.com/gonzalo/gphoto2-updater
+  # sudo wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh && chmod +x gphoto2-updater.sh && sudo ./gphoto2-updater.sh
   source ~/.bashrc
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then

@@ -1,7 +1,7 @@
 # expose-to-the-light
 
-## Install application on Raspberry Pi
-### Download install script
+## Install application
+### Download installer
 `curl -L -o install.sh https://www.dropbox.com/s/c1mm6l07hfo2kdd/install.sh?dl=1`
 
 ### Install
