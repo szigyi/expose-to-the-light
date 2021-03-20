@@ -2,7 +2,7 @@
 
 ## Install application on Raspberry Pi
 ### Download install script
-`wget https://www.dropbox.com/s/fd88r1lybiscjgb/install.sh?dl=1`
+install_link=`https://www.dropbox.com/s/89ga46kounyazb4/install.sh?dl=1`
 
 ### Install
 `./install.sh`
