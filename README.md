@@ -5,7 +5,8 @@
 `curl -L -o install.sh https://www.dropbox.com/s/2nx6m6y26qbzklj/install.sh?dl=1`
 
 ### Install
-`./install.sh`
+* `chmod u+x install.sh`
+* `./install.sh`
 
 The install script downloads the latest jar and script files and then setup them to your PATH so you can use it later as any other unix command.
 
