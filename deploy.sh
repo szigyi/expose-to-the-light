@@ -111,7 +111,7 @@ echo "$install_link"
 
 echo ""
 echo "Updating README to show the link of $version version..."
-replace_string "install_link=.*" "install_link=\`$install_link\`" "README.md"
+replace_string "\`curl -L -o install.sh .*" "\`curl -L -o install.sh $install_link\`" "README.md"
 
 echo ""
 echo "$version is deployed"
