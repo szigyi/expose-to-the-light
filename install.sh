@@ -9,11 +9,11 @@ replace_string() {
   sed -i '' -e "s/$placeholder/$ESCAPED_REPLACE/" "$file_name"
 }
 
-shared_link="https://www.dropbox.com/s/6pljren6kg73xol/expose-to-the-light_2.13-0.1.10.jar?dl=1"
+artifact_link="https://www.dropbox.com/s/582hbss7t6448oy/expose-to-the-light_2.13-0.1.10.jar?dl=1"
 artifact="expose-to-the-light_2.13-0.1.10.jar"
 
 echo "Downloading artifact..."
-curl -L -o "$artifact" "$shared_link"
+curl -L -o "$artifact" "$artifact_link"
 
 echo "Artifact's Manifest file:"
 jar xf "$artifact" META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
