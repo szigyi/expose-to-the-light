@@ -80,7 +80,7 @@ object CliEttlApp extends IOApp with StrictLogging {
         logger.info(s"App finished")
         Success(imagePaths)
       case Left(exception) =>
-        logger.error(s"App failed", exception)
+        logger.error(s"App failed: ${exception.getMessage}")
         Failure(exception)
     }
   }

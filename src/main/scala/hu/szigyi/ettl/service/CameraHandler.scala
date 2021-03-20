@@ -17,6 +17,9 @@ object CameraHandler extends StrictLogging {
         logger.warn("Executing shell kill and retry connecting to the camera...")
         shellKill
         initialiseCamera(camera)
+      case e: GPhotoException if e.result == -105 =>
+        logger.error("gphoto2 does not recognise your device. *Is it turned on? *Is the USB cable connected? *Is it in PTP mode? Turn off Wifi in the camera for example.")
+        Failure(e)
       case unrecoverableException =>
         Failure(unrecoverableException)
     }
