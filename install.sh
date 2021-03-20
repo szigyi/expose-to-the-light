@@ -9,8 +9,8 @@ replace_string() {
   sed -i '' -e "s/$placeholder/$ESCAPED_REPLACE/" "$file_name"
 }
 
-artifact_link="https://www.dropbox.com/s/4scetka9x040jtp/expose-to-the-light_2.13-0.1.11.jar?dl=1"
-ettl_link="https://www.dropbox.com/s/ocwg664en5bb0ie/ettl?dl=1"
+artifact_link="https://www.dropbox.com/s/2pkj4ahou5gs4bv/expose-to-the-light_2.13-0.1.11.jar?dl=1"
+ettl_link="https://www.dropbox.com/s/oeuwrwmrrgw7fzz/ettl?dl=1"
 artifact="expose-to-the-light_2.13-0.1.11.jar"
 
 echo "Creating app folder at /usr/local/opt/ettl"

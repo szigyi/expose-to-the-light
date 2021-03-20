@@ -2,7 +2,7 @@
 
 ## Install application on Raspberry Pi
 ### Download install script
-`curl -L -o install.sh https://www.dropbox.com/s/46qr79y746dw6vf/install.sh?dl=1`
+`curl -L -o install.sh https://www.dropbox.com/s/2nx6m6y26qbzklj/install.sh?dl=1`
 
 ### Install
 `./install.sh`
