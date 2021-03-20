@@ -9,7 +9,7 @@ import org.gphoto2.jna.GPhoto2Native.CameraFilePath;
 /**
  * Represents a path of a camera file.
  */
-public class PathMod {
+public class Path {
 
     public final String filename;
     public final String path;
@@ -20,12 +20,12 @@ public class PathMod {
      * @param filename the file name, without the path, gphoto-dependent. See {@link CameraFilePath} for details.
      * @param path     the path, gphoto-dependent.
      */
-    public PathMod(String filename, String path) {
+    public Path(String filename, String path) {
         this.filename = filename;
         this.path = path;
     }
 
-    public PathMod(CameraFilePath path) {
+    public Path(CameraFilePath path) {
         this.filename = CameraUtils.toString(path.name);
         this.path = CameraUtils.toString(path.folder);
     }
@@ -45,9 +45,9 @@ public class PathMod {
      * @param cam the camera handle.
      * @return camera file.
      */
-    CameraFileMod newFile(Pointer cam) {
+    CameraFile newFile(Pointer cam) {
         boolean returnedOk = false;
-        final CameraFileMod cf = new CameraFileMod(this);
+        final CameraFile cf = new CameraFile(this);
         try {
             // use instead of filename when https://github.com/gphoto/gphoto2/issues/48 is solved
             String jpgName = GFile.rawFileNameToJpg(this.filename); // Use it later when gphoto2 can read images when photo was taken with RAW+JPG mode
