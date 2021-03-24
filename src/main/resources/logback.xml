@@ -28,9 +28,9 @@
     <logger name="org.http4s.server.blaze" level="info"/>
     <logger name="org.http4s.blaze.channel" level="warn"/>
     <logger name="org.http4s.blaze.pipeline" level="error"/>
-    <logger name="hu.szigyi.ettl" level="debug"/>
+    <logger name="hu.szigyi.ettl" level="${LOG_LEVEL:-INFO}"/>
 
-    <root level="INFO">
+    <root level="${LOG_LEVEL:-INFO}">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="StartupRollingFile"/>
     </root>
