@@ -12,14 +12,14 @@ The install script downloads the latest jar and script files and then setup them
 
 ### Install runtime dependencies // TODO verify these steps
 #### On Mac Os
-* java 11
+* `brew cask install java11` [https://medium.com/macoclock/using-homebrew-to-install-java-jdk11-on-macos-44b30f497b38]
 [comment]: <> (* `brew install pkg-config`)
 * `brew install gphoto2`
 * `brew install libgphoto2`
 [comment]: <> (* `brew install gnuplot`)
 
 #### On Raspberry Pi (unix)
-* java 11
+* `sudo apt-get install openjdk-11-jdk`
 * `sudo apt install pkg-config`
 * `sudo apt install gphoto2`
 * `sudo apt install gnuplot`

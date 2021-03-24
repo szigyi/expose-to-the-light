@@ -42,8 +42,20 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   sudo chown -R pi /usr/local/bin/ettl
 
   echo "Installing dependencies"
-  # https://github.com/gonzalo/gphoto2-updater
-  # sudo wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh && chmod +x gphoto2-updater.sh && sudo ./gphoto2-updater.sh
+  if ! command -v java $> /dev/null
+  then
+    echo "java is missing, therefore installing java 11"
+    sudo apt-get -y install openjdk-11-jdk
+  fi
+  if ! command -v gphoto2 $> /dev/null
+  then
+    echo "gphoto2 is missing, therefore installing gphoto2"
+    # https://github.com/gonzalo/gphoto2-updater
+#    sudo wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh && chmod +x gphoto2-updater.sh && sudo ./gphoto2-updater.sh
+    sudo apt -y install gphoto2
+    sudo apt -y install libgphoto2-6
+  fi
+
   source ~/.bashrc
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then

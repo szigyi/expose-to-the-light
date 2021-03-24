@@ -21,7 +21,7 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
     val elapsed = Duration(now.toEpochMilli - lastCaptureTime.toEpochMilli, TimeUnit.MILLISECONDS)
     logger.trace(s"Waiting: ${lastCaptureTime.plusMillis(interval.toMillis)} - remaining: ${interval.minus(elapsed).toMillis} milliseconds")
     if (elapsed >= interval) {
-      capture // Can it cause problem? There is no explicit apply!
+      capture
     } else {
       logger.trace("feeling sleepy...")
       Thread.sleep(awakingFrequency.toMillis)
