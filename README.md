@@ -2,7 +2,7 @@
 
 ## Install application
 ### Download installer
-`curl -L -o install.sh https://www.dropbox.com/s/nvbg4ynlml5h421/install.sh?dl=1`
+`curl -L -o install.sh https://www.dropbox.com/s/edtm7wnh02gsuvt/install.sh?dl=1`
 
 ### Install
 * `chmod u+x install.sh`
