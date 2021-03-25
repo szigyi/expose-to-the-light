@@ -19,7 +19,7 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
   override def scheduleOne[T](nextTimeShouldStartAt: Instant, capture: => T): T = {
     val now = Instant.now(clock)
     val elapsed = Duration(nextTimeShouldStartAt.toEpochMilli - now.toEpochMilli, TimeUnit.MILLISECONDS)
-    logger.info(s"Waiting $elapsed -> Next: ${instantToLocalTime(nextTimeShouldStartAt)} - Now: ${instantToLocalTime(now)}")
+    logger.trace(s"Waiting $elapsed -> Next: ${instantToLocalTime(nextTimeShouldStartAt)} - Now: ${instantToLocalTime(now)}")
     if (elapsed.toMillis <= 0) {
       capture
     } else {
@@ -31,10 +31,13 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
 
   override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] = {
     val start = Instant.now(clock)
-    logger.trace(s"Schedule starts: $start")
+    logger.debug(s"Schedule starts: $start")
     (0 until numberOfTasks).toList.traverse {
       case 0 =>
-        time(s"[1/$numberOfTasks] Schedule took", task(1))
+        time(s"[1/$numberOfTasks] First Schedule took", {
+          logger.trace(s"First task starts: ${Instant.now(clock)}")
+          task(1)
+        })
       case index =>
         val nextTimeShouldStartAt = start.plusMillis(interval.toMillis * index)
         val imageCount = index + 1
