@@ -4,23 +4,51 @@ import hu.szigyi.ettl.testing.TestClock.AcceleratedClock
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
-import java.time.Instant
+import java.time.{Clock, Instant, ZoneId}
 import java.time.Instant.{parse => instant}
 import scala.concurrent.duration._
 import scala.util.Try
 
 class SchedulerImplSpec extends AnyFreeSpec with Matchers {
 
-  "execute task with perfect timing" in {
+  "execute the task immediately when task's next scheduled time is now" in {
     val realtimeTick = 1.millisecond
     val acceleratedTick = 100.millisecond
     val clock = AcceleratedClock("2021-02-19T13:00:00Z", realtimeTick, acceleratedTick)
     val scheduler = new SchedulerImpl(clock, 100.milliseconds)
-    val interval = 1.seconds
     def capture: Instant = clock.instant()
 
-    val result = scheduler.scheduleOne[Instant](instant("2021-02-19T13:00:00Z"), interval, capture)
+    val result = scheduler.scheduleOne[Instant](instant("2021-02-19T13:00:00Z"), capture)
 
+    // +100 millis when starting the schedule as the TickingClock is implemented
+    // +100 millis when running the test method, capture to get the instant
+    result.toString shouldBe "2021-02-19T13:00:00.200Z"
+  }
+
+  "execute the task immediately when the task's next scheduled time is in the past" in {
+    val realtimeTick = 1.millisecond
+    val acceleratedTick = 100.millisecond
+    val clock = AcceleratedClock("2021-02-19T13:00:00Z", realtimeTick, acceleratedTick)
+    val scheduler = new SchedulerImpl(clock, 100.milliseconds)
+    def capture: Instant = clock.instant()
+
+    val result = scheduler.scheduleOne[Instant](instant("2021-02-19T12:00:00Z"), capture)
+
+    // +100 millis when starting the schedule as the TickingClock is implemented
+    // +100 millis when running the test method, capture to get the instant
+    result.toString shouldBe "2021-02-19T13:00:00.200Z"
+  }
+
+  "execute the task at the time when the task's next scheduled time is in the future" in {
+    val realtimeTick = 1.millisecond
+    val acceleratedTick = 100.millisecond
+    val clock = AcceleratedClock("2021-02-19T13:00:00Z", realtimeTick, acceleratedTick)
+    val scheduler = new SchedulerImpl(clock, 100.milliseconds)
+    def capture: Instant = clock.instant()
+
+    val result = scheduler.scheduleOne[Instant](instant("2021-02-19T13:00:01.00Z"), capture)
+
+    // +100 millis when running the test method, capture to get the instant
     result.toString shouldBe "2021-02-19T13:00:01.100Z"
   }
 

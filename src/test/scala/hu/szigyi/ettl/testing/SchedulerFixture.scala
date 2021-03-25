@@ -11,7 +11,7 @@ import scala.util.Try
 object SchedulerFixture {
 
   def immediateScheduler: Scheduler = new Scheduler {
-    override def scheduleOne[T](lastCaptureTime: Instant, interval: Duration, capture: => T): T =
+    override def scheduleOne[T](lastCaptureTime: Instant, capture: => T): T =
       capture
 
     override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] =
