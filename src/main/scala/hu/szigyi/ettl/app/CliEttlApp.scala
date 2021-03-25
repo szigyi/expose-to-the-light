@@ -34,12 +34,11 @@ import scala.util.{Failure, Success, Try}
 // 19: do not rename image file names, leave as original
 // 20: remove unnecessary info from logs
 // 21: store files of one session in a dedicated timestamped directory
-// TODO 22: make script that installs the app and make it runnable from commandline to macOS and debian
+// 22: make script that installs the app and make it runnable from commandline to macOS and debian
 // TODO 23: can provide camera's settings for every capture (evaluated at the time of capture if it is possible)
 // TODO 24: emergency shutdown: cancel the execution (cancel fs2 stream?)
-// TODO 25: make the install script download the ettl script as well not just the artifact
+// 25: make the install script download the ettl script as well not just the artifact
 // 26: copy gphoto2-java into the project and compile with the app
-// 27: revert copying gphoto2-java - my mistake, it is not needed but I had no better idea at midnight
 
 object CliEttlApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
