@@ -10,7 +10,7 @@ class DirectoryService {
       case true =>
         Success(())
       case false =>
-        Failure(new Exception(s"Could not create folder: ${folderPath}"))
+        Failure(new Exception(s"Could not create folder: $folderPath"))
     }
 
 }

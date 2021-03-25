@@ -65,12 +65,4 @@ class EttlApp(appConfig: AppConfiguration, camera: GCamera, scheduler: Scheduler
 
   private def nowToSessionId(now: Instant): String =
     DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").withZone(ZoneId.systemDefault()).format(now)
-
-  private def createSessionFolder(sessionFolderName: String): Try[Unit] =
-    appConfig.imageBasePath.resolve(sessionFolderName).toFile.mkdirs() match {
-      case true =>
-        Success(())
-      case false =>
-        Failure(new Exception(s"Could not create session folder: ${appConfig.imageBasePath.resolve(sessionFolderName).toAbsolutePath}"))
-    }
 }
