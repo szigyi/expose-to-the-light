@@ -30,13 +30,14 @@ class SchedulerImpl(clock: Clock, awakingFrequency: Duration) extends Scheduler 
   }
 
   override def schedule[T](numberOfTasks: Int, interval: Duration, task: Int => Try[T]): Try[Seq[T]] = {
-    val start = Instant.now(clock)
-    logger.info(s"Schedule starts: $start")
+    var start: Instant = null
+    logger.trace(s"Scheduling $numberOfTasks tasks")
     (0 until numberOfTasks).toList.traverse {
       case 0 =>
-        logger.trace(s"Preparing the First task: ${Instant.now(clock)}")
+        logger.trace(s"Preparing for the First task: ${Instant.now(clock)}")
         time(s"[1/$numberOfTasks] First Schedule took", {
-          logger.trace(s"First task starts: ${Instant.now(clock)}")
+          start = Instant.now(clock)
+          logger.info(s"Schedule starts: $start")
           task(1)
         })
       case index =>
