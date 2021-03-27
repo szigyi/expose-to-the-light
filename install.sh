@@ -36,6 +36,9 @@ replace_string "artif=.*" "artif=\"/usr/local/opt/ettl/$artifact\"" "ettl"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Detected OS is Linux"
+  echo "Updating apt"
+  sudo apt-get -y update
+
   echo "Installing ettl command to /usr/local/bin"
   cd /usr/local/bin
   sudo ln -fs /usr/local/opt/ettl/ettl ettl
