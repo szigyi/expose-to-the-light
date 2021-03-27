@@ -4,7 +4,7 @@
 
 ### Download installer
 
-`curl -L -o install.sh https://www.dropbox.com/s/ihzbfz6f5kkp6z8/install.sh?dl=1`
+`curl -L -o install.sh https://www.dropbox.com/s/5ze0beswoeoxfxl/install.sh?dl=1`
 
 ### Install
 
