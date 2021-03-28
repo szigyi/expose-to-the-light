@@ -11,5 +11,5 @@ export JDK_JAVA_OPTIONS=$vm_options
 
 shift 2
 
-echo "Starting application..."
+echo "Starting ettl application..."
 java -jar "$artif" "$@"
