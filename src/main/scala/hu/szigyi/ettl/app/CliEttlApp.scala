@@ -39,6 +39,8 @@ import scala.util.{Failure, Success, Try}
 // TODO 24: emergency shutdown: cancel the execution (cancel fs2 stream?)
 // 25: make the install script download the ettl script as well not just the artifact
 // 26: copy gphoto2-java into the project and compile with the app
+// TODO 27: try to use `gphoto2 --capture-image-and-download --keep-raw` feature to not download the entire RAW and speed up the process, shrinking needed time between captures
+// TODO 28: create baseline how much time needed between image capturing
 
 object CliEttlApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
