@@ -10,6 +10,7 @@ trait GCamera {
   def initialize: Try[Unit]
   def newConfiguration: Try[GConfiguration]
   def captureImage: Try[GFile]
+  def close(): Try[Unit]
 }
 
 class GCameraImpl extends GCamera {
@@ -23,6 +24,9 @@ class GCameraImpl extends GCamera {
 
   override def captureImage: Try[GFile] =
     Try(c.captureImage()).map(new GFileImpl(_))
+
+  override def close(): Try[Unit] =
+    Try(c.close())
 }
 
 trait GConfiguration {

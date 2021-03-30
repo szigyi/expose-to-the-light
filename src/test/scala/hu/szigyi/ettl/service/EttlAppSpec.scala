@@ -52,10 +52,9 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
         val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), new GCamera {
           override def initialize: Try[Unit] =
             Failure(new GPhotoException("gp_camera_init failed with GP_ERROR_MODEL_NOT_FOUND #-105: Unknown model", -105))
-
           override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
-
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
         }, immediateScheduler, new DirectoryService {
           override def createFolder(folderPath: Path): Try[Unit] = Try(())
         }, instant("2021-03-19T19:00:00Z")).execute(None, 1, 10.millisecond)
@@ -69,6 +68,7 @@ class EttlAppSpec extends AnyFreeSpec with Matchers {
           override def initialize: Try[Unit] = throw new UnsupportedOperationException()
           override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
         }
         val result = new EttlApp(AppConfiguration(Paths.get("/"), "CR2"), camera, immediateScheduler, new DirectoryService {
           override def createFolder(folderPath: Path): Try[Unit] = Failure(new Exception("cannot create folder, sorry bro"))

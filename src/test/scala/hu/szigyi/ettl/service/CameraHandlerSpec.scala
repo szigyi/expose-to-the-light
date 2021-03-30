@@ -21,6 +21,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
           override def initialize: Try[Unit] = Try(())
           override def newConfiguration: Try[GConfiguration] = config
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -35,6 +36,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
           override def initialize: Try[Unit] = Failure(new GPhotoException("bad", -105))
           override def newConfiguration: Try[GConfiguration] = capturedConfiguration
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Failure[_]]
@@ -55,6 +57,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
             }
           override def newConfiguration: Try[GConfiguration] = capturedConfiguration
           override def captureImage: Try[GFile] = throw new UnsupportedOperationException()
+          override def close: Try[Unit] = throw new UnsupportedOperationException()
         }, { retried = true })
 
         handler shouldBe a[Success[_]]
@@ -72,6 +75,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
           override def close: Try[Unit] = throw new UnsupportedOperationException()
           override def saveImageTo(imageBasePath: Path): Try[Path] = throw new UnsupportedOperationException()
         })
+        override def close: Try[Unit] = throw new UnsupportedOperationException()
       })
 
       cameraFile shouldBe a[Success[_]]
@@ -82,6 +86,7 @@ class CameraHandlerSpec extends AnyFreeSpec with Matchers {
         override def initialize: Try[Unit] = throw new UnsupportedOperationException()
         override def newConfiguration: Try[GConfiguration] = throw new UnsupportedOperationException()
         override def captureImage: Try[GFile] = Failure(new GPhotoException("cannot take photo", -999))
+        override def close: Try[Unit] = throw new UnsupportedOperationException()
       })
 
       cameraFile shouldBe a[Failure[_]]

@@ -1,8 +1,8 @@
 package hu.szigyi.ettl.app
 
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ExitCase, ExitCode, IO, IOApp}
 import com.typesafe.scalalogging.StrictLogging
-import hu.szigyi.ettl.hal.{DummyCamera, GCameraImpl}
+import hu.szigyi.ettl.hal.{DummyCamera, GCamera, GCameraImpl}
 import hu.szigyi.ettl.model.Model.SettingsCameraModel
 import hu.szigyi.ettl.service.{DirectoryService, EttlApp, SchedulerImpl}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
@@ -36,7 +36,7 @@ import scala.util.{Failure, Success, Try}
 // 21: store files of one session in a dedicated timestamped directory
 // 22: make script that installs the app and make it runnable from commandline to macOS and debian
 // TODO 23: can provide camera's settings for every capture (evaluated at the time of capture if it is possible)
-// TODO 24: emergency shutdown: cancel the execution (cancel fs2 stream?)
+// 24: emergency shutdown: cancel the execution (cancel fs2 stream?) -- IOApp receives SIGABORT and SIGINT
 // 25: make the install script download the ettl script as well not just the artifact
 // 26: copy gphoto2-java into the project and compile with the app
 // TODO 27: try to use `gphoto2 --capture-image-and-download --keep-raw` feature to not download the entire RAW and speed up the process, shrinking needed time between captures
@@ -44,29 +44,50 @@ import scala.util.{Failure, Success, Try}
 
 object CliEttlApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
-    val conf = new Conf(args)
-    runApp(
-      conf.dummyCamera.apply(),
-      conf.imagesBasePath.apply(),
-      conf.setSettings.apply(),
-      conf.numberOfCaptures.apply(),
-      conf.intervalSeconds.apply(),
-      conf.rawFileExtension.apply()
-    ).as(ExitCode.Success)
+    val conf             = new Conf(args)
+    val isDummyCamera    = conf.dummyCamera.apply()
+    val camera           = if (isDummyCamera) new DummyCamera else new GCameraImpl
+    val rawFileExtension = if (isDummyCamera) "JPG" else conf.rawFileExtension.apply()
+    IO.suspend {
+        runApp(
+          isDummyCamera,
+          camera,
+          conf.imagesBasePath.apply(),
+          conf.setSettings.apply(),
+          conf.numberOfCaptures.apply(),
+          conf.intervalSeconds.apply(),
+          rawFileExtension
+        ).as(ExitCode.Success)
+      }
+      .guaranteeCase {
+        case ExitCase.Completed =>
+          logger.info(s"App finished")
+          IO.fromTry(camera.close())
+        case ExitCase.Error(e) =>
+          logger.error(s"App failed: ${e.getMessage}")
+          IO.fromTry(camera.close())
+        case ExitCase.Canceled =>
+          logger.error(s"App is cancelled")
+          IO.fromTry(camera.close())
+      }
   }
 
-  private def runApp(dummyCamera: Boolean, basePath: String, setSettings: Boolean, numberOfCaptures: Int, intervalSeconds: Double, rawFileExtension: String): IO[Try[Seq[Path]]] = {
+  private def runApp(dummyCamera: Boolean,
+                     camera: GCamera,
+                     basePath: String,
+                     setSettings: Boolean,
+                     numberOfCaptures: Int,
+                     intervalSeconds: Double,
+                     rawFileExtension: String): IO[Seq[Path]] = {
     val clock                     = Clock.systemDefaultZone()
-    val appConfig                 = AppConfiguration(Paths.get(basePath), if (dummyCamera) "JPG" else rawFileExtension)
+    val appConfig                 = AppConfiguration(Paths.get(basePath), rawFileExtension)
     val schedulerAwakingFrequency = 100.milliseconds
     val setting                   = if (setSettings) Some(SettingsCameraModel(Some(1d / 100d), Some(400), Some(2.8))) else None
     val interval                  = Duration(intervalSeconds, TimeUnit.SECONDS)
 
     val scheduler = new SchedulerImpl(clock, schedulerAwakingFrequency)
     val dir       = new DirectoryService
-    val ettl =
-      if (dummyCamera) new EttlApp(appConfig, new DummyCamera, scheduler, dir, clock.instant())
-      else new EttlApp(appConfig, new GCameraImpl, scheduler, dir, clock.instant())
+    val ettl      = new EttlApp(appConfig, camera, scheduler, dir, clock.instant())
 
     logger.info(s"             Clock: $clock")
     logger.info(s"      Dummy Camera: $dummyCamera")
@@ -76,14 +97,7 @@ object CliEttlApp extends IOApp with StrictLogging {
     logger.info(s"          Interval: $interval")
     logger.info(s"Raw File Extension: $rawFileExtension")
 
-    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval)).attempt.map {
-      case Right(imagePaths) =>
-        logger.info(s"App finished")
-        Success(imagePaths)
-      case Left(exception) =>
-        logger.error(s"App failed: ${exception.getMessage}")
-        Failure(exception)
-    }
+    IO.fromTry(ettl.execute(setting, numberOfCaptures, interval))
   }
 
   class Conf(args: Seq[String]) extends ScallopConf(args) {
