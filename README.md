@@ -3,7 +3,6 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FRLU958RSV3KY)
 
 ![Scala CI](https://github.com/szigyi/expose-to-the-light/actions/workflows/scala.yml/badge.svg)
-![Publish to Maven Central](https://github.com/szigyi/expose-to-the-light/actions/workflows/publish.yml/badge.svg)
 
 ## Install application
 
