@@ -2,6 +2,9 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FRLU958RSV3KY)
 
+![Scala CI](https://github.com/szigyi/expose-to-the-light/actions/workflows/scala.yml/badge.svg)
+![Publish to Maven Central](https://github.com/szigyi/expose-to-the-light/actions/workflows/publish.yml/badge.svg)
+
 ## Install application
 
 ### Download installer
@@ -13,7 +16,7 @@
 * `chmod u+x install.sh`
 * `./install.sh`
 
-The install script downloads the latest jar and script files and then setup them to your PATH so you can use it later as any other unix command.
+The `install.sh` script downloads the latest jar and script files and then setup them to your PATH so you can use it later as any other unix command.
 
 ### Runtime dependencies if you are not using the installer
 
