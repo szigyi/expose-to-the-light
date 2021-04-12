@@ -41,6 +41,10 @@ import scala.util.{Failure, Success, Try}
 // 26: copy gphoto2-java into the project and compile with the app
 // TODO 27: try to use `gphoto2 --capture-image-and-download --keep-raw` feature to not download the entire RAW and speed up the process, shrinking needed time between captures
 // TODO 28: create baseline how much time needed between image capturing
+// TODO 29: add description, project's goal to README
+// TODO 30: lists the main features of the app in README
+// TODO 31: link a video that showcases the features in README
+// TODO 32: lists cameras that the app was tested/used with
 
 object CliEttlApp extends IOApp with StrictLogging {
   override def run(args: List[String]): IO[ExitCode] = {
