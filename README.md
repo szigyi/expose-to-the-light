@@ -4,6 +4,10 @@
 
 ![Scala CI](https://github.com/szigyi/expose-to-the-light/actions/workflows/scala.yml/badge.svg)
 
+## Tasks & Issues
+- Sony A7S can only take one picture and then fails with `gp_camera_capture failed with GP_ERROR_IO #-7: I/O problem`
+- Update Readme with Sony A7S specific setup: Use PC Remote option to let the computer connect to the camera
+
 ## Install application
 
 ### Download installer
